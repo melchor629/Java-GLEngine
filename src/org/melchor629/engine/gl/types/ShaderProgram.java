@@ -23,6 +23,7 @@ public class ShaderProgram {
     protected int vertexShader, fragmentShader, geometryShader, shaderProgram;
     protected HashMap<String, Integer> uniforms;
     protected Attrib[] attribs;
+    protected boolean linked = false;
 
     /**
      * Create a Shader program from files, and checks for errors
@@ -80,20 +81,44 @@ public class ShaderProgram {
         shaderCheckForErrors(fragmentShader);
 
         shaderProgram = createProgram();
-        programCheckForErrors();
-        
-        bind();
-        fetchUniforms();
-        fetchAttribs();
-        unbind();
     }
 
+    /**
+     * Bind the Shader Program.<br>
+     * If the program was not linked, it will link it.
+     */
     public final void bind() {
+        if(!linked) {
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            if(geometryShader != -1)
+                gl.attachShader(shaderProgram, geometryShader);
+            gl.linkProgram(shaderProgram);
+            programCheckForErrors();
+            fetchUniforms();
+            fetchAttribs();
+            linked = true;
+        }
         gl.useProgram(shaderProgram);
     }
 
+    /**
+     * Unbind the program
+     */
     public final void unbind() {
         gl.useProgram(0);
+    }
+
+    /**
+     * Explicitly specifies the binding of the user-defined varying out variable {@code attrib}
+     * to fragment shader color number {@code colorNumber} for program program.
+     * {@code colorNumber} must be less than GL_MAX_DRAW_BUFFERS. This have to be called before
+     * link the shaders (done on the first {@link #bind()} call), or no effect will have.
+     * @param attrib The name of the user-defined varying out variable whose binding to modify
+     * @param colorNumber The color number to bind the user-defined varying out variable to
+     */
+    public void setColorOutput(String attrib, int colorNumber) {
+        gl.bindFragDataLocation(shaderProgram, colorNumber, attrib);
     }
 
     /**
@@ -109,7 +134,19 @@ public class ShaderProgram {
                 gl.enableVertexAttribArray(loc);
         }
         fetchAttribs();
-        unbind();
+    }
+
+    /**
+     * Explicitly specifies the binding of the user-defined varying out variable {@code attrib}
+     * to fragment shader color number {@code colorNumber} for program program.
+     * {@code colorNumber} must be less than GL_MAX_DRAW_BUFFERS. This have to be called before
+     * link the shaders (done on the first {@link #bind()} call), or no effect will have.
+     * Shortcut for {@link #setColorOutput(java.lang.String, int)}.
+     * @param attrib The name of the user-defined varying out variable whose binding to modify
+     * @param colorNumber The color number to bind the user-defined varying out variable to
+     */
+    public void bindFragDataLocation(String attrib, int colorNumber) {
+        setColorOutput(attrib, colorNumber);
     }
 
     /**
@@ -151,46 +188,104 @@ public class ShaderProgram {
         }
     }
 
+    /**
+     * Sets the value for a int or a sampler type uniform
+     * @param name Name of the uniform
+     * @param v0 Value to be set
+     */
     public void setUniform(String name, int v0) {
         bind();
         gl.uniform1i(uniforms.get(name), v0);
     }
 
+    /**
+     * Sets the value for a ivec2 uniform
+     * @param name Name of the uniform
+     * @param v0 1st Value to be set
+     * @param v1 2nd Value to be set
+     */
     public void setUniform(String name, int v0, int v1) {
         bind();
         gl.uniform2i(uniforms.get(name), v0, v1);
     }
 
+    /**
+     * Sets the value for a ivec3 uniform
+     * @param name Name of the uniform
+     * @param v0 1st Value to be set
+     * @param v1 2nd Value to be set
+     * @param v2 3rd Value to be set
+     */
     public void setUniform(String name, int v0, int v1, int v2) {
         bind();
         gl.uniform3i(uniforms.get(name), v0, v1, v2);
     }
 
+    /**
+     * Sets the value for a ivec4 uniform
+     * @param name Name of the uniform
+     * @param v0 1st value to be set
+     * @param v1 2nd value to be set
+     * @param v2 3rd value to be set
+     * @param v3 4th value to be set
+     */
     public void setUniform(String name, int v0, int v1, int v2, int v3) {
         bind();
         gl.uniform4i(uniforms.get(name), v0, v1, v2, v3);
     }
 
+    /**
+     * Sets the value for a float uniform
+     * @param name Name of the uniform
+     * @param v0 Value to be set
+     */
     public void setUniform(String name, float v0) {
         bind();
         gl.uniform1f(uniforms.get(name), v0);
     }
 
+    /**
+     * Sets the value for a vec2 uniform
+     * @param name Name of the uniform
+     * @param v0 1st value to be set
+     * @param v1 2nd value to be set
+     */
     public void setUniform(String name, float v0, float v1) {
         bind();
         gl.uniform2f(uniforms.get(name), v0, v1);
     }
 
+    /**
+     * Sets the value for a vec3 uniform
+     * @param name Name of the uniform
+     * @param v0 1st value to be set
+     * @param v1 2nd value to be set
+     * @param v2 3rd value to be set
+     */
     public void setUniform(String name, float v0, float v1, float v2) {
         bind();
         gl.uniform3f(uniforms.get(name), v0, v1, v2);
     }
 
+    /**
+     * Sets the value for a vec4 uniform
+     * @param name Name of the uniform
+     * @param v0 1st value to be set
+     * @param v1 2nd value to be set
+     * @param v2 3rd value to be set
+     * @param v3 4th value to be set
+     */
     public void setUniform(String name, float v0, float v1, float v2, float v3) {
         bind();
         gl.uniform4f(uniforms.get(name), v0, v1, v2, v3);
     }
 
+    //TODO hacer para mat2 y mat3
+    /**
+     * Sets the value for a mat4 uniform
+     * @param name Name of the uniform
+     * @param matrix Matrix with the values to be set
+     */
     public void setUniformMatrix(String name, mat4 matrix) {
         bind();
         gl.uniformMatrix4(uniforms.get(name), false, GLM.matrixAsArray(matrix));
@@ -243,11 +338,6 @@ public class ShaderProgram {
      */
     protected final int createProgram() {
         int program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        if(geometryShader != -1)
-            gl.attachShader(program, geometryShader);
-        gl.linkProgram(program);
         return program;
     }
 

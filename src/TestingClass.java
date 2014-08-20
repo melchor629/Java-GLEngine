@@ -97,16 +97,16 @@ public final class TestingClass {
         gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
         gl.setVsync(true);
         gl.setResizable(true);
-        
+
         VAO vao = new VAO();
         vao.bind();
-        
+
         BufferObject ebo = new BufferObject(BufferTarget.ELEMENT_ARRAY_BUFFER, BufferUsage.STATIC_DRAW);
         ebo.fillBuffer(new int[] {
                 0, 1, 2,
                 2, 3, 0
         });
-        
+
         BufferObject vbo = new BufferObject(BufferTarget.ARRAY_BUFFER, BufferUsage.STATIC_DRAW);
         vbo.fillBuffer(new float[] {
               //Position           | Color           | Texcoords
@@ -162,8 +162,9 @@ public final class TestingClass {
         });
 
         ShaderProgram shader = new ShaderProgram(vertex_shader, fragment_shader);
-        shader.enableAttribs("position", "color", "texcoord");
+        shader.setColorOutput("outColor", 0);
         shader.bind();
+        shader.enableAttribs("position", "color", "texcoord");
         shader.vertexAttribPointer("position", 3, type.FLOAT, false, 8 * 4, 0);
         shader.vertexAttribPointer("color", 3, type.FLOAT, false, 8 * 4, 3 * 4);
         shader.vertexAttribPointer("texcoord", 2, type.FLOAT, false, 8 * 4, 6 * 4);
@@ -200,13 +201,9 @@ public final class TestingClass {
         perro = new Texture.builder().setFile(img).build();
         
         shader.bind();
-        gl.setActiveTexture(0);
-        gato.bind();
-        gl.setActiveTexture(1);
-        perro.bind();
         shader.setUniform("kitten", 0);
         shader.setUniform("puppy", 1);
-        
+
         mat4 proj = perspective(45d, 1280d / 720d, 1d, 10d);
         mat4 view = lookAt(new vec3(2.2f, 2.2f, 2.2f), new vec3(), new vec3(0, 0, 1));
         mat4 rotate;
@@ -214,7 +211,7 @@ public final class TestingClass {
         int x = 0;
         shader.setUniformMatrix("view", view);
         shader.setUniformMatrix("proj", proj);
-        
+
         t.update();
         while(!gl.windowIsClosing()) {
             fbo.bind();
@@ -234,9 +231,9 @@ public final class TestingClass {
             rotate = rotateMatrix((float) (2 * Math.PI * x / ((float) t.fps * 4)), new vec3(0, 0, 1));
             shader.setUniform("time", time * time);
             shader.setUniformMatrix("model", rotate);
-            
+
             gl.drawArrays(DrawMode.TRIANGLES, 0, 36);
-            
+
             gl.enable(GLEnable.STENCIL_TEST);
                 gl.stencilFunc(StencilFunc.ALWAYS, 1, 0xFF);
                 gl.stencilOp(StencilOp.KEEP, StencilOp.KEEP, StencilOp.REPLACE);
@@ -244,7 +241,7 @@ public final class TestingClass {
                 gl.depthMask(false);
                 gl.clear(Renderer.STENCIL_BUFFER_BIT);
                 gl.drawArrays(DrawMode.TRIANGLES, 36, 6);
-                
+
                 gl.stencilFunc(StencilFunc.EQUAL, 1, 0xFF);
                 gl.stencilMask(0x00);
                 gl.depthMask(true);
@@ -256,22 +253,21 @@ public final class TestingClass {
                 gl.drawArrays(DrawMode.TRIANGLES, 0, 36);
                 shader.setUniform("overrideColor", 1.0f, 1.0f, 1.0f);
             gl.disable(GLEnable.STENCIL_TEST);
-            
+
             fbo.unbind();
             vaoQuad.bind();
             gl.disable(GLEnable.DEPTH_TEST);
             shaderQuad.bind();
             gl.setActiveTexture(0);
             texColor.bind();
-            
+
             gl.drawArrays(DrawMode.TRIANGLES, 0, 6);
-            
+
             t.update();
             gl._game_loop_sync(60);
         }
-        System.out.printf("Media de FPS: %.2f; Total de fotogramas: %d", (double) t.totalFrames / 60d, t.totalFrames);
-        
-        
+        System.out.printf("Tiempo: %.2fs\nTotal de fotogramas: %d", (double) t.totalFrames / 60d, t.totalFrames);
+
         vao.delete();
         ebo.delete();
         vbo.delete();

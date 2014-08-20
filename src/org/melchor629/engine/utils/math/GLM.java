@@ -587,7 +587,7 @@ public class GLM {
         int i = 0;
         for(int x = 0; x < 4; x++)
             for(int y = 0; y < 4; y++)
-                array[i] = mat.matrix[x][y];
+                array[i++] = mat.matrix[x][y];
         return array;
     }
 }

@@ -76,7 +76,7 @@ public class IOUtils {
         int[] pixels = new int[bi.getWidth() * bi.getHeight()];
         boolean alpha = bi.getColorModel().hasAlpha();
         int channels = alpha ? 4 : 3;
-        //ByteBuffer buffer = BufferUtils.createByteBuffer(bi.getWidth() * bi.getHeight() * channels);
+        bi.getRGB(0, 0, bi.getWidth(), bi.getHeight(), pixels, 0, bi.getWidth());
         byte[] buffer = new byte[bi.getWidth() * bi.getHeight() * channels];
         int i = 0;
 
@@ -84,11 +84,6 @@ public class IOUtils {
             for(int x = 0; x < bi.getWidth(); x++) {
                 int pos = y * bi.getHeight() + x;
                 int pixel = pixels[pos];
-                /*buffer.put((byte) ((pixel >> 16) & 0xFF));
-                buffer.put((byte) ((pixel >> 8) & 0xFF));
-                buffer.put((byte) (pixel & 0xFF));
-                if(alpha)
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));*/
                 buffer[i++] = (byte) ((pixel >> 16) & 0xFF);
                 buffer[i++] = (byte) ((pixel >> 8) & 0xFF);
                 buffer[i++] = (byte) (pixel & 0xFF);
@@ -97,7 +92,7 @@ public class IOUtils {
             }
         }
         Image img = new Image();
-        img.buffer = buffer;//(ByteBuffer) buffer;
+        img.buffer = buffer;
         img.width = bi.getWidth();
         img.height = bi.getHeight();
         img.channels = channels;

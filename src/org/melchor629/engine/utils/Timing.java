@@ -20,17 +20,22 @@ public class Timing {
         return (Sys.getTime() * 1000L) / Sys.getTimerResolution();
     }
 
+    public Timing() {
+        time = getTime() + 100; //Porque si xD
+    }
+
     /**
      * Use this at the end of every draw. Used for update FPS stats
      */
     public void update() {
-        if (getTime() - time >= 1000) {
+        long tt = getTime();
+        if (tt - time >= 1000) {
             fps = FPS;
             FPS = 0;
             time += 1000;
         }
         FPS++;
         totalFrames++;
-        frameTime = getTime() - frameTime;
+        frameTime = tt - frameTime;
     }
 }
