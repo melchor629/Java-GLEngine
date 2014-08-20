@@ -12,11 +12,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
-
-import org.lwjgl.BufferUtils;
 
 /**
  * I/O Utils for reading & writing data from all type of streams
@@ -79,21 +76,28 @@ public class IOUtils {
         int[] pixels = new int[bi.getWidth() * bi.getHeight()];
         boolean alpha = bi.getColorModel().hasAlpha();
         int channels = alpha ? 4 : 3;
-        ByteBuffer buffer = BufferUtils.createByteBuffer(bi.getWidth() * bi.getHeight() * channels);
+        //ByteBuffer buffer = BufferUtils.createByteBuffer(bi.getWidth() * bi.getHeight() * channels);
+        byte[] buffer = new byte[bi.getWidth() * bi.getHeight() * channels];
+        int i = 0;
 
         for(int y = 0; y < bi.getHeight(); y++) {
             for(int x = 0; x < bi.getWidth(); x++) {
                 int pos = y * bi.getHeight() + x;
                 int pixel = pixels[pos];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));
+                /*buffer.put((byte) ((pixel >> 16) & 0xFF));
                 buffer.put((byte) ((pixel >> 8) & 0xFF));
                 buffer.put((byte) (pixel & 0xFF));
                 if(alpha)
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));
+                    buffer.put((byte) ((pixel >> 24) & 0xFF));*/
+                buffer[i++] = (byte) ((pixel >> 16) & 0xFF);
+                buffer[i++] = (byte) ((pixel >> 8) & 0xFF);
+                buffer[i++] = (byte) (pixel & 0xFF);
+                if(alpha)
+                    buffer[i++] = ((byte) ((pixel >> 24) & 0xFF));
             }
         }
         Image img = new Image();
-        img.buffer = (ByteBuffer) buffer.compact().flip();
+        img.buffer = buffer;//(ByteBuffer) buffer;
         img.width = bi.getWidth();
         img.height = bi.getHeight();
         img.channels = channels;
@@ -200,7 +204,7 @@ public class IOUtils {
      * @author melchor9000
      */
     public static final class Image {
-        public ByteBuffer buffer;
+        public byte[] buffer;
         public int width, height;
         public int channels;
         public boolean alpha;

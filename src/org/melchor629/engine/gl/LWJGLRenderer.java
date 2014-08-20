@@ -476,11 +476,11 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#setActiveTexture(short)
+     * @see org.melchor629.engine.gl.Renderer#setActiveTexture(int)
      */
     @Override
-    public void setActiveTexture(short num) {
-        glActiveTexture(num);
+    public void setActiveTexture(int num) {
+        glActiveTexture(GL_TEXTURE0 + num);
     }
 
     /* (non-Javadoc)
@@ -538,15 +538,6 @@ public class LWJGLRenderer implements Renderer {
     @Override
     public void bindTexture(TextureTarget target, int tex) {
         glBindTexture(target.e, tex);
-    }
-
-
-    /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#activeTexture(int)
-     */
-    @Override
-    public void activeTexture(int num) {
-        glActiveTexture(num);
     }
 
     /* (non-Javadoc)
@@ -851,7 +842,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void bindRenderbuffer(int framebuffer) {
-        glBindRenderbuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, framebuffer);
     }
 
     /* (non-Javadoc)

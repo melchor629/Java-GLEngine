@@ -663,14 +663,13 @@ public interface Renderer {
     //void uniformMatrix4(int loc, mat4 matrix); TODO
 
     //Texturas
-    void setActiveTexture(short num);
+    void setActiveTexture(int i);
     short getMaxTextureUnits();
     int genTexture();
     void genTextures(int[] texs);
     void deleteTexture(int tex);
     void deleteTextures(int[] texs);
     void bindTexture(TextureTarget target, int tex);
-    void activeTexture(int num);
     void texParameteri(TextureTarget target, TextureParameter pName, int param);
     void texParameteri(TextureTarget target, TextureParameter pName, TextureWrap p);
     void texParameteri(TextureTarget target, TextureParameter pName, TextureFilter p);

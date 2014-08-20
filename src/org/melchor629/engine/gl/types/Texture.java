@@ -59,7 +59,8 @@ public class Texture {
         gl.texParameteri(target, TextureParameter.WRAP_S, wrap_s);
         gl.texParameteri(target, TextureParameter.WRAP_T, wrap_t);
         
-        java.nio.ByteBuffer buffer = null;
+        //java.nio.ByteBuffer buffer = null;
+        byte[] buffer = null;
         if(file != null) {
             IOUtils.Image image = IOUtils.readImage(file);
             width = image.width;
@@ -67,7 +68,7 @@ public class Texture {
             efmt = image.alpha ? TextureExternalFormat.RGBA : TextureExternalFormat.RGB;
             buffer = image.buffer;
         }
-        gl.texImage2D(target, 0, ifmt, width, height, 0, efmt, Renderer.type.UNSIGNED_BYTE, buffer.array()); //TODO Determinar 1D, 2D, 3D
+        gl.texImage2D(target, 0, ifmt, width, height, 0, efmt, Renderer.type.UNSIGNED_BYTE, buffer); //TODO Determinar 1D, 2D, 3D
         //TODO Mipmaps
         gl.bindTexture(target, 0);
     }
@@ -153,24 +154,27 @@ public class Texture {
          * Set a file for load a texture
          * @param file the file to set
          */
-        public void setFile(File file) {
+        public builder setFile(File file) {
             this.file = file;
+            return this;
         }
 
         /**
          * Sets the magnifier filter for the texture
          * @param mag the filter to set
          */
-        public void setMag(Renderer.TextureFilter mag) {
+        public builder setMag(Renderer.TextureFilter mag) {
             this.mag = mag;
+            return this;
         }
 
         /**
          * Set the minifier filter for the texture
          * @param min the filter to set
          */
-        public void setMin(Renderer.TextureFilter min) {
+        public builder setMin(Renderer.TextureFilter min) {
             this.min = min;
+            return this;
         }
 
         /**
@@ -178,8 +182,9 @@ public class Texture {
          * right borders.
          * @param wrap_s the wrap method to set
          */
-        public void setWrap_s(Renderer.TextureWrap wrap_s) {
+        public builder setWrap_s(Renderer.TextureWrap wrap_s) {
             this.wrap_s = wrap_s;
+            return this;
         }
 
         /**
@@ -187,16 +192,18 @@ public class Texture {
          * bottom borders.
          * @param wrap_t the wrap method to set
          */
-        public void setWrap_t(Renderer.TextureWrap wrap_t) {
+        public builder setWrap_t(Renderer.TextureWrap wrap_t) {
             this.wrap_t = wrap_t;
+            return this;
         }
 
         /**
          * Set the format of the image internally.
          * @param ifmt the format to set
          */
-        public void setIfmt(Renderer.TextureFormat ifmt) {
+        public builder setIfmt(Renderer.TextureFormat ifmt) {
             this.ifmt = ifmt;
+            return this;
         }
 
         /**
@@ -204,32 +211,36 @@ public class Texture {
          * this function if you load a texture from disk.
          * @param efmt the format to set
          */
-        public void setEfmt(Renderer.TextureExternalFormat efmt) {
+        public builder setEfmt(Renderer.TextureExternalFormat efmt) {
             this.efmt = efmt;
+            return this;
         }
 
         /**
          * Set whether the GPU will generate MipMaps or not.
          * @param mipmap the mipmap to set
          */
-        public void setMipmap(boolean mipmap) {
+        public builder setMipmap(boolean mipmap) {
             this.mipmap = mipmap;
+            return this;
         }
 
         /**
          * The width of the image, not needed for texture loading.
          * @param width the width to set
          */
-        public void setWidth(int width) {
+        public builder setWidth(int width) {
             this.width = width;
+            return this;
         }
 
         /**
          * The height of the image, not needed for texture loading.
          * @param height the height to set
          */
-        public void setHeight(int height) {
+        public builder setHeight(int height) {
             this.height = height;
+            return this;
         }
 
         public builder setTarget(Renderer.TextureTarget target) {

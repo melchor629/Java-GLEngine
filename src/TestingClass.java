@@ -1,9 +1,15 @@
+import java.io.File;
+import java.io.IOException;
+
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.gl.Renderer.BufferTarget;
 import org.melchor629.engine.gl.Renderer.BufferUsage;
 import org.melchor629.engine.gl.Renderer.DrawMode;
 import org.melchor629.engine.gl.Renderer.GLEnable;
+import org.melchor629.engine.gl.Renderer.StencilFunc;
+import org.melchor629.engine.gl.Renderer.StencilOp;
 import org.melchor629.engine.gl.Renderer.TextureExternalFormat;
 import org.melchor629.engine.gl.Renderer.TextureFormat;
 import org.melchor629.engine.gl.Renderer.type;
@@ -13,6 +19,11 @@ import org.melchor629.engine.gl.types.Renderbuffer;
 import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.gl.types.Texture;
 import org.melchor629.engine.gl.types.VAO;
+import org.melchor629.engine.utils.Timing;
+import org.melchor629.engine.utils.math.mat4;
+import org.melchor629.engine.utils.math.vec3;
+
+import static org.melchor629.engine.utils.math.GLM.*;
 
 public final class TestingClass {
 
@@ -80,8 +91,9 @@ public final class TestingClass {
             + "    blur();"
             + "}\n";
 
-    public static void main(String[] args) {
-        Renderer gl = new LWJGLRenderer();
+    public static void main(String[] args) throws IOException {
+        Renderer gl = Game.gl = new LWJGLRenderer();
+        Timing t = new Timing();
         gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
         gl.setVsync(true);
         gl.setResizable(true);
@@ -180,35 +192,84 @@ public final class TestingClass {
         fbo.attachDepthStencilRenderbuffer(rbo);
         fbo.attachColorTexture(texColor, 0);
         fbo.unbind();
+
+        File img = new File("/Users/melchor9000/Dropbox/Conpartido equisdé/sample.png");
+        Texture gato, perro;
+        gato = new Texture.builder().setFile(img).build();
+        img = new File("/Users/melchor9000/Dropbox/Conpartido equisdé/sample2.png");
+        perro = new Texture.builder().setFile(img).build();
         
+        shader.bind();
+        gl.setActiveTexture(0);
+        gato.bind();
+        gl.setActiveTexture(1);
+        perro.bind();
+        shader.setUniform("kitten", 0);
+        shader.setUniform("puppy", 1);
+        
+        mat4 proj = perspective(45d, 1280d / 720d, 1d, 10d);
+        mat4 view = lookAt(new vec3(2.2f, 2.2f, 2.2f), new vec3(), new vec3(0, 0, 1));
+        mat4 rotate;
+        float time;
+        int x = 0;
+        shader.setUniformMatrix("view", view);
+        shader.setUniformMatrix("proj", proj);
+        
+        t.update();
         while(!gl.windowIsClosing()) {
             fbo.bind();
             vao.bind();
             gl.enable(GLEnable.DEPTH_TEST);
             shader.bind();
             
-            //Textures TODO
+            gl.setActiveTexture(0);
+            gato.bind();
+            gl.setActiveTexture(1);
+            perro.bind();
             
             gl.clearColor(1, 1, 1, 1);
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
+
+            time = (float) Math.sin(2 * Math.PI * x++ / ((float) t.fps * 4));
+            rotate = rotateMatrix((float) (2 * Math.PI * x / ((float) t.fps * 4)), new vec3(0, 0, 1));
+            shader.setUniform("time", time * time);
+            shader.setUniformMatrix("model", rotate);
             
             gl.drawArrays(DrawMode.TRIANGLES, 0, 36);
             
             gl.enable(GLEnable.STENCIL_TEST);
-                //TODO
+                gl.stencilFunc(StencilFunc.ALWAYS, 1, 0xFF);
+                gl.stencilOp(StencilOp.KEEP, StencilOp.KEEP, StencilOp.REPLACE);
+                gl.stencilMask(0xFF);
+                gl.depthMask(false);
+                gl.clear(Renderer.STENCIL_BUFFER_BIT);
+                gl.drawArrays(DrawMode.TRIANGLES, 36, 6);
+                
+                gl.stencilFunc(StencilFunc.EQUAL, 1, 0xFF);
+                gl.stencilMask(0x00);
+                gl.depthMask(true);
+
+                rotate = translateMatrix(rotate, new vec3(0, 0, -1));
+                rotate = scaleMatrix(rotate, new vec3(1, 1, -1));
+                shader.setUniformMatrix("model", rotate);
+                shader.setUniform("overrideColor", 0.3f, 0.3f, 0.3f);
+                gl.drawArrays(DrawMode.TRIANGLES, 0, 36);
+                shader.setUniform("overrideColor", 1.0f, 1.0f, 1.0f);
             gl.disable(GLEnable.STENCIL_TEST);
             
             fbo.unbind();
             vaoQuad.bind();
             gl.disable(GLEnable.DEPTH_TEST);
             shaderQuad.bind();
-            gl.activeTexture(0);
+            gl.setActiveTexture(0);
             texColor.bind();
             
             gl.drawArrays(DrawMode.TRIANGLES, 0, 6);
             
+            t.update();
             gl._game_loop_sync(60);
         }
+        System.out.printf("Media de FPS: %.2f; Total de fotogramas: %d", (double) t.totalFrames / 60d, t.totalFrames);
         
         
         vao.delete();

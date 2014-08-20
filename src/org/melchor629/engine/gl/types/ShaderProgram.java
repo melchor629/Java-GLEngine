@@ -8,6 +8,8 @@ import java.util.HashMap;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.utils.IOUtils;
+import org.melchor629.engine.utils.math.GLM;
+import org.melchor629.engine.utils.math.mat4;
 
 import static org.melchor629.engine.Game.gl;
 
@@ -77,7 +79,7 @@ public class ShaderProgram {
         shaderCheckForErrors(vertexShader);
         shaderCheckForErrors(fragmentShader);
 
-        createProgram();
+        shaderProgram = createProgram();
         programCheckForErrors();
         
         bind();
@@ -127,6 +129,9 @@ public class ShaderProgram {
         gl.vertexAttribPointer(loc, type, t, norm, stride, offset);
     }
 
+    /**
+     * Delete the shader program.
+     */
     public void delete() {
         if(vertexShader != -1) {
             gl.deleteShader(vertexShader);
@@ -144,6 +149,51 @@ public class ShaderProgram {
             gl.deleteProgram(shaderProgram);
             shaderProgram = -1;
         }
+    }
+
+    public void setUniform(String name, int v0) {
+        bind();
+        gl.uniform1i(uniforms.get(name), v0);
+    }
+
+    public void setUniform(String name, int v0, int v1) {
+        bind();
+        gl.uniform2i(uniforms.get(name), v0, v1);
+    }
+
+    public void setUniform(String name, int v0, int v1, int v2) {
+        bind();
+        gl.uniform3i(uniforms.get(name), v0, v1, v2);
+    }
+
+    public void setUniform(String name, int v0, int v1, int v2, int v3) {
+        bind();
+        gl.uniform4i(uniforms.get(name), v0, v1, v2, v3);
+    }
+
+    public void setUniform(String name, float v0) {
+        bind();
+        gl.uniform1f(uniforms.get(name), v0);
+    }
+
+    public void setUniform(String name, float v0, float v1) {
+        bind();
+        gl.uniform2f(uniforms.get(name), v0, v1);
+    }
+
+    public void setUniform(String name, float v0, float v1, float v2) {
+        bind();
+        gl.uniform3f(uniforms.get(name), v0, v1, v2);
+    }
+
+    public void setUniform(String name, float v0, float v1, float v2, float v3) {
+        bind();
+        gl.uniform4f(uniforms.get(name), v0, v1, v2, v3);
+    }
+
+    public void setUniformMatrix(String name, mat4 matrix) {
+        bind();
+        gl.uniformMatrix4(uniforms.get(name), false, GLM.matrixAsArray(matrix));
     }
 
     @Override
