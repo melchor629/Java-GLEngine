@@ -90,7 +90,28 @@ public interface AL {
         Format(int t) { e = t; }
     }
 
+    enum DistanceModel {
+        INVERSE_DISTANCE (0xD001),
+        INVERSE_DISTANCE_CLAMPED (0xD002),
+        LINEAR_DISTANCE (0xD003),
+        LINEAR_DISTANCE_CLAMPED (0xD004),
+        EXPONENT_DISTANCE (0xD005),
+        EXPONENT_DISTANCE_CLAMPED (0xD006),
+        NONE (0x0);
+
+        final int e;
+        DistanceModel(int t) { e = t; }
+    }
+
+    /**
+     * Create a context with OpenAL 1.1 (if is not possible, then 1.0)
+     */
     void createContext();
+
+    /**
+     * Deletes the context for this thread
+     */
+    void deleteContext();
     //TODO Dispositivos
 
     /**
@@ -102,7 +123,7 @@ public interface AL {
      * @param data Array with the data
      * @param freq Frequency of the sound
      */
-    void alBufferData(int buffer, Format format, byte[] data, int freq);
+    void bufferData(int buffer, Format format, byte[] data, int freq);
 
     /**
      * This function fills a buffer with audio data. All the pre-defined formats are
@@ -113,7 +134,7 @@ public interface AL {
      * @param data Array with the data
      * @param freq Frequency of the sound
      */
-    void alBufferData(int buffer, Format format, short[] data, int freq);
+    void bufferData(int buffer, Format format, short[] data, int freq);
 
     /**
      * This function fills a buffer with audio data. All the pre-defined formats are
@@ -124,7 +145,7 @@ public interface AL {
      * @param data Array with the data
      * @param freq Frequency of the sound
      */
-    void alBufferData(int buffer, Format format, int[] data, int freq);
+    void bufferData(int buffer, Format format, int[] data, int freq);
     
     /**
      * This function deletes one buffer, freeing the resources used
@@ -133,7 +154,7 @@ public interface AL {
      * for information on how to detach a buffer from a source.
      * @param buffer Buffer to be deleted
      */
-    void alDeleteBuffer(int buffer);
+    void deleteBuffer(int buffer);
     
     /**
      * This function deletes one or more buffers, freeing the resources used
@@ -142,49 +163,121 @@ public interface AL {
      * for information on how to detach a buffer from a source.
      * @param buffers Array with references to buffers to be deleted
      */
-    void alDeleteBuffers(int[] buffers);
+    void deleteBuffers(int[] buffers);
 
     /**
      * This function deletes one source.
      * @param source Source reference to be deleted
      */
-    void alDeleteSource(int source);
+    void deleteSource(int source);
 
     /**
      * This function deletes one or more sources.
-     * @param sources array with all source references to be deleted
+     * @param sources array with l source references to be deleted
      */
-    void alDeleteSources(int[] sources);
-    void alDisable(int cap);
-    void alDistanceModel(int value);
-    void alDopplerFactor(float factor);
-    void alDopplerVelocity(float speed);
-    void alEnable(int cap);
+    void deleteSources(int[] sources);
+    void disable(int cap);
+
+    /**
+     * This function selects the OpenAL distance model. Values are:
+     * <ul>
+     *   <li>INVERSE_DISTANCE</li>
+     *   <li>INVERSE_DISTANCE_CLAMPED</li>
+     *   <li>LINEAR_DISTANCE</li>
+     *   <li>LINEAR_DISTANCE_CLAMPED</li>
+     *   <li>EXPONENT_DISTANCE</li>
+     *   <li>EXPONENT_DISTANCE_CLAMPED</li>
+     *   <li>AL_NONE</li>
+     * </ul>
+     * You can find them on {@link AL.DistanceModel} enum. Default value is
+     * INVERSE_DISTANCE_CLAMPED.<br>
+     * The <i>INVERSE_DISTANCE</i> model works according to the following formula:
+     * <pre>
+     * ￼gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE +
+     *         AL_ROLLOFF_FACTOR *
+     *         (distance – AL_REFERENCE_DISTANCE));
+     * </pre><br>
+     * The <i>INVERSE_DISTANCE_CLAMPED</i> model works according to the following formula:
+     * <pre>
+     *  distance = max(distance, AL_REFERENCE_DISTANCE);
+     *  distance = min(distance, AL_MAX_DISTANCE);
+     *  gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE +
+     *         AL_ROLLOFF_FACTOR * (distance - AL_REFERENCE_DISTANCE));
+     * </pre><br>
+     * The <i>LINEAR DISTANCE</i> model works according to the following formula:
+     * <pre>
+     *  distance = min(distance, AL_MAX_DISTANCE);
+     *  gain = (1 - AL_ROLLOFF_FACTOR * (distance -
+     *          AL_REFERENCE_DISTANCE) / 
+     *          (AL_MAX_DISTANCE - AL_REFERENCE_DISTANCE));
+     * </pre><br>
+     * The <i>LINEAR_DISTANCE_CLAMPED</i> model works according to the following formula:
+     * <pre>
+     *  distance = max(distance, AL_REFERENCE_DISTANCE);
+     *  distance = min(distance, AL_MAX_DISTANCE);
+     *  gain = (1 - AL_ROLLOFF_FACTOR * (distance -
+     *          AL_REFERENCE_DISTANCE) /
+     *          (AL_MAX_DISTANCE - AL_REFERENCE_DISTANCE));
+     * </pre><br>
+     * The <i>EXPONENT_DISTANCE</i> model works according to the following formula:
+     * <pre>
+     *  gain = (distance / AL_REFERENCE_DISTANCE) ^ (-AL_ROLLOFF_FACTOR);
+     * </pre><br>
+     * The <i>EXPONENT_DISTANCE_CLAMPED</i> model works according to the following formula:
+     * <pre>
+     *  distance = max(distance, AL_REFERENCE_DISTANCE);
+     *  distance = min(distance, AL_MAX_DISTANCE);
+     *  gain = (distance / AL_REFERENCE_DISTANCE) ^ (-AL_ROLLOFF_FACTOR);
+     * </pre><br>
+     * The <i>NONE</i> model works according to the following formula:
+     * <pre>  gain = 1;</pre><br>
+     * @param value Distance model to be set
+     */
+    void distanceModel(DistanceModel value);
+
+    /**
+     * Selects the OpenAL Doppler Factor
+     * @param factor the Doppler scale value to set
+     * @see <a href="http://en.wikipedia.org/wiki/Doppler_effect">Doppler effect on Wikipedia</a>
+     */
+    void dopplerFactor(float factor);
+
+    /**
+     * Sets the speed of the sound for calculate Doppler effect.
+     * Use {@link #alSpeedOfSound(float)} instead. This function has marked as
+     * deprecated because the function name makes some confusion.
+     * @deprecated for OpenAL 1.1
+     * @param speed Speed of the medium
+     * @see <a href="http://en.wikipedia.org/wiki/Doppler_effect">Doppler effect on Wikipedia</a>
+     */
+    @Deprecated
+    void dopplerVelocity(float speed);
+    void enable(int cap);
 
     /**
      * This function generates one buffer, which contain audio data.
      * @return Reference to the buffer
      */
-    int alGenBuffer();
+    int genBuffer();
 
     /**
      * This function generates one or more buffers, which contain audio data.
      * @param buffers Int array where will be references to buffers
      */
-    void alGenBuffers(int[] buffers);
+    void genBuffers(int[] buffers);
 
     /**
      * This function generates one source
      * @return Reference to the source
      */
-    int alGenSource();
+    int genSource();
 
     /**
      * This function generates one or more sources
      * @param sources array which will store the references of new sources
      */
-    void alGenSources(int[] sources);
-    boolean alGetBoolean(Get g);
+    void genSources(int[] sources);
+    boolean getBoolean(Get g);
 
     /**
      * This function retrieves a floating point property of a buffer.<br>
@@ -194,7 +287,7 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @return value for the attribute
      */
-    float alGetBufferf(int buffer, Buffer pname);
+    float getBufferf(int buffer, Buffer pname);
 
     /**
      * This function retrieves a integer property of a buffer.<br>
@@ -204,16 +297,16 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @return value for attribute
      */
-    int alGetBufferi(int buffer, Buffer pname);
+    int getBufferi(int buffer, Buffer pname);
 
-    double alGetDouble(Get cap);
-    void alGetDouble(Get cap, double[] doubles);
-    void alGetEnumValue(String ename);
-    Error alGetError();
-    float alGetFloat(Get pname);
-    void alGetFloat(Get pname, float[] floats);
-    int alGetInteger(Get pname);
-    void alGetInteger(Get pname, int[] integers);
+    double getDouble(Get cap);
+    void getDouble(Get cap, double[] doubles);
+    void getEnumValue(String ename);
+    Error getError();
+    float getFloat(Get pname);
+    void getFloat(Get pname, float[] floats);
+    int getInteger(Get pname);
+    void getInteger(Get pname, int[] integers);
 
     /**
      * Retrieves a floating point-vector property of the listener. Can retrieve
@@ -221,7 +314,7 @@ public interface AL {
      * @param pname Parameter to retrieve
      * @param floats array where the values will be set
      */
-    void alGetListener(Get pname, float[] floats);
+    void getListener(Get pname, float[] floats);
 
     /**
      * Retrieves a integer-vector property of the listener. Can retrieve
@@ -229,7 +322,7 @@ public interface AL {
      * @param pname Parameter to retrieve
      * @param ints array where the values will be set
      */
-    void alGetListener(Get pname, int[] ints);
+    void getListener(Get pname, int[] ints);
 
     /**
      * Retrieves a floating point property of the listener. Only can
@@ -237,7 +330,7 @@ public interface AL {
      * @param pname Parameter to retrieve
      * @return value of the parameter
      */
-    float alGetListenerf(Listener pname);
+    float getListenerf(Listener pname);
 
     /**
      * Retrieves an integer property of the listener. Actually, nothing can
@@ -245,7 +338,7 @@ public interface AL {
      * @param pname Parameter to retrieve
      * @return value of the parameter
      */
-    int alGetListeneri(Listener pname);
+    int getListeneri(Listener pname);
 
     /**
      * Retrieves some values into a floating point array.  Valid
@@ -257,7 +350,7 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @param floats array where the values will be stored
      */
-    void alGetSource(int source, Source pname, float[] floats);
+    void getSource(int source, Source pname, float[] floats);
 
     /**
      * Retrieves some values into a integer array.  Valid
@@ -269,7 +362,7 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @param integers array where the values will be stored
      */
-    void alGetSource(int source, Source pname, int[] integers);
+    void getSource(int source, Source pname, int[] integers);
 
     /**
      * Retrieves a floating point property of a source. Valid attributes for this
@@ -288,7 +381,7 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @return value for attribute
      */
-    float alGetSourcef(int source, Source pname);
+    float getSourcef(int source, Source pname);
 
     /**
      * Retrieves a integer value of a source. Valid attributes for this function
@@ -303,8 +396,19 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @return value for the attribute
      */
-    int alGetSourcei(int source, Source pname);
-    String alGetString(int pname);
+    int getSourcei(int source, Source pname);
+
+    /**
+     * Retrieves an OpenAL string property. Properties accepted by this
+     * function are:<br>
+     * &nbsp;&nbsp;- VENDOR
+     * &nbsp;&nbsp;- VERSION
+     * &nbsp;&nbsp;- RENDERER
+     * &nbsp;&nbsp;- EXTENSIONS
+     * @param pname Property name
+     * @return a string
+     */
+    String getString(int pname);
 
     /**
      * This function tests if the object is a buffer and is a
@@ -312,9 +416,22 @@ public interface AL {
      * @param obj Reference to something
      * @return True if is a buffer, false otherwise
      */
-    boolean alIsBuffer(int obj);
-    boolean alIsEnabled(int obj);
-    boolean alIsExtensionPresent(String obj);
+    boolean isBuffer(int obj);
+
+    /**
+     * Tests if this capability is enabled or not.
+     * @param obj Capability
+     * @return True if it's enabled, or false otherwise
+     */
+    boolean isEnabled(int obj);
+
+    /**
+     * Tests if this extension is available in this openAL
+     * driver.
+     * @param obj Extension to be tested
+     * @return True if is present, false otherwise
+     */
+    boolean isExtensionPresent(String obj);
 
     /**
      * This function tests if an object is a source and is a
@@ -322,7 +439,7 @@ public interface AL {
      * @param obj Reference to something
      * @return True if is a source, false otherwise
      */
-    boolean alIsSource(int obj);
+    boolean isSource(int obj);
 
     /**
      * Sets a floating point-vector property of the listener. Valid
@@ -330,7 +447,7 @@ public interface AL {
      * @param pname Property to change
      * @param data Values to be set
      */
-    void alListener(Listener pname, float[] data);
+    void listener(Listener pname, float[] data);
 
     /**
      * Sets a integer-vector property of the listener. Valid
@@ -338,7 +455,7 @@ public interface AL {
      * @param pname Property to change
      * @param data Values to be set
      */
-    void alListener(Listener pname, int[] data);
+    void listener(Listener pname, int[] data);
 
     /**
      * Sets a floating point property for the listener. Valid Params
@@ -348,7 +465,7 @@ public interface AL {
      * @param y Value
      * @param z Value
      */
-    void alListener3f(Listener pname, float x, float y, float z);
+    void listener3f(Listener pname, float x, float y, float z);
 
     /**
      * Sets a floating point property for the listener. Only can be changed
@@ -356,7 +473,7 @@ public interface AL {
      * @param pname Param to change
      * @param v Value to be set
      */
-    void alListenerf(Listener pname, float v);
+    void listenerf(Listener pname, float v);
 
     /**
      * Sets an intefer property for the listener. Actually there's no
@@ -364,7 +481,7 @@ public interface AL {
      * @param pname Param to change
      * @param v Value to be set
      */
-    void alListeneri(Listener pname, int v);
+    void listeneri(Listener pname, int v);
 
     /**
      * Sets a source property requiring an array of floating point values.
@@ -377,7 +494,7 @@ public interface AL {
      * @param data array with values
      * @see AL.Source Source attributes enum
      */
-    void alSource(int source, Source pname, float[] data);
+    void source(int source, Source pname, float[] data);
 
     /**
      * Sets a source property requiring three floating point values. Valid
@@ -392,7 +509,7 @@ public interface AL {
      * @param z Value
      * @see AL.Source Source attributes enum
      */
-    void alSource3f(int source, Source pname, float x, float y, float z);
+    void source3f(int source, Source pname, float x, float y, float z);
 
     /**
      * Sets a floating point property of a source. Valid attributes for this
@@ -412,7 +529,7 @@ public interface AL {
      * @param v Value to be set
      * @see AL.Source Source attributes enum
      */
-    void alSourcef(int source, Source pname, float v);
+    void sourcef(int source, Source pname, float v);
 
     /**
      * Sets an integer property of a source. Valid attributes for this function
@@ -428,31 +545,31 @@ public interface AL {
      * @param v Value to be set
      * @see AL.source Source attributes enum
      */
-    void alSourcei(int source, Source pname, int v);
+    void sourcei(int source, Source pname, int v);
 
     /**
      * Puases the source
      * @param source Reference to the source
      */
-    void alSourcePause(int source);
+    void sourcePause(int source);
 
     /**
      * Pauses the sources
      * @param sources array with the resources
      */
-    void alSourcePause(int[] sources);
+    void sourcePause(int[] sources);
 
     /**
      * Plays the source
      * @param source Reference to the source
      */
-    void alSourcePlay(int source);
+    void sourcePlay(int source);
 
     /**
      * Plays the sources
      * @param sources array with the sources to play
      */
-    void alSourcePlay(int[] sources);
+    void sourcePlay(int[] sources);
 
     /**
      * This function queues one buffers on a source. All buffers
@@ -462,7 +579,7 @@ public interface AL {
      * @param source Reference to the source
      * @param buffer buffer to attach
      */
-    void alSourceQueueBuffers(int source, int buffer);
+    void sourceQueueBuffers(int source, int buffer);
 
     /**
      * This function queues a set of buffers on a source. All buffers
@@ -472,45 +589,45 @@ public interface AL {
      * @param source Reference to the source
      * @param buffer array of buffers to attach
      */
-    void alSourceQueueBuffers(int source, int[] buffers);
+    void sourceQueueBuffers(int source, int[] buffers);
 
     /**
      * Stops the source and sets the position to initial
      * @param source Source
      */
-    void alSourceRewind(int source);
+    void sourceRewind(int source);
 
     /**
      * Stops the sources and sets the position to initial
      * @param sources array with sources
      */
-    void alSourceRewind(int[] sources);
+    void sourceRewind(int[] sources);
 
     /**
      * Stops the source
      * @param source Reference to the source
      */
-    void alSourceStop(int source);
+    void sourceStop(int source);
 
     /**
      * Stops the resources
-     * @param sources arry with all sources
+     * @param sources arry with l sources
      */
-    void alSourceStop(int[] sources);
+    void sourceStop(int[] sources);
 
     /**
      * Unqueues one buffer attached to a source.
      * @param source Reference to the source
      * @param buffer buffer to deattach
      */
-    void alSourceUnqueueBuffers(int source, int buffer);
+    void sourceUnqueueBuffers(int source, int buffer);
 
     /**
      * Unqueues a set of buffers attached to a source.
      * @param source Reference to the source
      * @param buffers buffers to deattach
      */
-    void alSourceUnqueueBuffers(int source, int[] buffers);
+    void sourceUnqueueBuffers(int source, int[] buffers);
 
     /**
      * This function sets floating points property of a buffer.<br>
@@ -520,7 +637,7 @@ public interface AL {
      * @param pname the attribute to set
      * @param floats values
      */
-    void alBuffer(int buffer, Buffer pname, float[] floats);
+    void buffer(int buffer, Buffer pname, float[] floats);
 
     /**
      * This function sets integers property of a buffer.<br>
@@ -530,7 +647,7 @@ public interface AL {
      * @param pname the attribute to set
      * @param integers values
      */
-    void alBuffer(int buffer, Buffer pname, int[] integers);
+    void buffer(int buffer, Buffer pname, int[] integers);
 
     /**
      * This function sets a floating point property of a buffer.<br>
@@ -542,7 +659,7 @@ public interface AL {
      * @param v1 value to be set
      * @param v2 value to be set
      */
-    void alBuffer3f(int buffer, Buffer pname, float v0, float v1, float v2);
+    void buffer3f(int buffer, Buffer pname, float v0, float v1, float v2);
 
     /**
      * This function sets a integer property of a buffer.<br>
@@ -554,7 +671,7 @@ public interface AL {
      * @param v1 value to be set
      * @param v2 value to be set
      */
-    void alBuffer3i(int buffer, Buffer pname, int v0, int v1, int v2);
+    void buffer3i(int buffer, Buffer pname, int v0, int v1, int v2);
 
     /**
      * This function sets a floating point property of a buffer.<br>
@@ -564,7 +681,7 @@ public interface AL {
      * @param pname the attribute to set
      * @param v value to be set
      */
-    void alBufferf(int buffer, Buffer pname, float v);
+    void bufferf(int buffer, Buffer pname, float v);
 
     /**
      * This function sets a floating point property of a buffer.<br>
@@ -574,7 +691,7 @@ public interface AL {
      * @param pname the attribute to set
      * @param v value to be set
      */
-    void alBufferi(int buffer, Buffer pname, int v);
+    void bufferi(int buffer, Buffer pname, int v);
 
     /**
      * This function retrieves a floating point property of a buffer.<br>
@@ -584,7 +701,7 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @param floats values in an array
      */
-    void alGetBuffer(int buffer, Buffer pname, float[] floats);
+    void getBuffer(int buffer, Buffer pname, float[] floats);
 
     /**
      * This function retrieves a integer property of a buffer.<br>
@@ -594,8 +711,7 @@ public interface AL {
      * @param pname The attribute to retrieve
      * @param floats values in an array
      */
-    void alGetBuffer(int buffer, Buffer pname, int[] integers);
-    void alGetListeneri(int listener, int[] integers);
+    void getBuffer(int buffer, Buffer pname, int[] integers);
 
     /**
      * Sets a integer property for the listener. Valid Params
@@ -605,7 +721,7 @@ public interface AL {
      * @param y Value
      * @param z Value
      */
-    void alListener3i(int listener, int v0, int v1, int v2);
+    void listener3i(int listener, int v0, int v1, int v2);
 
     /**
      * Sets a source property requiring an array of integers values. Valid
@@ -618,7 +734,7 @@ public interface AL {
      * @param integers Array with the values
      * @see AL.Source Source attributes enum
      */
-    void alSource(int source, Source pname, int[] integers);
+    void source(int source, Source pname, int[] integers);
 
     /**
      * Sets a source property requiring three integers values. Valid
@@ -633,6 +749,12 @@ public interface AL {
      * @param z Value
      * @see AL.Source Source attributes enum
      */
-    void alSource3i(int source, Source pname, int v0, int v1, int v2);
-    void alSpeedOfSound(float speed);
+    void source3i(int source, Source pname, int v0, int v1, int v2);
+
+    /**
+     * Sets the speed of the sound for calculate Doppler effect. (OpenAL 1.1)
+     * @param speed Speed of the medium
+     * @see <a href="http://en.wikipedia.org/wiki/Doppler_effect">Doppler effect on Wikipedia</a>
+     */
+    void speedOfSound(float speed);
 }
