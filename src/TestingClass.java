@@ -23,6 +23,8 @@ import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec3;
 
+import org.lwjgl.openal.*;
+
 import static org.melchor629.engine.utils.math.GLM.*;
 
 public final class TestingClass {
@@ -279,6 +281,10 @@ public final class TestingClass {
         rbo.delete();
         texColor.delete();
         System.exit(0);
+    }
+    
+    public final static void nada() {
+        
     }
 
 }
