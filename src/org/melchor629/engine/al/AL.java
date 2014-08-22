@@ -721,7 +721,7 @@ public interface AL {
      * @param y Value
      * @param z Value
      */
-    void listener3i(int listener, int v0, int v1, int v2);
+    void listener3i(Listener listener, int v0, int v1, int v2);
 
     /**
      * Sets a source property requiring an array of integers values. Valid

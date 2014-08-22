@@ -1,5 +1,6 @@
 package org.melchor629.engine;
 
+import org.melchor629.engine.al.AL;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
 
@@ -12,6 +13,7 @@ public abstract class Game {
     protected boolean fullscreen, resizable, vsync;
     protected String title;
     public static Renderer gl;
+    public static AL al;
 
     protected void setDisplay() {
         gl = new LWJGLRenderer();
