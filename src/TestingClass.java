@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
@@ -21,9 +23,8 @@ import org.melchor629.engine.gl.types.Texture;
 import org.melchor629.engine.gl.types.VAO;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.mat4;
+import org.melchor629.engine.utils.math.vec2;
 import org.melchor629.engine.utils.math.vec3;
-
-import org.lwjgl.openal.*;
 
 import static org.melchor629.engine.utils.math.GLM.*;
 
@@ -93,7 +94,7 @@ public final class TestingClass {
             + "    blur();"
             + "}\n";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {nada(); System.exit(1);
         Renderer gl = Game.gl = new LWJGLRenderer();
         Timing t = new Timing();
         gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
@@ -282,9 +283,66 @@ public final class TestingClass {
         texColor.delete();
         System.exit(0);
     }
-    
-    public final static void nada() {
+
+    public final static void nada() throws IOException {
+        org.melchor629.engine.utils.IOUtils.Image a;
+        a = org.melchor629.engine.utils.IOUtils.readImage(new File("/Users/melchor9000/desktop/Turn Down For What.png"));
+        vec2 pos = new vec2(251, 128), oldPos = new vec2(-1, -1);
+        ArrayList<Byte> data = new ArrayList<Byte>();
+        
+        boolean hasNext = true;
+        while(hasNext) {
+            data.add(getPixel(a, pos));
+
+            byte[] nearPixels = new byte[8];
+            for(int i = 0; i < nearPixels.length; i++)
+                nearPixels[i] = getPixel(a, getNearPixelsPos(i, pos));
+
+            hasNext = false;
+            for(int i = 0; i < nearPixels.length; i++) {
+                byte pixel = nearPixels[i];
+                
+                if(pixel != 0) {
+                    vec2 nextPos = getNearPixelsPos(i, pos);
+                    if(nextPos.x != oldPos.x || nextPos.y != oldPos.y) {
+                        oldPos = pos;
+                        pos = nextPos;
+                        hasNext = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        //Write out the sample
+        FileOutputStream fos = new FileOutputStream(new File("/Users/melchor9000/desktop/sample.bin"));
+        for(int i = 0; i < data.size(); i++)
+            fos.write(data.get(i));
+        fos.close();
         
     }
 
+    public final static byte getPixel(org.melchor629.engine.utils.IOUtils.Image a, vec2 pos) {
+        //Get RGB from ImageIO.read() ...
+        byte r = a.buffer[(int) (pos.y * a.width + pos.x) * a.channels];
+        byte g = a.buffer[(int) (pos.y * a.width + pos.x) * a.channels];
+        byte b = a.buffer[(int) (pos.y * a.width + pos.x) * a.channels];
+        assert(r != b && b != g);
+        return r;
+    }
+
+    public final static vec2 getNearPixelsPos(int direction, vec2 pos) {
+        //Near pixels from where you are
+        switch(direction) {
+            case 0: return new vec2(pos.x    , pos.y - 1);
+            case 1: return new vec2(pos.x + 1, pos.y - 1);
+            case 2: return new vec2(pos.x + 1, pos.y    );
+            case 3: return new vec2(pos.x + 1, pos.y + 1);
+            case 4: return new vec2(pos.x    , pos.y + 1);
+            case 5: return new vec2(pos.x - 1, pos.y + 1);
+            case 6: return new vec2(pos.x - 1, pos.y    );
+            case 7: return new vec2(pos.x - 1, pos.y - 1);
+            default: return null;
+        }
+    }
 }
