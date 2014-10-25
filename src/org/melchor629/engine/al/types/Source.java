@@ -2,6 +2,7 @@ package org.melchor629.engine.al.types;
 
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.GLM;
 
 /**
  * Source of a sound, with its position, gain, speed, and so...
@@ -23,6 +24,8 @@ public class Source {
     public float min_gain, max_gain;
 
     public Source(Buffer buffer0) {
+        if(buffer0 == null && buffer0.isComplete())
+            throw new IllegalArgumentException("Cannot pass a null or incomplete buffer");
         buffer = buffer0;
         position = new vec3();
         velocity = new vec3();
@@ -227,8 +230,6 @@ public class Source {
     public void destroy() {
         if(source != 0)
             al.destroySources(source);
-        if(buffer != null)
-            buffer.destroy();
         source = 0;
         buffer = null;
     }
