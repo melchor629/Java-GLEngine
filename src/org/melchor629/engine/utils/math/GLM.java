@@ -590,4 +590,50 @@ public class GLM {
                 array[i++] = mat.matrix[x][y];
         return array;
     }
+    
+    /**
+     * Useful function that checks if a number belongs to an
+     * interval.
+     * @param value Value to check
+     * @param min minimum number of the inverval
+     * @param max maximum number of the interval
+     **/
+    public static boolean belongsToInterval(float value, float min, float max) {
+        return min < value && value < max;
+    }
+    
+    /**
+     * Useful function that checks if a number belongs to an
+     * interval.
+     * @param value Value to check
+     * @param min minimum number of the inverval
+     * @param max maximum number of the interval
+     **/
+    public static boolean belongsToInterval(double value, double min, double max) {
+        return min < value && value < max;
+    }
+    
+    /**
+     * Because calculing float numbers are really imprecise, this function
+     * checks for a little difference between them:<b>
+     * <code> |a-b| < 0.00001 </code><br>
+     * @param a first float
+     * @param b second float
+     **/
+    public static boolean floatEqualsFloat(float a, float b) {
+        float err = Math.abs((a - b) / b);
+        return err <= 0.00001;
+    }
+    
+    /**
+     * Because calculing float numbers are really imprecise, this function
+     * checks for a little difference between them:<b>
+     * <code> |a-b| < 0.00001 </code><br>
+     * @param a first float
+     * @param b second float
+     **/
+    public static boolean doubleEqualsDouble(double a, double b) {
+        double err = Math.abs((a - b) / b);
+        return err <= 0.00001;
+    }
 }
