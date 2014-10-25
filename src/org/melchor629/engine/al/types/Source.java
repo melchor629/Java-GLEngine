@@ -17,13 +17,44 @@ public class Source {
     protected float pitch = 1.0f;
     protected vec3 direction;
     protected float cone_inner_angle = 360.0f, cone_outer_angle = 360.0f, cone_outer_gain = 0.0f;
+    protected vec3 position, velocity;
+    protected float gain;
     
     public float min_gain, max_gain;
 
     public Source(Buffer buffer0) {
         buffer = buffer0;
+        position = new vec3();
+        velocity = new vec3();
         source = al.genSources();
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
+    }
+    
+    public void setPosition(vec3 pos) {
+        position = pos;
+        al.source3f(source, AL.Source.POSITION, pos.x, pos.y, pos.z);
+    }
+    
+    public vec3 getPosition() {
+        return position;
+    }
+    
+    public void setVelocity(vec3 vel) {
+        velocity = vel;
+        al.source3f(source, AL.Source.VELOCITY, vel.x, vel.y, vel.z);
+    }
+    
+    public vec3 getVelocity() {
+        return velocity;
+    }
+    
+    public void setGain(float gain) {
+        this.gain = Math.abs(gain);
+        al.sourcef(source, AL.Source.GAIN, this.gain);
+    }
+    
+    public float getGain() {
+        return gain;
     }
 
     public void setRelative(boolean relativ) {
@@ -50,15 +81,15 @@ public class Source {
     }
     
     public void setGainBounds(float min, float max) {
-        al.sourcef(source, AL.Source.MIN_GAIN, min);
-        al.sourcef(source, AL.Source.MAX_GAIN, max);
-        this.min_gain = min;
-        this.max_gain = max;
+        this.min_gain = GLM.belongsToInterval(min, 0.0f, 1.0f) ? min : 0.0f;
+        this.max_gain = GLM.belongsToInterval(max, 0.0f, 1.0f) ? max : 1.0f;
+        al.sourcef(source, AL.Source.MIN_GAIN, min_gain);
+        al.sourcef(source, AL.Source.MAX_GAIN, max_gain);
     }
     
     public void setReferenceDistance(float dist) {
-        reference_distance = dist;
-        al.sourcef(source, AL.Source.REFERENCE_DISTANCE, dist);
+        reference_distance = Math.abs(dist);
+        al.sourcef(source, AL.Source.REFERENCE_DISTANCE, reference_distance);
     }
     
     public float getReferenceDistance() {
@@ -66,8 +97,8 @@ public class Source {
     }
     
     public void setRolloffFactor(float factor) {
-        rolloff_factor = factor;
-        al.sourcef(source, AL.Source.ROLLOFF_FACTOR, factor);
+        rolloff_factor = Math.abs(factor);
+        al.sourcef(source, AL.Source.ROLLOFF_FACTOR, Math.abs(factor));
     }
     
     public float getRolloffFactor() {
@@ -75,8 +106,8 @@ public class Source {
     }
     
     public void setMaxDistance(float dist) {
-        max_distance = dist;
-        al.sourcef(source, AL.Source.MAX_DISTANCE, dist);
+        max_distance = Math.abs(dist);
+        al.sourcef(source, AL.Source.MAX_DISTANCE, max_distance);
     }
     
     public void setPitch(float pitch) {
@@ -123,8 +154,8 @@ public class Source {
     }
     
     public void setConeOuterGain(float gain) {
-        cone_outer_gain = gain;
-        al.sourcef(source, AL.Source.CONE_OUTER_GAIN, gain);
+        cone_outer_gain = GLM.belongsToInterval(gain, 0.0f, 1.0f) ? gain, 0.0f;
+        al.sourcef(source, AL.Source.CONE_OUTER_GAIN, cone_outer_gain);
     }
     
     public float getConeOuterGain() {
@@ -132,7 +163,7 @@ public class Source {
     }
     
     public void setPlaybackPosition(float pos) {
-        al.sourcef(source, AL.Source.SEC_OFFSET, pos);
+        al.sourcef(source, AL.Source.SEC_OFFSET, Math.abs(pos));
     }
     
     public float getPlaybackPosition() {
@@ -140,7 +171,7 @@ public class Source {
     }
     
     public void setPlaybackSample(float pos) {
-        al.sourcef(source, AL.Source.SAMPLE_OFFSET, pos);
+        al.sourcef(source, AL.Source.SAMPLE_OFFSET, Math.abs(pos));
     }
     
     public float getPlaybackSample() {
@@ -148,7 +179,7 @@ public class Source {
     }
     
     public void setPlaybackBytes(float pos) {
-        al.sourcef(source, AL.Source.BYTE_OFFSET, pos);
+        al.sourcef(source, AL.Source.BYTE_OFFSET, Math.abs(pos));
     }
     
     public float getPlaybackBytes() {
