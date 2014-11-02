@@ -44,7 +44,7 @@ public class LWJGLRenderer implements Renderer {
             Display.create(new PixelFormat(), new ContextAttribs(3, 2).withProfileCore(true));
             return true;
         } catch(LWJGLException e) {
-            System.out.printf("Cannot create window or context: %s", e.getMessage());
+            System.out.printf("Cannot create window or context:\n  %s", e.getMessage());
         }
         return false;
     }
@@ -62,7 +62,7 @@ public class LWJGLRenderer implements Renderer {
             Display.create(new PixelFormat(), new ContextAttribs(version.a, version.b).withProfileCore(true));
             return true;
         } catch(LWJGLException e) {
-            System.out.printf("Cannot create window or context: %s", e.getMessage());
+            System.out.printf("Cannot create window or context:\n  %s", e.getMessage());
         }
         return false;
     }

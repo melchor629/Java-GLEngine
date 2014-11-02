@@ -80,6 +80,7 @@ public interface AL {
         Get(int t) { e = t; }
     }
 
+    //TODO No todos son 0, ninguno lo deberia ser
     enum Format {
         MONO8 (0x0),
         MONO16 (0x0),

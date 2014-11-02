@@ -4,6 +4,8 @@ import org.melchor629.engine.al.AL;
 import org.melchor629.engine.utils.math.vec3;
 import org.melchor629.engine.utils.math.GLM;
 
+import static org.melchor629.engine.Game.al;
+
 /**
  * Source of a sound, with its position, gain, speed, and so...
  * @author melchor9000
@@ -24,12 +26,12 @@ public class Source {
     public float min_gain, max_gain;
 
     public Source(Buffer buffer0) {
-        if(buffer0 == null && buffer0.isComplete())
+        if(buffer0 == null || buffer0.isComplete())
             throw new IllegalArgumentException("Cannot pass a null or incomplete buffer");
         buffer = buffer0;
         position = new vec3();
         velocity = new vec3();
-        source = al.genSources();
+        source = al.genSource();
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
     }
     
@@ -66,7 +68,7 @@ public class Source {
     }
 
     public boolean isRelative() {
-        return AL.relative;
+        return relative;
     }
     
     //TODO pasar el int a un enum en AL
@@ -114,7 +116,7 @@ public class Source {
     }
     
     public void setPitch(float pitch) {
-        if(pitch =< 0.0f)
+        if(pitch <= 0.0f)
             pitch = 1.f;
         this.pitch = pitch;
         al.sourcef(source, AL.Source.PITCH, pitch);
@@ -157,7 +159,7 @@ public class Source {
     }
     
     public void setConeOuterGain(float gain) {
-        cone_outer_gain = GLM.belongsToInterval(gain, 0.0f, 1.0f) ? gain, 0.0f;
+        cone_outer_gain = GLM.belongsToInterval(gain, 0.0f, 1.0f) ? gain : 0.0f;
         al.sourcef(source, AL.Source.CONE_OUTER_GAIN, cone_outer_gain);
     }
     
@@ -229,7 +231,7 @@ public class Source {
 
     public void destroy() {
         if(source != 0)
-            al.destroySources(source);
+            al.deleteSource(source);
         source = 0;
         buffer = null;
     }

@@ -94,12 +94,16 @@ public final class TestingClass {
             + "    blur();"
             + "}\n";
 
-    public static void main(String[] args) throws IOException {nada(); System.exit(1);
+    public static void main(String[] args) throws IOException {//nada(); System.exit(1);
         Renderer gl = Game.gl = new LWJGLRenderer();
         Timing t = new Timing();
-        gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
+        boolean cr;
+        cr = gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
         gl.setVsync(true);
         gl.setResizable(true);
+        
+        if(!cr)
+        	System.exit(-1);
 
         VAO vao = new VAO();
         vao.bind();
