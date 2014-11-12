@@ -24,7 +24,7 @@ public class GLError extends Error {
     }
 
     /**
-     * Create a new GLError with the given message and specifing the
+     * Create a new GLError with the given message and specifying the
      * OpenGL Function that send an error
      * @param glFunc
      * @param msg

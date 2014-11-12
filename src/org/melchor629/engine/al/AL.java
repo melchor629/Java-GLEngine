@@ -64,7 +64,8 @@ public interface AL {
         INVALID_ENUM (0xA002),
         INVALID_VALUE (0xA003),
         INVALID_OPERATION (0xA004),
-        OUT_OF_MEMORY (0xA005);
+        OUT_OF_MEMORY (0xA005),
+        UNKNOWN(-1);
 
         final int e;
         Error(int t) { e = t; }
@@ -106,6 +107,7 @@ public interface AL {
 
     /**
      * Create a context with OpenAL 1.1 (if is not possible, then 1.0)
+     * @throws ALError if an error occurrs while creating the context
      */
     void createContext();
 
@@ -273,6 +275,8 @@ public interface AL {
      */
     int genSource();
 
+    //TODO en las funciones de GET/SET Something, hay que comprobar que cosas
+    //pueden ser obtenidas con cada tipo.
     /**
      * This function generates one or more sources
      * @param sources array which will store the references of new sources
@@ -302,7 +306,7 @@ public interface AL {
 
     double getDouble(Get cap);
     void getDouble(Get cap, double[] doubles);
-    void getEnumValue(String ename);
+    int getEnumValue(String ename);
     Error getError();
     float getFloat(Get pname);
     void getFloat(Get pname, float[] floats);
