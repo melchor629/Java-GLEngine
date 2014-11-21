@@ -364,8 +364,7 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public int getSourcei(int source, Source pname) {
-		// TODO Auto-generated method stub
-		return 0;
+		return alGetSourcei(source, pname.e);
 	}
 
 	/* (non-Javadoc)

@@ -1,6 +1,7 @@
 package org.melchor629.engine.al.types;
 
 import org.melchor629.engine.al.AL;
+import org.melchor629.engine.objects.PCMData;
 import org.melchor629.engine.utils.math.vec3;
 import org.melchor629.engine.utils.math.GLM;
 
@@ -26,13 +27,17 @@ public class Source {
     public float min_gain, max_gain;
 
     public Source(Buffer buffer0) {
-        if(buffer0 == null || buffer0.isComplete())
+        if(buffer0 == null || !buffer0.isComplete())
             throw new IllegalArgumentException("Cannot pass a null or incomplete buffer");
         buffer = buffer0;
         position = new vec3();
         velocity = new vec3();
         source = al.genSource();
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
+    }
+    
+    public Source(PCMData data) {
+    	this(new Buffer(data));
     }
     
     public void setPosition(vec3 pos) {
@@ -73,7 +78,7 @@ public class Source {
     
     //TODO pasar el int a un enum en AL
     public int getSourceState() {
-        return al.getSourcei(source, AL.Source.SOURCE_TYPE);
+        return al.getSourcei(source, AL.Source.SOURCE_STATE);
     }
     
     public void setLoop(boolean loop) {

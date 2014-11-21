@@ -83,10 +83,10 @@ public interface AL {
 
     //TODO No todos son 0, ninguno lo deberia ser
     enum Format {
-        MONO8 (0x0),
-        MONO16 (0x0),
-        STEREO8 (0x0),
-        STEREO16 (0x0);
+        MONO8 (0x1100),
+        MONO16 (0x1101),
+        STEREO8 (0x1102),
+        STEREO16 (0x1103);
 
         final int e;
         Format(int t) { e = t; }
