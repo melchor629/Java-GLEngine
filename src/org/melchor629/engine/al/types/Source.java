@@ -237,6 +237,8 @@ public class Source {
     public void destroy() {
         if(source != 0)
             al.deleteSource(source);
+        if(buffer != null)
+        	buffer.destroy();
         source = 0;
         buffer = null;
     }

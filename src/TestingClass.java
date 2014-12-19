@@ -98,12 +98,14 @@ public final class TestingClass {
         Renderer gl = Game.gl = new LWJGLRenderer();
         Timing t = new Timing();
         boolean cr;
-        cr = gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
         gl.setVsync(true);
         gl.setResizable(true);
+        cr = gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
         
-        if(!cr)
+        if(!cr) {
+        	System.out.printf("Error al crear la ventana...");
         	System.exit(-1);
+        }
 
         VAO vao = new VAO();
         vao.bind();

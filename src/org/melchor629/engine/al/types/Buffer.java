@@ -13,10 +13,13 @@ public class Buffer {
 	protected int buffer;
 	
 	public Buffer(PCMData data) {
-		if(data == null || data.data == null || data.data.length == 0)
+		if(data == null || (data.data == null && data.data2 == null))
 			throw new IllegalArgumentException("Cannot pass a null or empty PCM sound");
 		buffer = al.genBuffer();
-		al.bufferData(buffer, data.format, data.data, data.freq);
+		if(data.data != null)
+			al.bufferData(buffer, data.format, data.data, data.freq);
+		else
+			al.bufferData(buffer, data.format, data.data2, data.freq);
 	}
 	
 	public int getBuffer() {
@@ -28,5 +31,9 @@ public class Buffer {
 		al.buffer(buffer, AL.Buffer.SIZE, ret);
 		return ret[0] != 0;*/
 		return al.getBufferi(buffer, AL.Buffer.SIZE) != 0;
+	}
+	
+	public void destroy() {
+		al.deleteBuffer(buffer);
 	}
 }

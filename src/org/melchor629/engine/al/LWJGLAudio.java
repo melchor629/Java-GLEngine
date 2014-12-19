@@ -1,29 +1,30 @@
 package org.melchor629.engine.al;
 
-import static org.lwjgl.openal.AL.*;
 import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.AL.*;
 
+import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
-import org.lwjgl.openal.AL11;
 
+import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.ALContext;
 import org.melchor629.engine.utils.BufferUtils;
 
 /**
  * @author melchor9000
  */
 public class LWJGLAudio implements AL {
+	ALContext context;
 
 	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#createContext()
 	 */
 	@Override
 	public void createContext() throws ALError {
-		try {
-			create();
-		} catch(Exception e) {
-			throw new ALError(e.getMessage());
-		}
+		context = ALContext.create();
+		if(context == null)
+			throw new ALError("Error creating context");
 	}
 
 	/* (non-Javadoc)
@@ -31,8 +32,8 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void deleteContext() {
-		if(isCreated())
-			destroy();
+		if(context != null)
+			destroy(context);
 	}
 
 	/* (non-Javadoc)
@@ -73,6 +74,19 @@ public class LWJGLAudio implements AL {
 		
 		alBufferData(buffer, format.e, BufferUtils.toBuffer(data), freq);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.melchor629.engine.al.AL#bufferData(int, org.melchor629.engine.al.AL.Format, ByteBuffer, int)
+	 */
+	@Override
+	public void bufferData(int buffer, Format format, ByteBuffer data, int freq) {
+		if(!isBuffer(buffer))
+			throw new ALError("alBufferData", "Argument passed as buffer is not a buffer");
+		if(data == null || data.capacity() == 0)
+			throw new ALError("alBufferData", "Data cannot be null or empty");
+		
+		alBufferData(buffer, format.e, data, freq);
+	}
 
 	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#deleteBuffer(int)
@@ -99,6 +113,7 @@ public class LWJGLAudio implements AL {
 	public void deleteSource(int source) {
 		if(!isSource(source))
 			throw new ALError("alDeleteSource", "Source is not a source");
+		alDeleteSources(source);
 	}
 
 	/* (non-Javadoc)

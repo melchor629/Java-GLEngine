@@ -1,5 +1,8 @@
 package org.melchor629.engine.al;
 
+import java.nio.ByteBuffer;
+
+//TODO Poner uso de Buffers (como ByteBuffer)
 /**
  * OpenAL interface for implement in bindings.
  * http://grva.lamce.coppe.ufrj.br/labcogsdk/download/extras/openal/OpenAL_Programmers_Guide.pdf
@@ -127,6 +130,17 @@ public interface AL {
      * @param freq Frequency of the sound
      */
     void bufferData(int buffer, Format format, byte[] data, int freq);
+
+    /**
+     * This function fills a buffer with audio data. All the pre-defined formats are
+     * PCM data, but this function may be used by extensions to load other data
+     * types as well.
+     * @param buffer Buffer to be filled
+     * @param format Format of the data
+     * @param data Array with the data
+     * @param freq Frequency of the sound
+     */
+    void bufferData(int buffer, Format format, ByteBuffer data, int freq);
 
     /**
      * This function fills a buffer with audio data. All the pre-defined formats are

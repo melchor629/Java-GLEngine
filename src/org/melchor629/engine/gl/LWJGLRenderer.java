@@ -8,11 +8,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.ContextAttribs;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.system.glfw.ErrorCallback;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
@@ -25,55 +22,88 @@ import static org.lwjgl.opengl.GL30.*;
 //import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL32.*;
 //import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.system.glfw.GLFW.*;
 
 /**
  * Class for Render with LWJGL
  * @author melchor9000
  */
 public class LWJGLRenderer implements Renderer {
+	public long window;
+	boolean vsync = false;
+	
+	public LWJGLRenderer() {
+		glfwInit();
+		glfwDefaultWindowHints();
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				glfwTerminate();
+			}
+		}));
+
+        glfwSetErrorCallback(new ErrorCallback() {
+			@Override
+			public void invoke(int error, long description) {
+				ByteBuffer native_str = org.lwjgl.system.MemoryUtil.memByteBufferNT1(description);
+				String java_str = org.lwjgl.system.MemoryUtil.memDecodeUTF8(native_str);
+				System.out.printf("GLFW [ERROR %d]: %s\n", error, java_str);
+			}
+		});
+	}
 
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.Renderer#createDisplay(short, short, boolean, java.lang.String)
      */
     @Override
-    public boolean createDisplay(short width, short height, boolean fullscreen, String title) {
-        try {
-            Display.setDisplayMode(new DisplayMode(width, height));
-            Display.setFullscreen(fullscreen);
-            Display.setTitle(title);
-            Display.create(new PixelFormat(), new ContextAttribs(3, 2).withProfileCore(true));
-            return true;
-        } catch(LWJGLException e) {
-            System.out.printf("Cannot create window or context:\n  %s", e.getMessage());
-        }
-        return false;
+    public boolean createDisplay(int width, int height, boolean fullscreen, String title) {
+        //glfwInit();
+        long fourth = fullscreen ? glfwGetPrimaryMonitor() : 0l;
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        window = glfwCreateWindow(width, height, title, fourth, 0l);
+        if(window != 0)
+        	glfwMakeContextCurrent(window);
+        //else
+        	//glfwTerminate();
+        GLContext.createFromCurrent();
+        return window != 0;
     }
 
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.Renderer#createDisplay(short, short, boolean, java.lang.String, org.melchor629.engine.gl.Renderer.GLVersion)
      */
     @Override
-    public boolean createDisplay(short width, short height, boolean fullscreen, String title,
+    public boolean createDisplay(int width, int height, boolean fullscreen, String title,
             GLVersion version) {
-        try {
-            Display.setDisplayMode(new DisplayMode(width, height));
-            Display.setFullscreen(fullscreen);
-            Display.setTitle(title);
-            Display.create(new PixelFormat(), new ContextAttribs(version.a, version.b).withProfileCore(true));
-            return true;
-        } catch(LWJGLException e) {
-            System.out.printf("Cannot create window or context:\n  %s", e.getMessage());
+    	//glfwInit();
+        long fourth = fullscreen ? glfwGetPrimaryMonitor() : 0l;
+        if(version.a >= 3) {
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
         }
-        return false;
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.a);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.b);
+        window = glfwCreateWindow(width, height, title, fourth, 0l);
+        if(window != 0)
+        	glfwMakeContextCurrent(window);
+        //else
+        	//glfwTerminate();
+        GLContext.createFromCurrent();
+        return window != 0;
     }
 
     
     public void setVsync(boolean vsync) {
-        Display.setVSyncEnabled(vsync);
+    	this.vsync = vsync;
+        //TODO VSync glfwWindowHint(GLFW_)
     }
 
     public void setResizable(boolean resizable) {
-        Display.setResizable(resizable);
+        glfwWindowHint(GLFW_RESIZABLE, resizable ? 1 : 0);
     }
 
     /* (non-Javadoc)
@@ -81,16 +111,19 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void destroyDisplay() {
-        Display.destroy();
+    	glfwDestroyWindow(window);
+    	glfwMakeContextCurrent(0l);
+        glfwTerminate();
     }
 
     public void _game_loop_sync(int fps) {
-        Display.update();
-        Display.sync(fps);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+        //TODO Sync with FPS
     }
 
     public boolean windowIsClosing() {
-        return Display.isCloseRequested();
+        return glfwWindowShouldClose(window) == 1;
     }
 
     /* (non-Javadoc)
@@ -424,7 +457,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public String getActiveAttrib(int program, int pos, int strlen) {
-        return glGetActiveAttrib(program, pos, strlen);
+        return glGetActiveAttrib(program, pos, strlen, null, null);
     }
 
     /* (non-Javadoc)
@@ -432,7 +465,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public int getActiveAttribSize(int program, int pos) {
-        return glGetActiveAttribSize(program, pos);
+        return -1;//glGetActiveAttribSize(program, pos); TODO
     }
 
     /* (non-Javadoc)
@@ -440,7 +473,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public int getActiveAttribType(int program, int pos) {
-        return glGetActiveAttribType(program, pos);
+        return -1;//glGetActiveAttribType(program, pos); TODO
     }
 
     /* (non-Javadoc)
@@ -456,7 +489,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public String getActiveUniform(int program, int pos, int strlen) {
-        return glGetActiveUniform(program, pos, strlen);
+        return glGetActiveUniform(program, pos, strlen, null, null);
     }
 
     /* (non-Javadoc)

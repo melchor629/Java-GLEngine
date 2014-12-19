@@ -20,7 +20,7 @@ public class ALError extends Error {
     public ALError(String msg) {
         super(msg);
         this.msg = msg;
-        this.initCause(this);
+        //this.initCause(this);
     }
 
     /**

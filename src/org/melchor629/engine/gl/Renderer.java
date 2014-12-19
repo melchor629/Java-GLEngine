@@ -16,6 +16,7 @@ public interface Renderer {
      * @author melchor9000
      */
     enum GLVersion {
+    	GL21(2,1),
         GL30(3,0), GL31(3,1), GL32(3,2), GL33(3,3),
         GL40(4,0), GL41(4,1), GL42(4,2), GL43(4,3), GL44(4,4);
 
@@ -546,7 +547,7 @@ public interface Renderer {
      * @param title Title of the window
      * @return True if a window is created or false otherwise
      */
-    boolean createDisplay(short width, short height, boolean fullscreen, String title);
+    boolean createDisplay(int width, int height, boolean fullscreen, String title);
 
     /**
      * Create a window with an orthographic projection of type 1:1 and screen completly black.
@@ -557,7 +558,7 @@ public interface Renderer {
      * @param version OpenGL version of the context
      * @return True if a window is created or false otherwise
      */
-    boolean createDisplay(short width, short height, boolean fullscreen, String title, GLVersion version);
+    boolean createDisplay(int width, int height, boolean fullscreen, String title, GLVersion version);
 
     /**
      * Sets if Vertical Synchronization is activated or not

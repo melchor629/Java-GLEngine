@@ -17,7 +17,8 @@ public class Timing {
     protected long time = 0;
 
     protected long getTime() {
-        return (Sys.getTime() * 1000L) / Sys.getTimerResolution();
+    	return System.nanoTime(); //TODO
+        //return (Sys.getTime() * 1000L) / Sys.getTimerResolution();
     }
 
     public Timing() {
