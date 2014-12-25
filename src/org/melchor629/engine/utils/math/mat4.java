@@ -375,6 +375,21 @@ public class mat4 {
         buffer.compact();
         return buffer;
     }
+    
+    /**
+     * Converts this matrix into a Identity matrix. That replaces
+     * all values.
+     */
+    public void setIdentity() {
+        for(int y = 0; y < 4; y++)
+            for(int x = 0; x < 4; x++)
+                this.matrix[y][x] = 0;
+
+        matrix[0][0] = 1;
+        matrix[1][1] = 1;
+        matrix[2][2] = 1;
+        matrix[3][3] = 1;
+    }
 
     /**
      * Clone that matrix. Is a shortcut of

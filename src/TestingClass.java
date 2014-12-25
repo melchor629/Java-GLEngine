@@ -22,6 +22,7 @@ import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.gl.types.Texture;
 import org.melchor629.engine.gl.types.VAO;
 import org.melchor629.engine.utils.Timing;
+import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec2;
 import org.melchor629.engine.utils.math.vec3;
@@ -215,11 +216,14 @@ public final class TestingClass {
 
         mat4 proj = perspective(45d, 1280d / 720d, 1d, 10d);
         mat4 view = lookAt(new vec3(2.2f, 2.2f, 2.2f), new vec3(), new vec3(0, 0, 1));
-        mat4 rotate;
+        //mat4 rotate;
+        ModelMatrix model = new ModelMatrix();
         float time;
         int x = 0;
         shader.setUniformMatrix("view", view);
         shader.setUniformMatrix("proj", proj);
+        
+        org.lwjgl.glfw.GLFW.glfwSwapInterval(1);
 
         t.update();
         while(!gl.windowIsClosing()) {
@@ -236,10 +240,11 @@ public final class TestingClass {
             gl.clearColor(1, 1, 1, 1);
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
 
+            model.setIdentity();
             time = (float) Math.sin(2 * Math.PI * x++ / ((float) t.fps * 4));
-            rotate = rotateMatrix((float) (2 * Math.PI * x / ((float) t.fps * 4)), new vec3(0, 0, 1));
+            model.rotate((float) (2 * Math.PI * x / ((float) t.fps * 4)), 0, 0, 1);
             shader.setUniform("time", time * time);
-            shader.setUniformMatrix("model", rotate);
+            shader.setUniformMatrix("model", model.getModelMatrix());
 
             gl.drawArrays(DrawMode.TRIANGLES, 0, 36);
 
@@ -255,9 +260,8 @@ public final class TestingClass {
                 gl.stencilMask(0x00);
                 gl.depthMask(true);
 
-                rotate = translateMatrix(rotate, new vec3(0, 0, -1));
-                rotate = scaleMatrix(rotate, new vec3(1, 1, -1));
-                shader.setUniformMatrix("model", rotate);
+                model.setLocation(0, 0, -1).setScale(1, 1, -1);
+                shader.setUniformMatrix("model", model.getModelMatrix());
                 shader.setUniform("overrideColor", 0.3f, 0.3f, 0.3f);
                 gl.drawArrays(DrawMode.TRIANGLES, 0, 36);
                 shader.setUniform("overrideColor", 1.0f, 1.0f, 1.0f);
@@ -275,7 +279,7 @@ public final class TestingClass {
             t.update();
             gl._game_loop_sync(60);
         }
-        System.out.printf("Tiempo: %.2fs\nTotal de fotogramas: %d", (double) t.totalFrames / 60d, t.totalFrames);
+        System.out.printf("Tiempo: %.2fs\nTotal de fotogramas: %d\n", (double) t.totalFrames / 60d, t.totalFrames);
 
         vao.delete();
         ebo.delete();

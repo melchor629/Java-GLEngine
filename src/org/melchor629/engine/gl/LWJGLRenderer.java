@@ -9,7 +9,7 @@ import java.nio.ShortBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.system.glfw.ErrorCallback;
+import org.lwjgl.glfw.GLFWErrorCallback;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
@@ -22,7 +22,7 @@ import static org.lwjgl.opengl.GL30.*;
 //import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL32.*;
 //import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.system.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Class for Render with LWJGL
@@ -43,7 +43,7 @@ public class LWJGLRenderer implements Renderer {
 			}
 		}));
 
-        glfwSetErrorCallback(new ErrorCallback() {
+        glfwSetErrorCallback(new GLFWErrorCallback() {
 			@Override
 			public void invoke(int error, long description) {
 				ByteBuffer native_str = org.lwjgl.system.MemoryUtil.memByteBufferNT1(description);
@@ -457,7 +457,10 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public String getActiveAttrib(int program, int pos, int strlen) {
-        return glGetActiveAttrib(program, pos, strlen, null, null);
+        IntBuffer size, type;
+        size = IntBuffer.allocate(1);
+        type = IntBuffer.allocate(1);
+        return glGetActiveAttrib(program, pos, strlen, size, type);
     }
 
     /* (non-Javadoc)
@@ -489,7 +492,10 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public String getActiveUniform(int program, int pos, int strlen) {
-        return glGetActiveUniform(program, pos, strlen, null, null);
+        IntBuffer size, type;
+        size = IntBuffer.allocate(1);
+        type = IntBuffer.allocate(1);
+        return glGetActiveUniform(program, pos, strlen, size, type);
     }
 
     /* (non-Javadoc)
