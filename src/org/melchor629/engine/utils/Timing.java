@@ -15,14 +15,15 @@ public class Timing {
     public short fps = 0;
     protected short FPS = 0;
     protected double time = 0;
+    protected double startTime;
 
     protected double getTime() {
     	return GLFW.glfwGetTime();
-        //return (Sys.getTime() * 1000L) / Sys.getTimerResolution();
     }
 
     public Timing() {
         time = getTime() + 0.100; //Porque si xD
+        startTime = getTime();
     }
 
     /**
@@ -38,5 +39,13 @@ public class Timing {
         FPS++;
         totalFrames++;
         frameTime = tt - frameTime;
+    }
+    
+    /**
+     * Time elapsed since the timer started, in seconds
+     * @return time
+     */
+    public double totalTime() {
+        return GLFW.glfwGetTime() - startTime;
     }
 }

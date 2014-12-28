@@ -1,0 +1,91 @@
+package org.melchor629.engine.loaders.collada;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.melchor629.engine.utils.math.mat4;
+import org.melchor629.engine.utils.math.vec3;
+
+/**
+ *
+ * @author melchor9000
+ */
+public class Node {
+    public vec3 location, scale;
+    public mat4 rotation;
+    public String id, name, type;
+    public Instance instance;
+
+    public Node(Element node) {
+        id = node.getAttribute("id");
+        name = node.getAttribute("name");
+        type = node.getAttribute("type");
+        location((Element) node.getElementsByTagName("translate").item(0));
+        scale((Element) node.getElementsByTagName("scale").item(0));
+        rotation(node.getElementsByTagName("rotate"));
+        
+        if(node.getElementsByTagName("instance_camera").item(0) != null)
+            instance = new Instance_Camera((Element) node.getElementsByTagName("instance_camera").item(0));
+        else if(node.getElementsByTagName("instance_light").item(0) != null)
+            instance = new Instance_Light((Element) node.getElementsByTagName("instance_light").item(0));
+        else if(node.getElementsByTagName("instance_geometry").item(0) != null)
+            instance = new Instance_Geometry((Element) node.getElementsByTagName("instance_geometry").item(0));
+        else if(node.getElementsByTagName("instance_controller").item(0) != null)
+            instance = new Instance_Controller((Element) node.getElementsByTagName("instance_controller").item(0));
+    }
+
+    public boolean isCamera() {
+        return instance instanceof Instance_Camera;
+    }
+
+    public boolean isLight() {
+        return instance instanceof Instance_Light;
+    }
+
+    public boolean isGeometry() {
+        return instance instanceof Instance_Geometry;
+    }
+
+    public boolean isController() {
+        return instance instanceof Instance_Controller;
+    }
+
+    private void location(Element loc) {
+        String[] l = loc.getTextContent().split(" ");
+        location = new vec3();
+        location.x = Float.parseFloat(l[0]);
+        location.y = Float.parseFloat(l[1]);
+        location.z = Float.parseFloat(l[2]);
+    }
+
+    private void scale(Element sca) {
+        String[] s = sca.getTextContent().split(" ");
+        scale = new vec3();
+        scale.x = Float.parseFloat(s[0]);
+        scale.y = Float.parseFloat(s[1]);
+        scale.z = Float.parseFloat(s[2]);
+    }
+
+    private void rotation(NodeList Lrot) {
+        rotation = new mat4();
+        for(int i = 0; i < Lrot.getLength(); i++) {
+            Element rot = (Element) Lrot.item(i);
+            String[] r = rot.getTextContent().split(" ");
+            if(rot.getAttribute("sid").equals("rotationZ")) {
+                rotation.matrix[0][0] = Float.parseFloat(r[0]);
+                rotation.matrix[0][1] = Float.parseFloat(r[1]);
+                rotation.matrix[0][2] = Float.parseFloat(r[2]);
+                rotation.matrix[0][3] = Float.parseFloat(r[3]);
+            } else if(rot.getAttribute("sid").equals("rotationY")) {
+                rotation.matrix[1][0] = Float.parseFloat(r[0]);
+                rotation.matrix[1][1] = Float.parseFloat(r[1]);
+                rotation.matrix[1][2] = Float.parseFloat(r[2]);
+                rotation.matrix[1][3] = Float.parseFloat(r[3]);
+            } else if(rot.getAttribute("sid").equals("rotationX")) {
+                rotation.matrix[2][0] = Float.parseFloat(r[0]);
+                rotation.matrix[2][1] = Float.parseFloat(r[1]);
+                rotation.matrix[2][2] = Float.parseFloat(r[2]);
+                rotation.matrix[2][3] = Float.parseFloat(r[3]);
+            }
+        }
+    }
+}

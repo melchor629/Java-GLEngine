@@ -279,7 +279,7 @@ public final class TestingClass {
             t.update();
             gl._game_loop_sync(60);
         }
-        System.out.printf("Tiempo: %.2fs\nTotal de fotogramas: %d\n", (double) t.totalFrames / 60d, t.totalFrames);
+        System.out.printf("Tiempo: %.2fs\nTotal de fotogramas: %d\nMedia FPS:%.2f\n", t.totalTime(), t.totalFrames, t.totalFrames/t.totalTime());
 
         vao.delete();
         ebo.delete();
@@ -291,6 +291,7 @@ public final class TestingClass {
         fbo.delete();
         rbo.delete();
         texColor.delete();
+        gl.destroyDisplay();
         System.exit(0);
     }
 
