@@ -20,7 +20,6 @@ public class GLError extends Error {
     public GLError(String msg) {
         super(msg);
         this.msg = msg;
-        this.initCause(this);
     }
 
     /**
@@ -33,7 +32,6 @@ public class GLError extends Error {
         super(msg);
         this.msg = msg;
         this.glFunc = glFunc;
-        this.initCause(this);
     }
 
     @Override

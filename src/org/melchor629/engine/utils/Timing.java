@@ -12,10 +12,11 @@ public class Timing {
     /** Time wasted for render a frame (all stuff: Graphic & CPU) **/
     public double frameTime = 0;
     /** Last Frames per Second **/
-    public short fps = 0;
+    public short fps = 60;
     protected short FPS = 0;
     protected double time = 0;
     protected double startTime;
+    private double tiempoAnterior;
 
     protected double getTime() {
     	return GLFW.glfwGetTime();
@@ -23,7 +24,7 @@ public class Timing {
 
     public Timing() {
         time = getTime() + 0.100; //Porque si xD
-        startTime = getTime();
+        startTime = tiempoAnterior = getTime();
     }
 
     /**
@@ -38,7 +39,8 @@ public class Timing {
         }
         FPS++;
         totalFrames++;
-        frameTime = tt - frameTime;
+        frameTime = tt - tiempoAnterior;
+        tiempoAnterior = tt;
     }
     
     /**
@@ -47,5 +49,19 @@ public class Timing {
      */
     public double totalTime() {
         return GLFW.glfwGetTime() - startTime;
+    }
+    
+    /**
+     * Causes the current thread to "sleep", in other words, cease temporarly
+     * its execution, for a determinated time in milliseconds. This method calls
+     * {@code Thread.sleep()} wrapped with a try/catch.
+     * @param time Time to sleep in milliseconds
+     */
+    public static final void sleep(long time) {
+        try {
+            Thread.sleep(Math.abs(time));
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

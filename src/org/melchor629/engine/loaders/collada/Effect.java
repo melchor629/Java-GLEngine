@@ -49,7 +49,7 @@ public class Effect {
         if(e.getElementsByTagName("color").item(0) != null)
             return "C"+e.getElementsByTagName("color").item(0).getTextContent();
         else if(e.getElementsByTagName("texture").item(0) != null)
-            return "T"+e.getElementsByTagName("color").item(0).getAttributes().getNamedItem("texture").getTextContent();
+            return "T"+e.getElementsByTagName("texture").item(0).getAttributes().getNamedItem("texture").getTextContent();
         return null;
     }
     

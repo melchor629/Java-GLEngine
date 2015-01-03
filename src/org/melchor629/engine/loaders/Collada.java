@@ -14,6 +14,7 @@ import org.melchor629.engine.loaders.collada.Geometry;
 import org.melchor629.engine.loaders.collada.Image;
 import org.melchor629.engine.loaders.collada.Material;
 import org.melchor629.engine.loaders.collada.VisualScene;
+import org.melchor629.engine.utils.Timing;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -58,6 +59,18 @@ public class Collada {
         visual_scenes(collada);
         controllers(collada);
         collada = null;
+    }
+    
+    public void disposeData() {
+        for(Geometry g : geometry)
+            g.mesh.disposeData();
+
+        new Thread(new Runnable() {
+            public void run() {
+                Timing.sleep(1000);
+                System.gc();
+            }
+        }).start();
     }
 
     protected void geometry(Element collada) {
@@ -110,7 +123,7 @@ public class Collada {
         }
 
         The_Scene = ((Element) ((Element) collada.getElementsByTagName("scene").item(0))
-            .getElementsByTagName("insance_visual_scene").item(0)).getAttribute("url");
+            .getElementsByTagName("instance_visual_scene").item(0)).getAttribute("url");
     }
 
     protected void controllers(Element collada) {

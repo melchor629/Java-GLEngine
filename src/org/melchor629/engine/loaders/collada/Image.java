@@ -23,11 +23,11 @@ public class Image {
             init_from = URLDecoder.decode(init_from, "UTF-8").replace("%2B", "+");
         } catch (UnsupportedEncodingException e) {}
         String s = img.getAttribute("width");
-        width = Integer.getInteger(s.length() != 0 ? s : "1");
+        width = Integer.parseInt(s.length() != 0 ? s : "1", 10);
         s = img.getAttribute("height");
-        height = Integer.getInteger(s.length() != 0 ? s : "1");
+        height = Integer.parseInt(s.length() != 0 ? s : "1", 10);
         s = img.getAttribute("depth");
-        depth = Integer.getInteger(s.length() != 0 ? s : "1");
+        depth = Integer.parseInt(s.length() != 0 ? s : "1", 10);
         /*String s = img.getAttributeValue("width"); TODO
         width = Integer.getInteger(s != null ? s : "-1");
         s = img.getAttributeValue("height");

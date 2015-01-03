@@ -19,6 +19,7 @@ public class Node {
         id = node.getAttribute("id");
         name = node.getAttribute("name");
         type = node.getAttribute("type");
+        if(!node.getAttribute("type").equals("NODE")) return; //TODO
         location((Element) node.getElementsByTagName("translate").item(0));
         scale((Element) node.getElementsByTagName("scale").item(0));
         rotation(node.getElementsByTagName("rotate"));

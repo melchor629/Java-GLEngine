@@ -17,6 +17,7 @@ import static org.melchor629.engine.Game.gl;
  * Class for create shaders and shaders programs, manage them and
  * make games be better. Shaders can be created from files or passing
  * them as Strings.
+ * TODO comprobar si el nombre del UNIFORM existe, y si no THROW
  * @author melchor9000
  */
 public class ShaderProgram {
@@ -124,9 +125,13 @@ public class ShaderProgram {
     /**
      * Enable all attribs passed to this method. <b>This method</b> binds for
      * you the shader, but also unbinds it ({@code glUseProgram}).
+     * @param vao Vertex Array Object 
      * @param attribss Variable list for Strings, or an array of Strings
+     * @see <a href="http://stackoverflow.com/questions/13403807/glvertexattribpointer-raising-gl-invalid-operation">
+     *      glVertexAttribPointer raising GL_INVALID_OPERATION</a>
      */
-    public void enableAttribs(String... attribss) {
+    public void enableAttribs(VAO vao, String... attribss) {
+        vao.bind();
         bind();
         for(String attribS : attribss) {
             int loc = gl.getAttribLocation(shaderProgram, attribS);
@@ -134,6 +139,7 @@ public class ShaderProgram {
                 gl.enableVertexAttribArray(loc);
         }
         fetchAttribs();
+        vao.unbind();
     }
 
     /**

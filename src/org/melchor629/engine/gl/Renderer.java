@@ -1,6 +1,11 @@
 package org.melchor629.engine.gl;
 
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 //import static org.lwjgl.opengl.GL11.*;
 
@@ -477,6 +482,65 @@ public interface Renderer {
         final int e;
         GLGet(int t) { e = t; }
     }
+    
+    /**
+     * Values returned by calling {@link #getError()}
+     * @author melchor9000
+     */
+    enum Error {
+        /**
+         * No error has been recorded
+         */
+        NO_ERROR(0),
+        
+        /**
+         * An unacceptable value is specified for an enumerated argument.
+         * The offending command is ignored and has no other side effect
+         * than to set the error flag.
+         */
+        INVALID_ENUM(1280),
+
+        /**
+         * A numeric argument is out of range. The offending command is
+         * ignored and has no other side effect than to set the error flag.
+         */
+        INVALID_VALUE(1281),
+        
+        /**
+         * The specified operation is not allowed in the current state.
+         * The offending command is ignored and has no other side effect
+         * than to set the error flag.
+         */
+        INVALID_OPERATION(1282),
+        
+        /**
+         * The framebuffer object is not complete. The offending command
+         * is ignored and has no other side effect than to set the error flag.
+         */
+        INVALID_FRAMEBUFFER_OPERATION(1286),
+        
+        /**
+         * There is not enough memory left to execute the command. The
+         * state of the GL is undefined, except for the state of the
+         * error flags, after this error is recorded.
+         */
+        OUT_OF_MEMORY(1285),
+        
+        /**
+         * An attempt has been made to perform an operation that would
+         * cause an internal stack to overflow.
+         */
+        STACK_OVERFLOW(1283),
+        
+        /**
+         * An attempt has been made to perform an operation that would
+         * cause an internal stack to underflow.
+         */
+        STACK_UNDERFLOW(1284);
+        
+        public final int errno;
+        Error(int t) { errno = t; }
+    }
 
     /**
      * Enum for glGetBufferParameteriv/glGetBufferParameteri64v
@@ -597,6 +661,16 @@ public interface Renderer {
      * @return True if is activated, false otherwise
      */
     boolean isEnabled(GLEnable enabled);
+    
+    /**
+     * Each detectable error is assigned a numeric
+     * code and symbolic name. When an error occurs,
+     * the error flag is set to the appropriate error
+     * code value. All values returner by this method
+     * are in {@link Renderer.Error} enum.
+     * @return the value of the error flag
+     */
+    Error getError();
 
     //Vertex Arrays
     int genVertexArray();
@@ -611,11 +685,27 @@ public interface Renderer {
     void deleteBuffer(int vbo);
     void deleteBuffers(int[] ebo);
     void bindBuffer(BufferTarget target, int bo);
+    void bufferData(BufferTarget target, int count, BufferUsage usage);
     void bufferData(BufferTarget target, byte[] buff, BufferUsage usage);
     void bufferData(BufferTarget target, short[] buff, BufferUsage usage);
     void bufferData(BufferTarget target, int[] buff, BufferUsage usage);
     void bufferData(BufferTarget target, float[] buff, BufferUsage usage);
     void bufferData(BufferTarget target, double[] buff, BufferUsage usage);
+    void bufferData(BufferTarget target, ByteBuffer buff, BufferUsage usage);
+    void bufferData(BufferTarget target, ShortBuffer buff, BufferUsage usage);
+    void bufferData(BufferTarget target, IntBuffer buff, BufferUsage usage);
+    void bufferData(BufferTarget target, FloatBuffer buff, BufferUsage usage);
+    void bufferData(BufferTarget target, DoubleBuffer buff, BufferUsage usage);
+    void bufferSubData(BufferTarget target, long offset, byte[] buff);
+    void bufferSubData(BufferTarget target, long offset, short[] buff);
+    void bufferSubData(BufferTarget target, long offset, int[] buff);
+    void bufferSubData(BufferTarget target, long offset, float[] buff);
+    void bufferSubData(BufferTarget target, long offset, double[] buff);
+    void bufferSubData(BufferTarget target, long offset, ByteBuffer buff);
+    void bufferSubData(BufferTarget target, long offset, ShortBuffer buff);
+    void bufferSubData(BufferTarget target, long offset, IntBuffer buff);
+    void bufferSubData(BufferTarget target, long offset, FloatBuffer buff);
+    void bufferSubData(BufferTarget target, long offset, DoubleBuffer buff);
     void drawArrays(DrawMode mode, int first, int count);
     void drawElements(DrawMode mode, int length, type type, long offset);
     int getBufferParameteri(BufferTarget target, GLGetBuffer param);
@@ -675,6 +765,7 @@ public interface Renderer {
     void texParameteri(TextureTarget target, TextureParameter pName, TextureWrap p);
     void texParameteri(TextureTarget target, TextureParameter pName, TextureFilter p);
 
+    //TODO Con texturas usar tambien Buffers, a parte de arrays
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t);
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, byte[] b);
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, short[] b);

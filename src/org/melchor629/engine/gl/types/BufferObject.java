@@ -1,5 +1,8 @@
 package org.melchor629.engine.gl.types;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
@@ -7,7 +10,7 @@ import org.melchor629.engine.gl.Renderer;
 /**
  * Class for manage all types of *BO (<i>Buffer Objects</i>) like VBO
  * (<i>Vertex Buffer Object</i>) or EBO (<i>Element Buffer Object</i>)
- * Incomplete, but 100% usable TODO
+ * Incomplete, but 100% usable TODO (Buffers and glBufferSubData)
  * @author melchor9000
  */
 public class BufferObject {
@@ -89,6 +92,16 @@ public class BufferObject {
     /**
      * Fill the buffer object with data from {@code buff}. And also binds
      * this BO for more intuitive coding ;)
+     * @param buff Data to be copied as ints (3 bytes)
+     */
+    public void fillBuffer(IntBuffer buff) {
+        bind();
+        Game.gl.bufferData(target, buff, usage);
+    }
+
+    /**
+     * Fill the buffer object with data from {@code buff}. And also binds
+     * this BO for more intuitive coding ;)
      * @param buff Data to be copied as floats (32 bit floating number)
      */
     public void fillBuffer(float[] buff) {
@@ -104,6 +117,33 @@ public class BufferObject {
     public void fillBuffer(double[] buff) {
         bind();
         Game.gl.bufferData(target, buff, usage);
+    }
+    
+    public void initPartialFillBuffer(int count) {
+        bind();
+        Game.gl.bufferData(target, count, usage);
+    }
+    
+    /**
+     * Partially fills the buffer object with data from {@code buff}, starting
+     * from the {@code offset}.
+     * @param offset Position where start copying the data
+     * @param buff Data to be copied as int (32 bit number)
+     */
+    public void partiallyFillBuffer(long offset, IntBuffer buff) {
+        bind();
+        Game.gl.bufferSubData(target, offset, buff);
+    }  
+    
+    /**
+     * Partially fills the buffer object with data from {@code buff}, starting
+     * from the {@code offset}.
+     * @param offset Position where start copying the data
+     * @param buff Data to be copied as float (32 bit floating number)
+     */
+    public void partiallyFillBuffer(long offset, FloatBuffer buff) {
+        bind();
+        Game.gl.bufferSubData(target, offset, buff);
     }
 
     /**

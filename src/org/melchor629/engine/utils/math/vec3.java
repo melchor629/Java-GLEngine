@@ -59,9 +59,9 @@ public class vec3 {
      */
     public void normalize() {
         float modulo = length();
-        x = x / modulo;
-        y = y / modulo;
-        z = z / modulo;
+        x /= modulo;
+        y /= modulo;
+        z /= modulo;
     }
 
     public void add(float v) {

@@ -1150,7 +1150,7 @@ public class LWJGLRenderer implements Renderer {
     @Override
     public void uniformMatrix4(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 4 * 4) throw new BufferUnderflowException();
-        FloatBuffer buff = BufferUtils.createFloatBuffer(4 * 4).put(matrix).compact();
+        FloatBuffer buff = BufferUtils.createFloatBuffer(4 * 4).put(matrix);buff.flip();
         glUniformMatrix4(loc, trans, buff);
         buff.clear();
     }
@@ -1170,6 +1170,176 @@ public class LWJGLRenderer implements Renderer {
     @Override
     public long getBufferParameteri64(BufferTarget target, GLGetBuffer param) {
         return glGetBufferParameteri64(target.e, param.e);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.ByteBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     */
+    @Override
+    public void bufferData(BufferTarget target, ByteBuffer buff, BufferUsage usage) {
+        glBufferData(target.e, buff, usage.e);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.ShortBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     */
+    @Override
+    public void bufferData(BufferTarget target, ShortBuffer buff, BufferUsage usage) {
+        glBufferData(target.e, buff, usage.e);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.IntBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     */
+    @Override
+    public void bufferData(BufferTarget target, IntBuffer buff, BufferUsage usage) {
+        glBufferData(target.e, buff, usage.e);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.FloatBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     */
+    @Override
+    public void bufferData(BufferTarget target, FloatBuffer buff, BufferUsage usage) {
+        glBufferData(target.e, buff, usage.e);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.DoubleBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     */
+    @Override
+    public void bufferData(BufferTarget target, DoubleBuffer buff, BufferUsage usage) {
+        glBufferData(target.e, buff, usage.e);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, byte[])
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, byte[] buff) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, short[])
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, short[] buff) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, int[])
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, int[] buff) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, float[])
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, float[] buff) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, double[])
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, double[] buff) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.ByteBuffer)
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, ByteBuffer buff) {
+        glBufferSubData(target.e, offset, buff);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.ShortBuffer)
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, ShortBuffer buff) {
+        glBufferSubData(target.e, offset, buff);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.IntBuffer)
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, IntBuffer buff) {
+        glBufferSubData(target.e, offset, buff);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.FloatBuffer)
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, FloatBuffer buff) {
+        glBufferSubData(target.e, offset, buff);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.DoubleBuffer)
+     */
+    @Override
+    public void bufferSubData(BufferTarget target, long offset, DoubleBuffer buff) {
+        glBufferSubData(target.e, offset, buff);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#getError()
+     */
+    @Override
+    public Error getError() {
+        int errno = glGetError();
+        Error error;
+        
+        switch(errno) {
+            case GL_INVALID_ENUM:
+                error = Error.INVALID_ENUM;
+                break;
+            case GL_INVALID_VALUE:
+                error = Error.INVALID_VALUE;
+                break;
+            case GL_INVALID_OPERATION:
+                error = Error.INVALID_OPERATION;
+                break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION:
+                error = Error.INVALID_FRAMEBUFFER_OPERATION;
+                break;
+            case GL_OUT_OF_MEMORY:
+                error = Error.OUT_OF_MEMORY;
+                break;
+            case GL_STACK_OVERFLOW:
+                error = Error.STACK_OVERFLOW;
+                break;
+            case GL_STACK_UNDERFLOW:
+                error = Error.STACK_UNDERFLOW;
+                break;
+            default:
+                error = Error.NO_ERROR;
+        }
+        
+        return error;
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, int, org.melchor629.engine.gl.Renderer.BufferUsage)
+     */
+    @Override
+    public void bufferData(BufferTarget target, int count, BufferUsage usage) {
+        glBufferData(target.e, count, usage.e);
     }
 
 }

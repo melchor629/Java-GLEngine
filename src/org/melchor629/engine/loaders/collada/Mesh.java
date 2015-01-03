@@ -16,8 +16,6 @@ public class Mesh {
 
     public Mesh(Element mesh) {
         sources = new ArrayList<Source>();
-        //for(Element source : getChildren(mesh, "source"))
-        //    sources.add(new Source(source));
         org.w3c.dom.NodeList nl = mesh.getElementsByTagName("source");
         for(int i = 0; i < nl.getLength(); i++) {
             Element source = (Element) nl.item(i);
@@ -28,5 +26,17 @@ public class Mesh {
             polylist = new Polylist((Element) mesh.getElementsByTagName("polylist").item(0));
         vertices = new Polylist.Input((Element) ((Element) mesh.getElementsByTagName("vertices").item(0)).getElementsByTagName("input").item(0));
         vertices_id = ((Element) mesh.getElementsByTagName("vertices").item(0)).getAttribute("id");
+    }
+    
+    public void disposeData() {
+        polylist.p.clear();
+        polylist.vcount.clear();
+        polylist.p = null;
+        polylist.vcount = null;
+        
+        for(Source source : sources) {
+            source.buff.clear();
+            source.buff = null;
+        }
     }
 }

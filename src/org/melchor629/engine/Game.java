@@ -3,6 +3,8 @@ package org.melchor629.engine;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
+import org.melchor629.engine.input.Keyboard;
+import org.melchor629.engine.input.Mouse;
 
 /**
  * Basic class for every game
@@ -14,6 +16,8 @@ public abstract class Game {
     protected String title;
     public static Renderer gl;
     public static AL al;
+    public static Keyboard keyboard;
+    public static Mouse mouse;
 
     protected void setDisplay() {
         gl = new LWJGLRenderer();
