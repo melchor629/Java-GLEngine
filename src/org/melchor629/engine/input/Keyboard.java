@@ -65,6 +65,14 @@ public abstract class Keyboard {
     public abstract boolean isKeyPressed(String key);
     
     /**
+     * Use this method when you will not use anymore th keyboard
+     * input.<br>
+     * Implementors should call methods to release native data
+     * and related stuff.
+     */
+    public abstract void release();
+    
+    /**
      * {@code OnKeyboardEvent} interface. This Event is fired
      * every frame.
      * @author melchor9000

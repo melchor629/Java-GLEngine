@@ -20,18 +20,20 @@ import org.melchor629.engine.gl.LWJGLRenderer;
  * @author melchor9000
  */
 public class LWJGLKeyboard extends Keyboard {
+    private static GLFWKeyCallback kCbk;
 
     public LWJGLKeyboard() {
         super();
-        glfwSetKeyCallback(((LWJGLRenderer) Game.gl).window, new GLFWKeyCallback() {
+        glfwSetKeyCallback(((LWJGLRenderer) Game.gl).window, kCbk = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
+                if(key == -1) key = 1023;
                 if(action == GLFW_PRESS)
                     LWJGLKeyboard.this.keysPressed[key] = true;
                 else if(action == GLFW_RELEASE)
                     LWJGLKeyboard.this.keysPressed[key] = false;
 
-                LWJGLKeyboard.this.shiftPressed = (mods & GLFW_MOD_SHIFT) == 1;
+                LWJGLKeyboard.this.shiftPressed = (mods & GLFW_MOD_SHIFT) == 1 || key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT;
                 LWJGLKeyboard.this.controlPressed = (mods & GLFW_MOD_CONTROL) == 1;
                 LWJGLKeyboard.this.altPressed = (mods & GLFW_MOD_ALT) == 1;
                 LWJGLKeyboard.this.superPressed = (mods & GLFW_MOD_SUPER) == 1;
@@ -52,6 +54,14 @@ public class LWJGLKeyboard extends Keyboard {
             pos = -1;
         }
         return this.keysPressed[pos];
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.input.Keyboard#release()
+     */
+    @Override
+    public void release() {
+        kCbk.release();
     }
 
 }

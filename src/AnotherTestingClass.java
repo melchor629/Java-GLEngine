@@ -1,10 +1,6 @@
 import java.io.File;
 import java.util.ArrayList;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
@@ -19,10 +15,9 @@ import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
-import org.melchor629.engine.input.Mouse.OnMouseClickEvent;
-import org.melchor629.engine.input.Mouse.OnMouseMoveEvent;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.collada.Geometry;
+import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.ModelMatrix;
@@ -65,6 +60,10 @@ public class AnotherTestingClass {
         gl.setVsync(true);
         gl.setResizable(true);
         cr = gl.createDisplay(1280, 720, false, "Eso...");
+        Keyboard keyboard = Game.keyboard = new LWJGLKeyboard();
+        Mouse mouse = Game.mouse = new LWJGLMouse();
+        Camera camera = new Camera();
+        camera.setClipPanes(0.1, 100);
         
         if(!cr) {
             System.out.printf("Error al crear la ventana...");
@@ -105,30 +104,23 @@ public class AnotherTestingClass {
         }
         
         vao.unbind();
-        //vbo.unbind();
-        //ebo.unbind();
+        vbo.unbind();
+        ebo.unbind();
         c.disposeData();
         
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);
         s.bindFragDataLocation("outColor", 0);
         s.bind();
-        /*for(VAO _vao : vaos) {
+        for(VAO _vao : vaos) {
             s.enableAttribs(_vao, "position", "normal", "color");
-            s.vertexAttribPointer("position", 3, Renderer.type.FLOAT, false, 3 * 4, 0);
-            s.vertexAttribPointer("normal", 3, Renderer.type.FLOAT, false, 3 * 4, 0);
-            s.vertexAttribPointer("color", 3, Renderer.type.FLOAT, false, 3 * 4, 0);
-        }*/
+        }
         s.unbind();
-        
-        mat4 view, proj;
+
         ModelMatrix model = new ModelMatrix();
         
-        view = GLM.lookAt(new vec3(0, 0, 2), new vec3(), new vec3(0, 0, 1));
-        proj = GLM.perspective(60, 1280d/720d, 0.1d, 100d);
-        
         s.bind();
-        s.setUniformMatrix("view", view);
-        s.setUniformMatrix("project", proj);
+        s.setUniformMatrix("view", camera.getViewMatrix());
+        s.setUniformMatrix("project", camera.getProjectionMatrix());
         s.setUniformMatrix("model", model.getModelMatrix());
         
         gl.enable(GLEnable.DEPTH_TEST);
@@ -136,6 +128,8 @@ public class AnotherTestingClass {
         
         while(!gl.windowIsClosing()) {
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
+            s.setUniformMatrix("view", camera.getViewMatrix());
+            s.setUniformMatrix("project", camera.getProjectionMatrix());
             
             for(int i = 0; i < c.geometry.size(); i++) {
                 int offsetNormal = c.geometry.get(i).mesh.sources.get(0).count() * 4; //4 -> sizeof(float)
@@ -143,17 +137,17 @@ public class AnotherTestingClass {
 
                 s.setUniformMatrix("model", model.getModelMatrix());
                 vaos.get(i).bind();
-                //vbos.get(i).bind();
+                vbos.get(i).bind();
                 s.vertexAttribPointer("position", 3, Renderer.type.FLOAT, false, 3 * 4, 0);
                 s.vertexAttribPointer("normal", 3, Renderer.type.FLOAT, false, 3 * 4, offsetNormal);
                 s.vertexAttribPointer("color", 3, Renderer.type.FLOAT, false, 3 * 4, offsetNormal); //No tenemos color :(
-                //if(i < 166)
-                    gl.drawElements(DrawMode.TRIANGLES, facesCount, Renderer.type.UNSIGNED_INT, 0);
-                    //gl.drawArrays(DrawMode.TRIANGLES, 0, offsetNormal/4);
+                gl.drawElements(DrawMode.TRIANGLES, facesCount, Renderer.type.UNSIGNED_INT, 0); //facesCount wrong?
             }
             
             gl._game_loop_sync(60);
             t.update();
+            keyboard.fireEvent(t.frameTime);
+            mouse.fireEvent(t.frameTime);
         }
         
         s.delete();
@@ -163,6 +157,8 @@ public class AnotherTestingClass {
             ebos.get(i).delete();
         }
         
+        keyboard.release();
+        mouse.release();
         gl.destroyDisplay();
     }
     
@@ -172,9 +168,11 @@ public class AnotherTestingClass {
         boolean cr;
         gl.setVsync(true);
         gl.setResizable(true);
+        org.lwjgl.glfw.GLFW.glfwWindowHint(135181, 16); //Activate Antialiasing
         cr = gl.createDisplay(1280, 720, false, "Cámara");
-        Keyboard keyboard = new LWJGLKeyboard();
-        Mouse mouse = new LWJGLMouse();
+        Keyboard keyboard = Game.keyboard = new LWJGLKeyboard();
+        Mouse mouse = Game.mouse = new LWJGLMouse();
+        gl.enable(Renderer.GLEnable.MULTISAMPLE); //Enable on OpenGL
         
         if(!cr) {
             System.out.printf("Error al crear la ventana...");
@@ -210,7 +208,6 @@ public class AnotherTestingClass {
         mat4 view, proj;
         final ModelMatrix model = new ModelMatrix();
         final vec3 cameraPos = new vec3(0f, 1f, 2.2f), cameraDir = GLM.product(-1f, cameraPos), cameraUp = new vec3(0, 0, 1);
-        final vec3 mousePos = new vec3(), cameraRotation = new vec3();
         
         view = GLM.lookAt(cameraPos, GLM.sum(cameraPos, cameraDir), cameraUp);
         proj = GLM.perspective(45d, 1280d/720d, 1d, 10d);
@@ -223,76 +220,26 @@ public class AnotherTestingClass {
         gl.enable(GLEnable.DEPTH_TEST);
         gl.clearColor(1, 1, 1, 1);
         
-        keyboard.addListener(new Keyboard.OnKeyboardEvent() {
-            @Override
-            public void invoke(Keyboard self, double delta) {
-                float cameraSpeed = 1.f * (float) delta;
-                float x = cameraPos.x, y = cameraPos.y, z = cameraPos.z;
-                
-                if(self.isKeyPressed("W"))
-                    cameraPos.substract(GLM.product(cameraSpeed, cameraPos));
-                if(self.isKeyPressed("S"))
-                    cameraPos.add(GLM.product(cameraSpeed, cameraPos));
-                if(self.isKeyPressed("A"))
-                    cameraPos.substract(GLM.product(cameraSpeed, GLM.normalize(GLM.cross(cameraDir, cameraUp))));
-                if(self.isKeyPressed("D"))
-                    cameraPos.add(GLM.product(cameraSpeed, GLM.normalize(GLM.cross(cameraDir, cameraUp))));
-                if(self.isKeyPressed("Q"))
-                    cameraPos.z += cameraSpeed;
-                if(self.isKeyPressed("E"))
-                    cameraPos.z -= cameraSpeed;
-                if(self.isKeyPressed("ESCAPE"))
-                    GLFW.glfwSetWindowShouldClose(((LWJGLRenderer) Game.gl).window, 1);
-                
-                x = cameraPos.x - x; y = cameraPos.y - y; z = cameraPos.z - z;
-            }
-        });
-
-        mouse.addListener(new OnMouseMoveEvent() {
+        final Camera c = new Camera(cameraPos, cameraDir, cameraUp);
+        
+        mouse.addListener(new Mouse.OnMouseMoveEvent() {
             @Override
             public void invoke(Mouse self) {
-                if(!self.isCaptured()) return;
-
-                if(mousePos.z == 0.0f) {
-                    mousePos.x = (float) self.getMousePosition().x;
-                    mousePos.y = (float) self.getMousePosition().y;
-                    mousePos.z = 1;
-                    
-                    cameraDir.normalize();
-                    cameraRotation.z = (float) Math.toDegrees(Math.asin(cameraDir.z));
-                    cameraRotation.x = (float) Math.toDegrees(Math.acos(cameraDir.x / Math.cos(Math.toRadians(cameraRotation.z))));
-                    
-                    //Seleccionando el cuadrante correcto según donde apunta
-                    if(cameraRotation.x >= 90.f && cameraDir.z < 0f)
-                        cameraRotation.x = -90.f;
+                if(self.getWheelSpeed().y != 0.f) {
+                    if(self.isShiftPressed())
+                        c.setPosition(c.getPosition().x, c.getPosition().y + self.getWheelSpeed().y * .5f, c.getPosition().z);
+                    else if(self.isAltPressed())
+                        c.setFOV(c.getFOV() + self.getWheelSpeed().y);
+                    else
+                        c.setRotation(c.getRotation().x, c.getRotation().y + self.getWheelSpeed().y * 0.3f, c.getRotation().z);
                 }
-
-                float sensibility = 60f * (float) t.frameTime;
-                float dx = (float) self.getMousePosition().x - mousePos.x, dy = mousePos.y - (float) self.getMousePosition().y; //Reverse Y position
                 
-                mousePos.x = (float) self.getMousePosition().x;
-                mousePos.y = (float) self.getMousePosition().y;
-                
-                cameraRotation.x += dx * sensibility;
-                cameraRotation.z += dy * sensibility;
-                
-                if(cameraRotation.z > 89.f)
-                    cameraRotation.z = 89.f;
-                else if(cameraRotation.z < -89.f)
-                    cameraRotation.z = -89.f;
-                
-                cameraDir.x = (float) (Math.cos(Math.toRadians(cameraRotation.x)) * Math.cos(Math.toRadians(cameraRotation.z)));
-                cameraDir.z = (float) (Math.sin(Math.toRadians(cameraRotation.z)));
-                cameraDir.y = (float) (Math.sin(Math.toRadians(cameraRotation.x)) * Math.cos(Math.toRadians(cameraRotation.z)));
-            }
-        });
-        
-        //Arreglar esto
-        mouse.addListener(new OnMouseClickEvent() {
-            @Override
-            public void invoke(Mouse self, double delta) {
-                if(self.isKeyPressed("LEFT"))
-                    self.setCaptured(!self.isCaptured());
+                if(self.getWheelSpeed().x != 0.f) {
+                    if(self.isShiftPressed())
+                        c.setPosition(c.getPosition().x + self.getWheelSpeed().x * .5f, c.getPosition().y, c.getPosition().z);
+                    else
+                        c.setRotation(c.getRotation().x + self.getWheelSpeed().x * 0.3f, c.getRotation().y, c.getRotation().z);
+                }
             }
         });
         
@@ -300,10 +247,11 @@ public class AnotherTestingClass {
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
             
             model.setIdentity();
-            view = GLM.lookAt(cameraPos, GLM.sum(cameraPos, cameraDir), cameraUp);
+            view = c.getViewMatrix();
             s.bind();
             s.setUniformMatrix("model", model.getModelMatrix());
-            s.setUniformMatrix("view", view);
+            s.setUniformMatrix("view", c.getViewMatrix());
+            s.setUniformMatrix("project", c.getProjectionMatrix());
             vao.bind();
             gl.drawArrays(DrawMode.TRIANGLES, 0, 6);
             s.unbind();
@@ -318,11 +266,12 @@ public class AnotherTestingClass {
     }
     
     public static void main(String[] args) {
-        //colladaxd(args);
-        cameraxd(args);
+        colladaxd(args);
+        //cameraxd(args);
         System.exit(0);
     }
     
+    @SuppressWarnings("unused")
     private static final void printError() {
         Renderer.Error err = Game.gl.getError();
         //if(err != Renderer.Error.NO_ERROR)

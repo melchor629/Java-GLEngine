@@ -18,27 +18,25 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class LWJGLMouse extends Mouse {
     private long window;
+    private GLFWMouseButtonCallback mbCbk;
+    private GLFWCursorPosCallback cpCbk;
+    private GLFWScrollCallback sCbk;
     
     public LWJGLMouse() {
         super();
         window = ((LWJGLRenderer) Game.gl).window;
         
-        glfwSetMouseButtonCallback(window, new GLFWMouseButtonCallback() {
+        glfwSetMouseButtonCallback(window, mbCbk = new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
                 if(action == GLFW_PRESS)
                     LWJGLMouse.this.mousePressed[button] = true;
                 else if(action == GLFW_RELEASE)
                     LWJGLMouse.this.mousePressed[button] = false;
-
-                LWJGLMouse.this.shiftPressed = (mods & GLFW_MOD_SHIFT) == 1;
-                LWJGLMouse.this.controlPressed = (mods & GLFW_MOD_CONTROL) == 1;
-                LWJGLMouse.this.altPressed = (mods & GLFW_MOD_ALT) == 1;
-                LWJGLMouse.this.superPressed = (mods & GLFW_MOD_SUPER) == 1;
             }
         });
         
-        glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() {
+        glfwSetCursorPosCallback(window, cpCbk = new GLFWCursorPosCallback() {
             @Override
             public void invoke(long window, double xpos, double ypos) {
                 vec2 oldPos = LWJGLMouse.this.pos;
@@ -52,7 +50,7 @@ public class LWJGLMouse extends Mouse {
             }
         });
         
-        glfwSetScrollCallback(window, new GLFWScrollCallback() {
+        glfwSetScrollCallback(window, sCbk = new GLFWScrollCallback() {
             @Override
             public void invoke(long window, double xoffset, double yoffset) {
                 LWJGLMouse.this.wheel.x = (float) xoffset;
@@ -109,6 +107,16 @@ public class LWJGLMouse extends Mouse {
     @Override
     public void setCursorPosition(vec2 position) {
         setCursorPosition(position.x, position.y);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.input.Mouse#release()
+     */
+    @Override
+    public void release() {
+        cpCbk.release();
+        mbCbk.release();
+        sCbk.release();
     }
 
 }

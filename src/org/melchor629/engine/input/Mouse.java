@@ -2,6 +2,7 @@ package org.melchor629.engine.input;
 
 import java.util.ArrayList;
 
+import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.math.vec2;
 
 /**
@@ -15,11 +16,6 @@ public abstract class Mouse {
      * pressed
      */
     protected final boolean[] mousePressed;
-
-    /**
-     * Control variables for modifier keys
-     */
-    protected boolean shiftPressed, controlPressed, altPressed, superPressed;
     
     /**
      * Value that represents the sensibility of the mouse
@@ -59,7 +55,6 @@ public abstract class Mouse {
         mousePressed = new boolean[20];
         listeners = new ArrayList<>();
         listeners2 = new ArrayList<>();
-        shiftPressed = controlPressed = altPressed = superPressed = false;
         sensibility = 1.f;
         pos = new vec2();
         dPos = new vec2();
@@ -103,6 +98,8 @@ public abstract class Mouse {
     protected void fireOtherEvent() {
         for(OnMouseMoveEvent e : listeners2)
             e.invoke(this);
+        wheel.x = wheel.y = 0.f;
+        dPos.x = dPos.y = 0.f;
     }
     
     /**
@@ -129,6 +126,22 @@ public abstract class Mouse {
      */
     public final vec2 getWheelSpeed() {
         return wheel;
+    }
+    
+    public final boolean isShiftPressed() {
+        return Game.keyboard.shiftPressed;
+    }
+    
+    public final boolean isCtrlPressed() {
+        return Game.keyboard.controlPressed;
+    }
+    
+    public final boolean isAltPressed() {
+        return Game.keyboard.altPressed;
+    }
+    
+    public final boolean isSuperPressed() {
+        return Game.keyboard.superPressed;
     }
     
     /**
@@ -169,6 +182,14 @@ public abstract class Mouse {
      * @param position Position relative to the window
      */
     public abstract void setCursorPosition(vec2 position);
+    
+    /**
+     * Use this method when you will not use anymore th keyboard
+     * input.<br>
+     * Implementors should call methods to release native data
+     * and related stuff.
+     */
+    public abstract void release();
 
 
     /**
