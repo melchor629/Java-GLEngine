@@ -27,7 +27,7 @@ public interface Renderer {
 
         final int a, b;
         GLVersion(int a, int b) { this.a = a; this.b = b; }
-    };
+    }
 
     /**
      * Enum for select some capability to enable/disable (maybe incomplete)
@@ -473,7 +473,7 @@ public interface Renderer {
     }
 
     enum CullFaceMode {
-        BACK, FRONT, FRONT_AND_BACK;
+        BACK, FRONT, FRONT_AND_BACK
     }
 
     enum GLGet {
@@ -626,13 +626,13 @@ public interface Renderer {
 
     /**
      * Sets if Vertical Synchronization is activated or not
-     * @param vsync
+     * @param vsync whether set vsync or not
      */
     void setVsync(boolean vsync);
 
     /**
      * Makes the window resizable or not
-     * @param resizable
+     * @param resizable whether to set the window resizable or not
      */
     void setResizable(boolean resizable);
 
@@ -644,14 +644,14 @@ public interface Renderer {
     /**
      * Enable a capability
      * @param enable Capability to enable
-     * @see {@link #GLEnable}
+     * @see {@link GLEnable}
      */
     void enable(GLEnable enable);
 
     /**
      * Disable a capability
      * @param disable Capability to disable
-     * @see {@link #GLEnable}
+     * @see {@link GLEnable}
      */
     void disable(GLEnable disable);
 

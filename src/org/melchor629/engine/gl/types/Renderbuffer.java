@@ -26,9 +26,10 @@ public class Renderbuffer {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         delete();
     }
 
-    int _get_rbo_() { return rbo; };
+    int _get_rbo_() { return rbo; }
 }

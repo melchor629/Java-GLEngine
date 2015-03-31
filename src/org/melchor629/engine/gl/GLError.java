@@ -5,7 +5,7 @@ package org.melchor629.engine.gl;
  * fail, like calling a bind on a deleted VAO.
  * @author melchor9000
  */
-public class GLError extends Error {
+public class GLError extends RuntimeException {
     private String msg, glFunc;
 
     /**
@@ -25,8 +25,8 @@ public class GLError extends Error {
     /**
      * Create a new GLError with the given message and specifying the
      * OpenGL Function that send an error
-     * @param glFunc
-     * @param msg
+     * @param glFunc OpenGL Function
+     * @param msg Error' message
      */
     public GLError(String glFunc, String msg) {
         super(msg);

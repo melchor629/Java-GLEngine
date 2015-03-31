@@ -13,7 +13,7 @@ import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec3;
 
 /**
- *
+ * Simple Camera class
  * @author melchor9000
  */
 //TODO add to OnResize Listener for projection to change
@@ -27,6 +27,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     
     private mat4 view, proj;
     private boolean needsUpdateView = true, needsUpdateProj = true;
+    private long tempDate = System.currentTimeMillis();
     
     /**
      * Creates a camera with position (0, 0, 0) & rotation 0º & 0º,
@@ -112,7 +113,10 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         }
         return view;
     }
-    
+
+    /**
+     * @return the Projection Matrix of the "lens camera"
+     */
     public mat4 getProjectionMatrix() {
         if(needsUpdateProj) {
             proj = GLM.perspective(fov, aspect, near, far);
@@ -120,11 +124,19 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         }
         return proj;
     }
-    
+
+    /**
+     * @return the Field Of View of the "lens"
+     */
     public final double getFOV() {
         return fov;
     }
 
+    /**
+     * Changes the FOV (<i>Field Of View</i>) of the camera. FOV can
+     * values between 10.0 and 179.0
+     * @param fov new FOV value
+     */
     public final void setFOV(double fov) {
         this.fov = fov;
         if(this.fov > 179.f)
@@ -133,19 +145,36 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
             this.fov = 10.f;
         needsUpdateProj = true;
     }
-    
+
+    /**
+     * Sets the clip panes. This values sets the minimum distance that an object
+     * will start to render and the maximum distance where an object will render.
+     * @param near Minimum distance
+     * @param far Maximum distance
+     */
     public final void setClipPanes(double near, double far) {
         if(near <= 0.0) near = 0.1;
         this.near = near;
         this.far = far;
         needsUpdateProj = true;
     }
-    
+
+    /**
+     * Sets the aspect ratio calculating from the {@code width} and {@code height}.
+     * @param width width
+     * @param height height
+     */
     public final void setAspectRation(double width, double height) {
         this.aspect = width / height;
         needsUpdateProj = true;
     }
-    
+
+    /**
+     * Sets the position of the camera
+     * @param x X Coordinate
+     * @param y Y Coordinate
+     * @param z Z Coordinate
+     */
     public final void setPosition(float x, float y, float z) {
         this.pos.x = x;
         this.pos.y = y;
@@ -153,40 +182,62 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         needsUpdateView = true;
     }
 
+    /**
+     * Sets the position of the camera
+     * @param pos New position as vector
+     */
     public final void setPosition(vec3 pos) {
         setPosition(pos.x, pos.y, pos.z);
     }
-    
+
+    /**
+     * @return the position of the camera
+     */
     public final vec3 getPosition() {
         return pos;
     }
-    
+
+    /**
+     * This method returns the rotation as a representation of Degrees
+     * rotated over (X, Y, Z) axis.
+     * @return the rotation of the camera
+     */
     public final vec3 getRotation() {
         return rot;
     }
-    
+
+    /**
+     * Changes the rotation of the camera in Degrees
+     * @param x Rotation over X axis
+     * @param y Rotation over Y axis
+     * @param z Rotation over Z axis
+     */
     public final void setRotation(float x, float y, float z) {
         this.rot.x = x;
         this.rot.y = y;
         this.rot.z = z;
         needsUpdateView = true;
     }
-    
+
+    /**
+     * Changes the rotation of the camera in Degrees. Every vector component
+     * specifies the rotation on every axis
+     * @param rot Rotation of the camera as vector
+     */
     public final void setRotation(vec3 rot) {
         setRotation(rot.x, rot.y, rot.z);
     }
 
     
-    private final void initListeners() {
+    private void initListeners() {
         Game.keyboard.addListener(this);
         Game.mouse.addListener((OnMouseMoveEvent) this);
         //Arreglar esto
         Game.mouse.addListener((OnMouseClickEvent) this);
     }
-    
-    @Override
+
     public void invoke(Keyboard self, double delta) {
-        float cameraSpeed = 1.f * (float) delta;
+        float cameraSpeed = 5.f * (float) delta;
         float x = pos.x, y = pos.y, z = pos.z;
         
         if(self.isKeyPressed("W"))
@@ -208,12 +259,11 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         if(speed.x != 0.f || speed.y != 0.f || speed.z != 0.f)
             needsUpdateView = true;
     }
-    
-    @Override
-    public void invoke(Mouse self) {
+
+    public void invoke(Mouse self, double delta) {
         if(!self.isCaptured()) return;
 
-        float sensibility = 1/6f;
+        float sensibility = (float) delta * 4;
         
         rot.x += self.getMouseSpeed().x * sensibility;
         rot.y += self.getMouseSpeed().y * sensibility;
@@ -229,14 +279,17 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         
         needsUpdateView = true;
     }
-    
-    @Override
-    public void invoke(Mouse self, double delta) {
-        if(self.isKeyPressed("LEFT"))
+
+    public void invoke(Mouse self) {
+        if(self.isKeyPressed("LEFT")) {
             self.setCaptured(!self.isCaptured());
+            tempDate = System.currentTimeMillis();
+        }
     }
-    
-    @Override
+
+    /**
+     * A {@link String} representation of the camera
+     */
     public String toString() {
         return String.format("Camera [\n    (%.3f, %.3f, %.3f),\n    (%.3fº, %.3fº, %.3fº),\n    (%.1f, %.1f, %.1f) px/s\n]",
                 pos.x, pos.y, pos.z, rot.x, rot.y, 0.f /*rot.z*/, speed.x, speed.y, speed.z);

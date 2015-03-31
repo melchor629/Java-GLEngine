@@ -15,7 +15,6 @@ public class VAO {
      */
     public VAO() {
         vao = Game.gl.genVertexArray();
-        Game.gl.bindVertexArray(vao);
     }
 
     /**
@@ -26,7 +25,7 @@ public class VAO {
         if(vao != -1)
             Game.gl.bindVertexArray(vao);
         else
-            throw new GLError("");
+            throw new GLError("This Vertex Array Object was deleted before");
     }
 
     /**
@@ -46,7 +45,8 @@ public class VAO {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         delete();
     }
 }

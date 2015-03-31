@@ -28,7 +28,7 @@ public class IOUtils {
      * @throws FileNotFoundException If the file doesn't exist, is a directory or (rarely) failed reading
      * @throws IOException If an I/O error happend while reading
      */
-    public static final String readFile(File file) throws FileNotFoundException, IOException {
+    public static String readFile(File file) throws FileNotFoundException, IOException {
         BufferedReader bis = null;
         StringBuilder sb = new StringBuilder();
         try {
@@ -57,7 +57,7 @@ public class IOUtils {
      * @return {@link IOUtils.Image} with the image decoded
      * @throws IOException If we cannot read the file, or is a directory
      */
-    public static final Image readImage(File file, String ext) throws IOException {
+    public static Image readImage(File file, String ext) throws IOException {
         BufferedImage bi = null;
 
         boolean imageio = false;
@@ -109,7 +109,7 @@ public class IOUtils {
      * @return {@link IOUtils.Image} with the image decoded
      * @throws IOException If we cannot read the file, or is a directory
      */
-    public static final Image readImage(File file) throws IOException {
+    public static Image readImage(File file) throws IOException {
         String ext = file.getName();
         ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
         return readImage(file, ext);
@@ -122,10 +122,15 @@ public class IOUtils {
      * @throws FileNotFoundException If the file cannot be created or is a directory
      * @throws IOException If an I/O error happend while writing
      */
-    public static final void writeFile(File file, String content) throws FileNotFoundException, IOException {
+    public static void writeFile(File file, String content) throws FileNotFoundException, IOException {
         BufferedWriter bw = null;
+        boolean created = true;
         try {
-            if(!file.exists()) file.createNewFile();
+            if(!file.exists())
+                created = file.createNewFile();
+            if(!created) {
+                throw new IOException("File cannot be created");
+            }
             bw = new BufferedWriter(new FileWriter(file, false));
             bw.write(content);
             bw.flush();
@@ -134,7 +139,8 @@ public class IOUtils {
                 bw.close();
             throw e;
         } finally {
-            bw.close();
+            if(bw != null)
+                bw.close();
         }
     }
 
@@ -145,7 +151,7 @@ public class IOUtils {
      * @throws FileNotFoundException If the file is a directory
      * @throws IOException If an I/O error happend while writing
      */
-    public static final void appendFile(File file, String content) throws FileNotFoundException, IOException {
+    public static void appendFile(File file, String content) throws FileNotFoundException, IOException {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(file, true));
@@ -156,7 +162,8 @@ public class IOUtils {
                 bw.close();
             throw e;
         } finally {
-            bw.close();
+            if(bw != null)
+                bw.close();
         }
     }
 
@@ -166,7 +173,7 @@ public class IOUtils {
      * @return Contents of the URL
      * @throws IOException If an error occurs while reading the connexion
      */
-    public static final String readUrl(URL url) throws IOException {
+    public static String readUrl(URL url) throws IOException {
         StringBuilder sb = new StringBuilder();
         //ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -190,7 +197,7 @@ public class IOUtils {
         return sb.toString();
     }
 
-    public static final File createTempFile() throws IOException {
+    public static File createTempFile() throws IOException {
         return File.createTempFile("engine", ".tmp");
     }
 

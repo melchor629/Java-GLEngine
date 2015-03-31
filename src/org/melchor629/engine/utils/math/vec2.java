@@ -13,4 +13,8 @@ public class vec2 {
         this.x = x;
         this.y = y;
     }
+
+    public String toString() {
+        return String.format("(%.3f, %.3f)", x, y);
+    }
 }

@@ -60,6 +60,17 @@ public class Collada {
         controllers(collada);
         collada = null;
     }
+
+    public Geometry searchForGeometryWithId(String id) {
+        boolean found = false;
+        int i = 0;
+
+        if(id.startsWith("#"))
+            id = id.substring(1);
+        while(!found && i < geometry.size())
+            found = geometry.get(i++).id.equals(id);
+        return found ? geometry.get(--i) : null;
+    }
     
     public void disposeData() {
         for(Geometry g : geometry)
@@ -73,8 +84,12 @@ public class Collada {
         }).start();
     }
 
+    protected void finalize() {
+        disposeData();
+    }
+
     protected void geometry(Element collada) {
-        geometry = new ArrayList<Geometry>();
+        geometry = new ArrayList<>();
         NodeList nl = ((Element) collada.getElementsByTagName("library_geometries").item(0))
                 .getElementsByTagName("geometry");
         for(int i = 0; i < nl.getLength(); i++) {
@@ -84,7 +99,7 @@ public class Collada {
     }
 
     protected void image(Element collada) {
-        images = new ArrayList<Image>();
+        images = new ArrayList<>();
         NodeList nl = ((Element) collada.getElementsByTagName("library_images").item(0))
                 .getElementsByTagName("image");
         for(int i = 0; i < nl.getLength(); i++) {
@@ -94,7 +109,7 @@ public class Collada {
     }
 
     protected void materials(Element collada) {
-        materials = new ArrayList<Material>();
+        materials = new ArrayList<>();
         NodeList nl = ((Element) collada.getElementsByTagName("library_materials").item(0))
                 .getElementsByTagName("material");
         for(int i = 0; i < nl.getLength(); i++) {
@@ -104,7 +119,7 @@ public class Collada {
     }
 
     protected void effects(Element collada) {
-        effects = new ArrayList<Effect>();
+        effects = new ArrayList<>();
         NodeList nl = ((Element) collada.getElementsByTagName("library_effects").item(0))
                 .getElementsByTagName("effect");
         for(int i = 0; i < nl.getLength(); i++) {
@@ -114,7 +129,7 @@ public class Collada {
     }
 
     protected void visual_scenes(Element collada) {
-        visual_scenes = new ArrayList<VisualScene>();
+        visual_scenes = new ArrayList<>();
         NodeList nl = ((Element) collada.getElementsByTagName("library_visual_scenes").item(0))
                 .getElementsByTagName("visual_scene");
         for(int i = 0; i < nl.getLength(); i++) {
@@ -127,7 +142,7 @@ public class Collada {
     }
 
     protected void controllers(Element collada) {
-        controllers = new ArrayList<Controller>();
+        controllers = new ArrayList<>();
         NodeList nl = ((Element) collada.getElementsByTagName("library_controllers").item(0))
                 .getElementsByTagName("controller");
         for(int i = 0; i < nl.getLength(); i++) {

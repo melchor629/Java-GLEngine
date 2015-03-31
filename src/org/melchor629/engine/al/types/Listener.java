@@ -17,7 +17,7 @@ public class Listener {
      * of the listener.
      * @param value Volume to be set [0.0, 1.0]
      */
-    public static final void setGain(float value) {
+    public static void setGain(float value) {
         al.listenerf(AL.Listener.GAIN, value);
     }
 
@@ -27,7 +27,7 @@ public class Listener {
      * @param y Y component of the position
      * @param z Z component of the position
      */
-    public static final void setPosition(float x, float y, float z) {
+    public static void setPosition(float x, float y, float z) {
         al.listener3f(AL.Listener.POSITION, x, y, z);
     }
 
@@ -37,7 +37,7 @@ public class Listener {
      * @param y Y component of the position
      * @param z Z component of the position
      */
-    public static final void setPosition(int x, int y, int z) {
+    public static void setPosition(int x, int y, int z) {
         al.listener3i(AL.Listener.POSITION, x, y, z);
     }
 
@@ -45,7 +45,7 @@ public class Listener {
      * Sets the position of the listener as a vec3
      * @param vec vector indicating the position
      */
-    public static final void setPosition(vec3 vec) {
+    public static void setPosition(vec3 vec) {
         setPosition(vec.x, vec.y, vec.z);
     }
     
@@ -58,7 +58,7 @@ public class Listener {
      * @param vy Y velocity component
      * @param vz Z velocity component
      */
-    public static final void setVelocity(float vx, float vy, float vz) {
+    public static void setVelocity(float vx, float vy, float vz) {
         al.listener3f(AL.Listener.VELOCITY, vx, vy, vz);
     }
 
@@ -69,7 +69,7 @@ public class Listener {
      * @param vy Y velocity component
      * @param vz Z velocity component
      */
-    public static final void setVelocity(int vx, int vy, int vz) {
+    public static void setVelocity(int vx, int vy, int vz) {
         al.listener3i(AL.Listener.VELOCITY, vx, vy, vz);
     }
 
@@ -78,7 +78,7 @@ public class Listener {
      * with a {@link org.melchor629.engine.utils.math.vec3 vec3}.
      * @param vec Velocity as vector
      */
-    public static final void setVelocity(vec3 vec) {
+    public static void setVelocity(vec3 vec) {
         setVelocity(vec.x, vec.y, vec.z);
     }
 
@@ -92,19 +92,19 @@ public class Listener {
      * @param atx X component of vector <i>at</i>
      * @param aty Y component of vector <i>at</i>
      * @param atz Z component of vector <i>at</i>
-     * @param upx
-     * @param upy
-     * @param upz
+     * @param upx X component of vector <i>up</i>
+     * @param upy Y component of vector <i>up</i>
+     * @param upz Z component of vector <i>up</i>
      */
-    public static final void setOrientation(float atx, float aty, float atz, float upx, float upy, float upz) {
+    public static void setOrientation(float atx, float aty, float atz, float upx, float upy, float upz) {
         al.listener(AL.Listener.ORIENTATION, new float[] {atx, aty, atz, upx, upy, upz});
     }
 
-    public static final void setOrientation(int atx, int aty, int atz, int upx, int upy, int upz) {
+    public static void setOrientation(int atx, int aty, int atz, int upx, int upy, int upz) {
         al.listener(AL.Listener.ORIENTATION, new int[] {atx, aty, atz, upx, upy, upz});
     }
 
-    public static final void setOrientation(vec3 at, vec3 up) {
+    public static void setOrientation(vec3 at, vec3 up) {
         setOrientation(at.x, at.y, at.z, up.x, up.y, up.z);
     }
 
@@ -116,7 +116,7 @@ public class Listener {
      * @param rot Vector with the rotation of the camera/listener
      * @param up Up vector
      */
-    public static final void calculateAndSetOrientation(vec3 rot, vec3 up) {
+    public static void calculateAndSetOrientation(vec3 rot, vec3 up) {
         float x = (float) (GLM.sin(-rot.x - 90.d));
         float y = (float) GLM.sin(-rot.y - 90.d);
         float z = (float) GLM.cos(-rot.x - 90.d);

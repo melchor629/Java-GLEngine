@@ -134,12 +134,23 @@ public class ShaderProgram {
         vao.bind();
         bind();
         for(String attribS : attribss) {
-            int loc = gl.getAttribLocation(shaderProgram, attribS);
-            if(loc != -1)
-                gl.enableVertexAttribArray(loc);
+            enableAttrib(attribS);
         }
         fetchAttribs();
         vao.unbind();
+    }
+
+    /**
+     * Enable one attribs. This method requires to bind a VAO to work.
+     * @param attrib An attribute name
+     * @see <a href="http://stackoverflow.com/questions/13403807/glvertexattribpointer-raising-gl-invalid-operation">
+     *      glVertexAttribPointer raising GL_INVALID_OPERATION</a>
+     */
+    public void enableAttrib(String attrib) {
+        bind();
+        int loc = gl.getAttribLocation(shaderProgram, attrib);
+        if(loc != -1)
+            gl.enableVertexAttribArray(loc);
     }
 
     /**
@@ -297,8 +308,27 @@ public class ShaderProgram {
         gl.uniformMatrix4(uniforms.get(name), false, GLM.matrixAsArray(matrix));
     }
 
+    /**
+     * Returns the Uniform location from the shader
+     * @param name Uniform name
+     * @return its location
+     */
+    public int getUniformLocation(String name) {
+        return uniforms.get(name);
+    }
+
+    /**
+     * Returns the Attribute location from the shader
+     * @param name Attribute name
+     * @return its location
+     */
+    public int getAttributeLocation(String name) {
+        return gl.getAttribLocation(shaderProgram, name);
+    }
+
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         delete();
     }
 
@@ -317,7 +347,7 @@ public class ShaderProgram {
 
     /**
      * Check for errors. If there is an error, then will throw an GLError
-     * @param shader
+     * @param shader shader to check
      * @throws GLError If COMPILE_STATUS is not GL_TRUE (an error occurred
      *                 while compiling)
      */
@@ -343,8 +373,7 @@ public class ShaderProgram {
      * @return the program
      */
     protected final int createProgram() {
-        int program = gl.createProgram();
-        return program;
+        return gl.createProgram();
     }
 
     /**
@@ -361,7 +390,7 @@ public class ShaderProgram {
      */
     private void fetchUniforms() {
         int count = gl.getProgram(shaderProgram, Renderer.GLGetProgram.ACTIVE_UNIFORMS);
-        uniforms = new HashMap<String, Integer>(count);
+        uniforms = new HashMap<>(count);
         int strlen = gl.getProgram(shaderProgram, Renderer.GLGetProgram.ACTIVE_UNIFORM_MAX_LENGTH);
         for(int i = 0; i < count; i++) {
             String name = gl.getActiveUniform(shaderProgram, i, strlen);

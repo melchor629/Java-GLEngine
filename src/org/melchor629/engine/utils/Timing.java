@@ -57,7 +57,7 @@ public class Timing {
      * {@code Thread.sleep()} wrapped with a try/catch.
      * @param time Time to sleep in milliseconds
      */
-    public static final void sleep(long time) {
+    public static void sleep(long time) {
         try {
             Thread.sleep(Math.abs(time));
         } catch(Exception e) {

@@ -107,7 +107,8 @@ public class Texture {
     final int _get_texture_() { return texture; }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         delete();
     }
 

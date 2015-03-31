@@ -180,8 +180,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void deleteVertexArrays(int[] buff) {
-        for(short i = 0; i < buff.length; i++)
-            deleteVertexArray(buff[i]);
+        for (int aBuff : buff) deleteVertexArray(aBuff);
     }
 
     /* (non-Javadoc)

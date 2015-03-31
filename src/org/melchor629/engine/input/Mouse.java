@@ -6,10 +6,11 @@ import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.math.vec2;
 
 /**
- *
+ * Manages the Mouse input. This abstract class has to be implemented
+ * fully depending on the library used. See the Javadoc for all the
+ * subclasses that implements this one.
  * @author melchor9000
  */
-//TODO glfwSetCursorEnterCallback ?
 public abstract class Mouse {
     /**
      * Array that maps between a button (<i>index</i>) and if it's
@@ -43,18 +44,24 @@ public abstract class Mouse {
     /**
      * An array with listeners
      */
-    protected final ArrayList<OnMouseClickEvent> listeners;
+    private final ArrayList<OnMouseClickEvent> listeners;
     
-    /*
+    /**
      * An array with listeners, again
      */
-    protected final ArrayList<OnMouseMoveEvent> listeners2;
+    private final ArrayList<OnMouseMoveEvent> listeners2;
+
+    /**
+     * Another array with more listeners
+     */
+    private final ArrayList<OnButtonPressedEvent> listeners3;
     
 
     public Mouse() {
         mousePressed = new boolean[20];
         listeners = new ArrayList<>();
         listeners2 = new ArrayList<>();
+        listeners3 = new ArrayList<>();
         sensibility = 1.f;
         pos = new vec2();
         dPos = new vec2();
@@ -76,30 +83,64 @@ public abstract class Mouse {
     public void addListener(OnMouseMoveEvent e) {
         listeners2.add(e);
     }
+
+    /**
+     * Adds a listener for the event {@link Mouse.OnButtonPressedEvent}
+     * @param e Event listener
+     */
+    public void addListener(OnButtonPressedEvent e) {
+        listeners3.add(e);
+    }
     
     /**
      * Fire all listeners for the event {@link Mouse.OnMouseClickEvent}.
-     * This method should be called at the start/end of the game loop.
+     */
+    protected void fireMouseClick() {
+        for(OnMouseClickEvent e : listeners)
+            e.invoke(this);
+    }
+    
+    /**
+     * Fire all listeners for the event {@link Mouse.OnMouseMoveEvent}.
      * Delta value is the inverse of the Frame Rate, in other words,
      * the time spent to draw a frame. This value can be useful for
      * animation calculations.
      * @param delta Delta value
      */
-    public void fireEvent(double delta) {
-        for(OnMouseClickEvent e : listeners)
-            e.invoke(this, delta);
+    protected void fireMouseMove(double delta) {
+        if((wheel.x != 0 && wheel.y != 0) || (dPos.x != 0 && dPos.y != 0)) {
+            for(OnMouseMoveEvent e : listeners2)
+                e.invoke(this, delta);
+            wheel.x = wheel.y = 0.f;
+            dPos.x = dPos.y = 0.f;
+        }
     }
-    
+
     /**
-     * Fire all listeners for the event {@link Mouse.OnMouseMoveEvent}.
-     * This method should be called by the implementors everytime the
-     * mouse or the wheel is moved.
+     * Fire all listeners for the event {@link Mouse.OnButtonPressedEvent}.
+     * Delta value is the inverse of the Frame Rate.
+     * @param delta Delva value
      */
-    protected void fireOtherEvent() {
-        for(OnMouseMoveEvent e : listeners2)
-            e.invoke(this);
-        wheel.x = wheel.y = 0.f;
-        dPos.x = dPos.y = 0.f;
+    protected void fireButtonPressed(double delta) {
+        boolean hasSomethingTrue = false;
+        int i = 0;
+        while(!hasSomethingTrue && i < mousePressed.length)
+            hasSomethingTrue = mousePressed[i++];
+
+        if(hasSomethingTrue) {
+            for(OnButtonPressedEvent e : listeners3)
+                e.invoke(this, delta);
+        }
+    }
+
+    /**
+     * Method that updates all stuff related to mouse input. Call this
+     * at the end of every frame.
+     * @param delta Inverse of the FrameRate
+     */
+    public void update(double delta) {
+        fireMouseMove(delta);
+        fireButtonPressed(delta);
     }
     
     /**
@@ -149,7 +190,7 @@ public abstract class Mouse {
      * The string is a representation of the button, for example, the
      * right button will be "RIGHT", or 5th, "5". Depends on the
      * implementation, see Javadoc of the Implemented Class.
-     * Implementers should return using the array {@link #keysPressed}.
+     * Implementers should return using the array {@link Keyboard#keysPressed}.
      * @param key String representation of the Key
      * @return true if the key is pressed, or false otherwise
      */
@@ -184,7 +225,7 @@ public abstract class Mouse {
     public abstract void setCursorPosition(vec2 position);
     
     /**
-     * Use this method when you will not use anymore th keyboard
+     * Use this method when you will not use anymore the mouse
      * input.<br>
      * Implementors should call methods to release native data
      * and related stuff.
@@ -193,20 +234,31 @@ public abstract class Mouse {
 
 
     /**
-     * {@code OnMouseClickEvent} interface. This Event is called on
-     * every frame, and affects to click events of the mouse.
+     * {@code OnMouseClickEvent} interface. This Event is everytime
+     * a mouse button is clicked or released.
      * @author melchor9000
      */
     public static interface OnMouseClickEvent {
-        void invoke(Mouse self, double delta);
+        void invoke(Mouse self);
     }
     
     /**
-     * {@code OnMouseMoveEvent} interface. This Event is called everytime
-     * the mouse or the wheel moves
+     * {@code OnMouseMoveEvent} interface. This Event is called on every
+     * frame with a mouse movement.
      * @author melchor9000
      */
     public static interface OnMouseMoveEvent {
-        void invoke(Mouse self); //TODO delta value?
+        void invoke(Mouse self, double delta);
+    }
+
+    /**
+     * {@code OnButtonPressedEvent} interface. This Event is called
+     * on every frame with a button pressed. This event differs from
+     * {@link org.melchor629.engine.input.Mouse.OnMouseClickEvent}
+     * because this event is called all time the button is pressed, whilst
+     * the other is called only when the button is pressed and released.
+     */
+    public static interface OnButtonPressedEvent {
+        void invoke(Mouse self, double delta);
     }
 }

@@ -149,7 +149,7 @@ public class mat4 {
     /**
      * Set the column with values in {@code v}: <i>(v.x, v.y, v.z, v.w)</i>
      * @param col Column to be changed
-     * @param v The new column
+     * @param vec The new column
      */
     public void setColumn(int col, vec4 vec) {
         matrix[0][col] = vec.x;
@@ -176,8 +176,8 @@ public class mat4 {
     /**
      * Set the column with values from the vector and the float:
      * <i>(v.x, v.y, v.z, d)</i>
-     * @param column Column to be changed
-     * @param v Part of the new column
+     * @param col Column to be changed
+     * @param vec Part of the new column
      * @param d Last value to be changed
      */
     public void setColumn(int col, vec3 vec, float d) {

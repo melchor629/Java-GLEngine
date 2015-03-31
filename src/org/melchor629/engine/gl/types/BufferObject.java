@@ -162,7 +162,8 @@ public class BufferObject {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         delete();
     }
 }

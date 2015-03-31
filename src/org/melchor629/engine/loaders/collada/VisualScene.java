@@ -13,7 +13,7 @@ public class VisualScene {
     public String id, name;
 
     public VisualScene(Element scene) {
-        nodes = new ArrayList<Node>();
+        nodes = new ArrayList<>();
         org.w3c.dom.NodeList nl = scene.getElementsByTagName("node");
         for(int i = 0; i < nl.getLength(); i++) {
             Element node = (Element) nl.item(i);

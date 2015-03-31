@@ -15,7 +15,7 @@ public class Mesh {
     public String vertices_id;
 
     public Mesh(Element mesh) {
-        sources = new ArrayList<Source>();
+        sources = new ArrayList<>();
         org.w3c.dom.NodeList nl = mesh.getElementsByTagName("source");
         for(int i = 0; i < nl.getLength(); i++) {
             Element source = (Element) nl.item(i);

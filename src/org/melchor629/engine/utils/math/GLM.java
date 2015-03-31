@@ -24,16 +24,16 @@ public class GLM {
     }
 
     /**
-     * Cosinus of the angle
+     * Cosine of the angle
      * @param angle in degrees
-     * @return Cosinus
+     * @return Cosine
      */
     public static double cos(double angle) {
         return Math.cos(Math.toRadians(angle));
     }
 
     /**
-     * Trigonometic tangent of the angle
+     * Trigonometric tangent of the angle
      * @param angle in degrees
      * @return tangent
      */
@@ -88,10 +88,10 @@ public class GLM {
      */
     public static vec3 sum(vec3... vec) {
         vec3 w = new vec3();
-        for(byte i = 0; i < vec.length; i++) {
-            w.x += vec[i].x;
-            w.y += vec[i].y;
-            w.z += vec[i].z;
+        for (vec3 aVec : vec) {
+            w.x += aVec.x;
+            w.y += aVec.y;
+            w.z += aVec.z;
         }
         return w;
     }
@@ -103,18 +103,18 @@ public class GLM {
      */
     public static vec4 sum(vec4... vec) {
         vec4 w = new vec4();
-        for(byte i = 0; i < vec.length; i++) {
-            w.x += vec[i].x;
-            w.y += vec[i].y;
-            w.z += vec[i].z;
-            w.w += vec[i].w;
+        for (vec4 aVec : vec) {
+            w.x += aVec.x;
+            w.y += aVec.y;
+            w.z += aVec.z;
+            w.w += aVec.w;
         }
         return w;
     }
 
     /**
      * Substract all vectors.
-     * @param vec Variable length of vectors
+     * @param v Variable length of vectors
      * @return vector substraction of all vectors
      */
     public static vec3 sub(vec3 u, vec3 v) {
@@ -127,7 +127,7 @@ public class GLM {
 
     /**
      * Substract all vectors.
-     * @param vec Variable length of vectors
+     * @param v Variable length of vectors
      * @return vector substraction of all vectors
      */
     public static vec4 sub(vec4 u, vec4 v) {
@@ -146,7 +146,7 @@ public class GLM {
      * @return vector multiplied by value
      */
     public static vec3 product(float value, vec3 vec) {
-        vec3 v = (vec3) vec.clone();
+        vec3 v = vec.clone();
         v.x *= value;
         v.y *= value;
         v.z *= value;
@@ -345,12 +345,12 @@ public class GLM {
     /**
      * Create a rotation matrix with the angle and the axis on which rotate
      * @param angle rotate angle (in radians)
-     * @param rot
-     * @return
+     * @param rot axis vector
+     * @return matrix with rotation transformation
      */
     public static mat4 rotateMatrix(float angle, vec3 rot) {
         mat4 rotate = new mat4(0.f), result = new mat4();
-        final float a = angle, c = (float) Math.cos(a), s = (float) Math.sin(a);
+        final float c = (float) Math.cos(angle), s = (float) Math.sin(angle);
         vec3 axis = normalize(rot);
         vec3 temp = product(1.f - c, axis);
         

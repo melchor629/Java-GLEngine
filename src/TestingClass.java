@@ -201,10 +201,10 @@ public final class TestingClass {
         fbo.attachColorTexture(texColor, 0);
         fbo.unbind();
 
-        File img = new File("/Users/melchor9000/Dropbox/Conpartido equisdé/sample.png");
+        File img = new File("/Users/melchor9000/Dropbox/Conpartido equisdé/sample.png");
         Texture gato, perro;
         gato = new Texture.builder().setFile(img).build();
-        img = new File("/Users/melchor9000/Dropbox/Conpartido equisdé/sample2.png");
+        img = new File("/Users/melchor9000/Dropbox/Conpartido equisdé/sample2.png");
         perro = new Texture.builder().setFile(img).build();
         
         shader.bind();

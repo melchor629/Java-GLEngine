@@ -2,10 +2,7 @@ package org.melchor629.engine.input;
 
 import java.lang.reflect.Field;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
-import org.lwjgl.glfw.GLFWMouseButtonCallback;
-import org.lwjgl.glfw.GLFWScrollCallback;
+import org.lwjgl.glfw.*;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.utils.math.vec2;
@@ -29,10 +26,13 @@ public class LWJGLMouse extends Mouse {
         glfwSetMouseButtonCallback(window, mbCbk = new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
+                boolean beforeStatus = LWJGLMouse.this.mousePressed[button];
                 if(action == GLFW_PRESS)
                     LWJGLMouse.this.mousePressed[button] = true;
                 else if(action == GLFW_RELEASE)
                     LWJGLMouse.this.mousePressed[button] = false;
+                if(beforeStatus != LWJGLMouse.this.mousePressed[button])
+                    LWJGLMouse.this.fireMouseClick();
             }
         });
         
@@ -45,8 +45,6 @@ public class LWJGLMouse extends Mouse {
 
                 LWJGLMouse.this.pos.x = (float) xpos;
                 LWJGLMouse.this.pos.y = (float) ypos;
-                
-                LWJGLMouse.this.fireOtherEvent();
             }
         });
         
@@ -55,7 +53,6 @@ public class LWJGLMouse extends Mouse {
             public void invoke(long window, double xoffset, double yoffset) {
                 LWJGLMouse.this.wheel.x = (float) xoffset;
                 LWJGLMouse.this.wheel.y = (float) yoffset;
-                LWJGLMouse.this.fireOtherEvent();
             }
         });
     }

@@ -17,7 +17,10 @@ import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.collada.Geometry;
+import org.melchor629.engine.loaders.collada.Instance_Geometry;
+import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.objects.Camera;
+import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.ModelMatrix;
@@ -47,10 +50,10 @@ public class AnotherTestingClass {
             + "\n"
             + "in vec3 Color;"
             + "in vec3 Normal;"
-            + "out vec3 outColor;"
+            + "out vec4 outColor;"
             + ""
             + "void main() {"
-            + "    outColor = Color;"
+            + "    outColor = vec4(Color, 1.0);"
             + "}";
 
     public static void colladaxd(String[] args) {
@@ -72,51 +75,33 @@ public class AnotherTestingClass {
         
         Collada c = null;
         try {
-            c = new Collada(new File("/Users/melchor9000/Documents/Programación/JavaBlockWorld/res/sponza/Muñeco Minecraft.dae"));
+            c = new Collada(new File("mierda.dae"));
         } catch(Exception e) {
             e.printStackTrace();
             gl.destroyDisplay();
             System.exit(1);
         }
-        
-        ArrayList<VAO> vaos = new ArrayList<>(c.geometry.size());
-        ArrayList<BufferObject> vbos = new ArrayList<>(c.geometry.size());
-        ArrayList<BufferObject> ebos = new ArrayList<>(c.geometry.size());
-        
-        BufferObject vbo = null, ebo = null;
-        VAO vao = null;
-        for(Geometry g : c.geometry) {
-            vao = new VAO();
-            vao.bind();
-            
-            vbo = new BufferObject(BufferTarget.ARRAY_BUFFER, BufferUsage.STATIC_DRAW);
-            ebo = new BufferObject(BufferTarget.ELEMENT_ARRAY_BUFFER, BufferUsage.STATIC_DRAW);
-            
-            ebo.fillBuffer(g.mesh.polylist.p);
-            vbo.initPartialFillBuffer(4*(g.mesh.sources.get(0).buff.capacity()+g.mesh.sources.get(1).buff.capacity()+g.mesh.sources.get(2).buff.capacity()));
-            vbo.partiallyFillBuffer(0, g.mesh.sources.get(0).buff);
-            vbo.partiallyFillBuffer(g.mesh.sources.get(0).buff.capacity() * 4, g.mesh.sources.get(1).buff);
-            vbo.partiallyFillBuffer(g.mesh.sources.get(0).buff.capacity() * 4 + g.mesh.sources.get(1).buff.capacity() * 4, g.mesh.sources.get(2).buff);
-            
-            vaos.add(vao);
-            vbos.add(vbo);
-            ebos.add(ebo);
+
+        ArrayList<Meshy> meshies = new ArrayList<>();
+        for(Node n : c.visual_scenes.get(0).nodes) {
+            if(n.isGeometry()) {
+                meshies.add(new Meshy(c, n));
+            }
         }
-        
-        vao.unbind();
-        vbo.unbind();
-        ebo.unbind();
-        c.disposeData();
         
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);
         s.bindFragDataLocation("outColor", 0);
         s.bind();
-        for(VAO _vao : vaos) {
-            s.enableAttribs(_vao, "position", "normal", "color");
-        }
+        for(Meshy m : meshies)
+            m.enableAttribs(s, "position", "normal", "color");
         s.unbind();
 
-        ModelMatrix model = new ModelMatrix();
+        Cube cube = new Cube();
+
+        ModelMatrix model = new ModelMatrix(),
+                cubeModel = new ModelMatrix();
+        cubeModel.translate(7.5f, 0.f, 0.f);
+        cube.bindStuff(s, "position", "normal", null, "color");
         
         s.bind();
         s.setUniformMatrix("view", camera.getViewMatrix());
@@ -124,38 +109,34 @@ public class AnotherTestingClass {
         s.setUniformMatrix("model", model.getModelMatrix());
         
         gl.enable(GLEnable.DEPTH_TEST);
-        gl.clearColor(0, 0, 0, 1);
+        gl.clearColor(1, 1, 1, 1);
         
         while(!gl.windowIsClosing()) {
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
             s.setUniformMatrix("view", camera.getViewMatrix());
             s.setUniformMatrix("project", camera.getProjectionMatrix());
-            
-            for(int i = 0; i < c.geometry.size(); i++) {
-                int offsetNormal = c.geometry.get(i).mesh.sources.get(0).count() * 4; //4 -> sizeof(float)
-                int facesCount = c.geometry.get(i).mesh.polylist.count;
 
-                s.setUniformMatrix("model", model.getModelMatrix());
-                vaos.get(i).bind();
-                vbos.get(i).bind();
-                s.vertexAttribPointer("position", 3, Renderer.type.FLOAT, false, 3 * 4, 0);
-                s.vertexAttribPointer("normal", 3, Renderer.type.FLOAT, false, 3 * 4, offsetNormal);
-                s.vertexAttribPointer("color", 3, Renderer.type.FLOAT, false, 3 * 4, offsetNormal); //No tenemos color :(
-                gl.drawElements(DrawMode.TRIANGLES, facesCount, Renderer.type.UNSIGNED_INT, 0); //facesCount wrong?
+            s.setUniformMatrix("model", cubeModel.getModelMatrix());
+            cube.draw();
+            //cubeModel.rotate((float) (0.4 * Math.PI * t.frameTime), 1, 0, 0);
+            //cubeModel.rotate((float) (-.2 * Math.PI * t.frameTime), 0, 1, 0);
+            //cubeModel.rotate((float) (0.5 * Math.PI * t.frameTime), 0, 0, 1);
+
+            for(Meshy mesh : meshies) {
+                mesh.draw(s);
             }
             
             gl._game_loop_sync(60);
             t.update();
             keyboard.fireEvent(t.frameTime);
-            mouse.fireEvent(t.frameTime);
+            mouse.update(t.frameTime);
+
+            //System.out.printf("%s %s\r", camera.getPosition(), camera.getRotation());
         }
         
         s.delete();
-        for(int i = 0; i < c.geometry.size(); i++) {
-            vaos.get(i).delete();
-            vbos.get(i).delete();
-            ebos.get(i).delete();
-        }
+        for(Meshy mesh : meshies)
+            mesh.delete();
         
         keyboard.release();
         mouse.release();
@@ -181,8 +162,7 @@ public class AnotherTestingClass {
         
         VAO vao = new VAO();
         BufferObject vbo = new BufferObject(BufferTarget.ARRAY_BUFFER, BufferUsage.STATIC_DRAW);
-        
-        vao.bind();
+
         vbo.fillBuffer(new float[] {
               //POSICIÓN           | COLOR          | TEXCOORD
                -1.0f, -1.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -192,13 +172,14 @@ public class AnotherTestingClass {
                -1.0f,  1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
                -1.0f, -1.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
         });
-        vao.unbind();
-        
+        vbo.unbind();
+
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);
         s.bindFragDataLocation("outColor", 0);
         s.bind();
         s.enableAttribs(vao, "color", "position", "normal");
         vao.bind();
+        vbo.bind();
         s.vertexAttribPointer("position", 3, Renderer.type.FLOAT, false, 8 * 4, 0);
         s.vertexAttribPointer("color", 3, Renderer.type.FLOAT, false, 8 * 4, 3 * 4);
         s.vertexAttribPointer("normal", 3, Renderer.type.FLOAT, false, 8 * 4, 5 * 4);
@@ -206,7 +187,8 @@ public class AnotherTestingClass {
         s.unbind();
         
         mat4 view, proj;
-        final ModelMatrix model = new ModelMatrix();
+        final ModelMatrix model = new ModelMatrix(),
+            cubeModel = new ModelMatrix();
         final vec3 cameraPos = new vec3(0f, 1f, 2.2f), cameraDir = GLM.product(-1f, cameraPos), cameraUp = new vec3(0, 0, 1);
         
         view = GLM.lookAt(cameraPos, GLM.sum(cameraPos, cameraDir), cameraUp);
@@ -221,10 +203,13 @@ public class AnotherTestingClass {
         gl.clearColor(1, 1, 1, 1);
         
         final Camera c = new Camera(cameraPos, cameraDir, cameraUp);
-        
+        Cube cube = new Cube();
+        cubeModel.setIdentity().translate(0, 0, 1.f);
+        cube.bindStuff(s, "position", "normal", null, "color");
+
         mouse.addListener(new Mouse.OnMouseMoveEvent() {
             @Override
-            public void invoke(Mouse self) {
+            public void invoke(Mouse self, double f) {
                 if(self.getWheelSpeed().y != 0.f) {
                     if(self.isShiftPressed())
                         c.setPosition(c.getPosition().x, c.getPosition().y + self.getWheelSpeed().y * .5f, c.getPosition().z);
@@ -247,19 +232,25 @@ public class AnotherTestingClass {
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
             
             model.setIdentity();
-            view = c.getViewMatrix();
             s.bind();
             s.setUniformMatrix("model", model.getModelMatrix());
             s.setUniformMatrix("view", c.getViewMatrix());
             s.setUniformMatrix("project", c.getProjectionMatrix());
             vao.bind();
             gl.drawArrays(DrawMode.TRIANGLES, 0, 6);
+
+            s.setUniformMatrix("model", cubeModel.getModelMatrix());
+            cube.draw();
+            cubeModel.rotate((float) (0.4 * Math.PI * t.frameTime), 1, 0, 0);
+            cubeModel.rotate((float) (-.2 * Math.PI * t.frameTime), 0, 1, 0);
+            cubeModel.rotate((float) (0.5 * Math.PI * t.frameTime), 0, 0, 1);
+
             s.unbind();
             
             gl._game_loop_sync(60);
             t.update();
             keyboard.fireEvent(t.frameTime);
-            mouse.fireEvent(t.frameTime);
+            mouse.update(t.frameTime);
         }
         
         gl.destroyDisplay();
@@ -270,9 +261,8 @@ public class AnotherTestingClass {
         //cameraxd(args);
         System.exit(0);
     }
-    
-    @SuppressWarnings("unused")
-    private static final void printError() {
+
+    public static void printError() {
         Renderer.Error err = Game.gl.getError();
         //if(err != Renderer.Error.NO_ERROR)
             System.out.printf("Error %s (%d)\n", err.toString(), err.errno);

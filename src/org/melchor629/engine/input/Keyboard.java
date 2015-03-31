@@ -46,7 +46,7 @@ public abstract class Keyboard {
      * this method at the end/start of the game loop. It's needed to 
      * pass a delta value. This value is the inverse of the Frame Rate,
      * in other words, the time spent to draw a frame.
-     * @param delta
+     * @param delta Time spent between frames
      */
     public final void fireEvent(double delta) {
         for(OnKeyboardEvent e : listeners)

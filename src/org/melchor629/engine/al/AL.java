@@ -110,7 +110,7 @@ public interface AL {
 
     /**
      * Create a context with OpenAL 1.1 (if is not possible, then 1.0)
-     * @throws ALError if an error occurrs while creating the context
+     * @throws ALError if an error occurs while creating the context
      */
     void createContext();
 
@@ -167,7 +167,7 @@ public interface AL {
     /**
      * This function deletes one buffer, freeing the resources used
      * by the buffer. Buffers which are attached to a source can not be deleted.
-     * See {@link #alSourcei(int, Source, int)} and {@link #alSourceUnqueueBuffers(int, int[])}
+     * See {@link #sourcei(int, Source, int)} and {@link #sourceUnqueueBuffers(int, int[])}
      * for information on how to detach a buffer from a source.
      * @param buffer Buffer to be deleted
      */
@@ -176,7 +176,7 @@ public interface AL {
     /**
      * This function deletes one or more buffers, freeing the resources used
      * by the buffer. Buffers which are attached to a source can not be deleted.
-     * See {@link #alSourcei(int, Source, int)} and {@link #alSourceUnqueueBuffers(int, int[])}
+     * See {@link #sourcei(int, Source, int)} and {@link #sourceUnqueueBuffers(int, int[])}
      * for information on how to detach a buffer from a source.
      * @param buffers Array with references to buffers to be deleted
      */
@@ -261,7 +261,7 @@ public interface AL {
 
     /**
      * Sets the speed of the sound for calculate Doppler effect.
-     * Use {@link #alSpeedOfSound(float)} instead. This function has marked as
+     * Use {@link #speedOfSound(float)} instead. This function has marked as
      * deprecated because the function name makes some confusion.
      * @deprecated for OpenAL 1.1
      * @param speed Speed of the medium
@@ -302,7 +302,7 @@ public interface AL {
      * This function retrieves a floating point property of a buffer.<br>
      * There are no relevant buffer properties defined in OpenAL 1.1 which
      * can be affected by this call, but this function may be used by OpenAL extensions.
-     * @param buffer Buffer whose attribute is being retrived
+     * @param buffer Buffer whose attribute is being retrieved
      * @param pname The attribute to retrieve
      * @return value for the attribute
      */
@@ -312,7 +312,7 @@ public interface AL {
      * This function retrieves a integer property of a buffer.<br>
      * There are no relevant buffer properties defined in OpenAL 1.1 which
      * can be affected by this call, but this function may be used by OpenAL extensions.
-     * @param buffer Buffer whose attribute is being retrived
+     * @param buffer Buffer whose attribute is being retrieved
      * @param pname The attribute to retrieve
      * @return value for attribute
      */
@@ -562,7 +562,7 @@ public interface AL {
      * @param source Source reference whose attribute is being set
      * @param pname Attribute to change
      * @param v Value to be set
-     * @see AL.source Source attributes enum
+     * @see AL.Source Source attributes enum
      */
     void sourcei(int source, Source pname, int v);
 
@@ -594,7 +594,7 @@ public interface AL {
      * This function queues one buffers on a source. All buffers
      * attached to a source will be played in sequence, and the number
      * of processed buffers can be detected using an
-     * {@link #alGetSourcei(int, Source)} call to retrieve AL_BUFFERS_PROCESSED.
+     * {@link #getSourcei(int, Source)} call to retrieve AL_BUFFERS_PROCESSED.
      * @param source Reference to the source
      * @param buffer buffer to attach
      */
@@ -604,9 +604,9 @@ public interface AL {
      * This function queues a set of buffers on a source. All buffers
      * attached to a source will be played in sequence, and the number
      * of processed buffers can be detected using an
-     * {@link #alGetSourcei(int, Source)} call to retrieve AL_BUFFERS_PROCESSED.
+     * {@link #getSourcei(int, Source)} call to retrieve AL_BUFFERS_PROCESSED.
      * @param source Reference to the source
-     * @param buffer array of buffers to attach
+     * @param buffers array of buffers to attach
      */
     void sourceQueueBuffers(int source, int[] buffers);
 
@@ -630,21 +630,21 @@ public interface AL {
 
     /**
      * Stops the resources
-     * @param sources arry with l sources
+     * @param sources array with l sources
      */
     void sourceStop(int[] sources);
 
     /**
      * Unqueues one buffer attached to a source.
      * @param source Reference to the source
-     * @param buffer buffer to deattach
+     * @param buffer buffer to detach
      */
     void sourceUnqueueBuffers(int source, int buffer);
 
     /**
      * Unqueues a set of buffers attached to a source.
      * @param source Reference to the source
-     * @param buffers buffers to deattach
+     * @param buffers buffers to detach
      */
     void sourceUnqueueBuffers(int source, int[] buffers);
 
@@ -728,17 +728,17 @@ public interface AL {
      * can be affected by this call, but this function may be used by OpenAL extensions.
      * @param buffer Buffer whose attribute is being retrived
      * @param pname The attribute to retrieve
-     * @param floats values in an array
+     * @param integers values in an array
      */
     void getBuffer(int buffer, Buffer pname, int[] integers);
 
     /**
      * Sets a integer property for the listener. Valid Params
      * are VELOCITY and POSITION
-     * @param pname Property to change
-     * @param x Value
-     * @param y Value
-     * @param z Value
+     * @param listener Listener property to change
+     * @param v0 Value 1
+     * @param v1 Value 2
+     * @param v2 Value 3
      */
     void listener3i(Listener listener, int v0, int v1, int v2);
 
@@ -763,9 +763,9 @@ public interface AL {
      * &nbsp;&nbsp;- DIRECTION<br>
      * @param source Source reference whose attribute is being set
      * @param pname Attribute to change
-     * @param x Value
-     * @param y Value
-     * @param z Value
+     * @param v0 Value 1
+     * @param v1 Value 2
+     * @param v2 Value 3
      * @see AL.Source Source attributes enum
      */
     void source3i(int source, Source pname, int v0, int v1, int v2);

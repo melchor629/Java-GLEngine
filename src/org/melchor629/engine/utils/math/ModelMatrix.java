@@ -41,9 +41,9 @@ public class ModelMatrix {
     /**
      * Translates the object (in the Matrix representation), like OpenGL 2
      * {@code glTranslate3f(float x, float y, float z) }.
-     * @param x Amout of values to translate over X axis
-     * @param y Amout of values to translate over Y axis
-     * @param z Amout of values to translate over Z axis
+     * @param x Amount of values to translate over X axis
+     * @param y Amount of values to translate over Y axis
+     * @param z Amount of values to translate over Z axis
      * @return Itself, for chaining methods
      */
     public ModelMatrix translate(float x, float y, float z) {
@@ -52,6 +52,16 @@ public class ModelMatrix {
         loc.z += z;
         calculateMatrix();
         return this;
+    }
+
+    /**
+     * Translates the object (in the Matrix representation), like OpenGL 2
+     * {@code glTranslate3f(float x, float y, float z)}, but with a Vector.
+     * @param v Amount of units to translate
+     * @return Itself, for chaining methods
+     */
+    public ModelMatrix translate(vec3 v) {
+        return this.translate(v.x, v.y, v.z);
     }
     
     /**
@@ -85,9 +95,9 @@ public class ModelMatrix {
         if(angle > Math.PI * 2)
             angle -= Math.PI * 2;
 
-        rot.x = (float) (angle * x + rot.x);
-        rot.y = (float) (angle * y + rot.y);
-        rot.z = (float) (angle * z + rot.z);
+        rot.x = angle * x + rot.x;
+        rot.y = angle * y + rot.y;
+        rot.z = angle * z + rot.z;
         
         if(rot.x > 2*Math.PI)
             rot.x -= 2*Math.PI;
@@ -98,6 +108,30 @@ public class ModelMatrix {
 
         calculateMatrix();
         return this;
+    }
+
+    /**
+     * Rotate the object along the axis selected and with certain angle,
+     * like OpenGL 2 function {@code glRotatef(float angle, float x, float
+     * y, float z) }, using a Vector as axis.
+     * @param v Axis for the rotation
+     * @param angle Amount of degrees to rotate
+     * @return Itself, for chaining methods
+     */
+    public ModelMatrix rotate(vec3 v, float angle) {
+        return this.rotate(angle, v.x, v.y, v.z);
+    }
+
+    /**
+     * Rotate the object along the axis selected and with certain angle,
+     * like OpenGL 2 function {@code glRotatef(float angle, float x, float
+     * y, float z) }, using a Vector as axis and its fourth component as
+     * angle.
+     * @param v Axis and angle for the rotation
+     * @return Itself, for chaining methods
+     */
+    public ModelMatrix rotate(vec4 v) {
+        return this.rotate(v.w, v.x, v.y, v.z);
     }
     
     /**
@@ -133,6 +167,19 @@ public class ModelMatrix {
         scale.z += z;
         calculateMatrix();
         return this;
+    }
+
+    /**
+     * Produces a nonuniform scaling along the x, y, and z
+     * axes. The three parameters indicate the desired scale
+     * factor along each of the three axes. From {@code
+     * glScalef(float x, float y, float z)} function of OpenGL 2,
+     * using a Vector
+     * @param v Amount of units to scale
+     * @return Itself, for chaining methods
+     */
+    public ModelMatrix scale(vec3 v) {
+        return this.scale(v.x, v.y, v.z);
     }
     
     /**

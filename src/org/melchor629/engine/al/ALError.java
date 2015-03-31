@@ -4,7 +4,7 @@ package org.melchor629.engine.al;
  * Error threw when an exception or other kind of errors occurred
  * @author melchor9000
  */
-public class ALError extends Error {
+public class ALError extends RuntimeException {
 	
 	protected String msg, alFunc;
 
@@ -26,8 +26,8 @@ public class ALError extends Error {
     /**
      * Create a new GLError with the given message and specifying the
      * OpenGL Function that send an error
-     * @param glFunc
-     * @param msg
+     * @param glFunc OpenGL Function
+     * @param msg Error' message
      */
     public ALError(String glFunc, String msg) {
         super(msg);

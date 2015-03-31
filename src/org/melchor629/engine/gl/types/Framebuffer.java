@@ -43,7 +43,7 @@ public class Framebuffer {
         } else if(texture.is2D()) {
             gl.framebufferTexture2D(coloratt(num), texture.getTarget(), texture._get_texture_(), 0);
         } else if(texture.is3D()) {
-            gl.framebufferTexture3D(coloratt(num), texture.getTarget(), texture._get_texture_(), 0, (int) (num >> 8));
+            gl.framebufferTexture3D(coloratt(num), texture.getTarget(), texture._get_texture_(), 0, num >> 8);
         }
     }
 
@@ -183,7 +183,8 @@ public class Framebuffer {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         delete();
     }
 

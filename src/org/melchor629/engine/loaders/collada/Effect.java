@@ -20,7 +20,7 @@ public class Effect {
         if(technique.getElementsByTagName("phong").item(0) != null)
             phong((Element) technique.getElementsByTagName("phong").item(0));
         //else ... TODO
-        params = new ArrayList<newparam>();
+        params = new ArrayList<>();
         org.w3c.dom.NodeList nl = profile_COMMON.getElementsByTagName("newparam");
         for(int i = 0; i < nl.getLength(); i++) {
             Element newparam = (Element) nl.item(i);
@@ -54,7 +54,7 @@ public class Effect {
     }
     
     private float getFloatValue(Element e) {
-        return Float.parseFloat(((Element) e.getElementsByTagName("float").item(0)).getTextContent());
+        return Float.parseFloat(e.getElementsByTagName("float").item(0).getTextContent());
     }
 
     public class newparam {
