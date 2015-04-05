@@ -1,15 +1,16 @@
 package org.melchor629.engine.al;
 
-import static org.lwjgl.openal.AL10.*;
-import static org.lwjgl.openal.AL.*;
+import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.ALContext;
+import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
-import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.ALContext;
-import org.melchor629.engine.utils.BufferUtils;
+import static org.lwjgl.openal.AL.destroy;
+import static org.lwjgl.openal.AL10.*;
 
 /**
  * @author melchor9000
@@ -84,7 +85,24 @@ public class LWJGLAudio implements AL {
 			throw new ALError("alBufferData", "Argument passed as buffer is not a buffer");
 		if(data == null || data.capacity() == 0)
 			throw new ALError("alBufferData", "Data cannot be null or empty");
+		if(!data.isDirect())
+			throw new ALError("alBufferData", "Data buffer is not direct, cannot be used by OpenAL");
 		
+		alBufferData(buffer, format.e, data, freq);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.melchor629.engine.al.AL#bufferData(int, org.melchor629.engine.al.AL.Format, ShortBuffer, int)
+	 */
+	@Override
+	public void bufferData(int buffer, Format format, ShortBuffer data, int freq) {
+		if(!isBuffer(buffer))
+			throw new ALError("alBufferData", "Argument passed as buffer is not a buffer");
+		if(data == null || data.capacity() == 0)
+			throw new ALError("alBufferData", "Data cannot be null or empty");
+		if(!data.isDirect())
+			throw new ALError("alBufferData", "Data buffer is not direct, cannot be used by OpenAL");
+
 		alBufferData(buffer, format.e, data, freq);
 	}
 

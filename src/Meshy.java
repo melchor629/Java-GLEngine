@@ -117,13 +117,15 @@ public class Meshy {
         ebo.bind();
     }
 
+    static org.melchor629.engine.utils.math.mat4 id = new org.melchor629.engine.utils.math.mat4();
     public void draw(ShaderProgram s) {
         int facesCount = geometry.mesh.polylist.count;
-        s.setUniformMatrix("model", model.getModelMatrix());
+        s.setUniformMatrix("model", id);
+        //s.setUniformMatrix("model", model.getModelMatrix());
         vao.bind();
-        //vbo.bind();
-        //ebo.bind();
-        Game.gl.drawArrays(Renderer.DrawMode.TRIANGLES, 0, facesCount * 3);
+        Game.gl.drawElements(Renderer.DrawMode.TRIANGLES, facesCount, Renderer.type.UNSIGNED_INT, 0);
+        AnotherTestingClass.printError();
+        //Game.gl.drawArrays(Renderer.DrawMode.TRIANGLES, 0, facesCount * 3);
         vao.unbind();
     }
 

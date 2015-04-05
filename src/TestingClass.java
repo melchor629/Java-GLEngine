@@ -1,30 +1,18 @@
-import java.io.File;
-import java.io.IOException;
-
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
-import org.melchor629.engine.gl.Renderer.BufferTarget;
-import org.melchor629.engine.gl.Renderer.BufferUsage;
-import org.melchor629.engine.gl.Renderer.DrawMode;
-import org.melchor629.engine.gl.Renderer.GLEnable;
-import org.melchor629.engine.gl.Renderer.StencilFunc;
-import org.melchor629.engine.gl.Renderer.StencilOp;
-import org.melchor629.engine.gl.Renderer.TextureExternalFormat;
-import org.melchor629.engine.gl.Renderer.TextureFormat;
-import org.melchor629.engine.gl.Renderer.type;
-import org.melchor629.engine.gl.types.BufferObject;
-import org.melchor629.engine.gl.types.Framebuffer;
-import org.melchor629.engine.gl.types.Renderbuffer;
-import org.melchor629.engine.gl.types.ShaderProgram;
-import org.melchor629.engine.gl.types.Texture;
-import org.melchor629.engine.gl.types.VAO;
+import org.melchor629.engine.gl.Renderer.*;
+import org.melchor629.engine.gl.types.*;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec3;
 
-import static org.melchor629.engine.utils.math.GLM.*;
+import java.io.File;
+import java.io.IOException;
+
+import static org.melchor629.engine.utils.math.GLM.lookAt;
+import static org.melchor629.engine.utils.math.GLM.perspective;
 
 public final class TestingClass {
 
@@ -94,7 +82,7 @@ public final class TestingClass {
 
     public static void main(String[] args) throws IOException {
         Renderer gl = Game.gl = new LWJGLRenderer();
-        Timing t = new Timing();
+        Timing t = Timing.getGameTiming();
         boolean cr;
         gl.setVsync(true);
         gl.setResizable(true);

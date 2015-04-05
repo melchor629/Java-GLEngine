@@ -1,11 +1,15 @@
 package org.melchor629.engine.input;
 
-import java.lang.reflect.Field;
-
-import org.lwjgl.glfw.*;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
+import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.vec2;
+
+import java.lang.reflect.Field;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -45,6 +49,8 @@ public class LWJGLMouse extends Mouse {
 
                 LWJGLMouse.this.pos.x = (float) xpos;
                 LWJGLMouse.this.pos.y = (float) ypos;
+
+                LWJGLMouse.this.fireMouseMove(Timing.getGameTiming().frameTime);
             }
         });
         
@@ -53,6 +59,8 @@ public class LWJGLMouse extends Mouse {
             public void invoke(long window, double xoffset, double yoffset) {
                 LWJGLMouse.this.wheel.x = (float) xoffset;
                 LWJGLMouse.this.wheel.y = (float) yoffset;
+
+                LWJGLMouse.this.fireMouseMove(Timing.getGameTiming().frameTime);
             }
         });
     }

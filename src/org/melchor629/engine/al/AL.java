@@ -1,6 +1,7 @@
 package org.melchor629.engine.al;
 
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 //TODO Poner uso de Buffers (como ByteBuffer)
 /**
@@ -141,6 +142,17 @@ public interface AL {
      * @param freq Frequency of the sound
      */
     void bufferData(int buffer, Format format, ByteBuffer data, int freq);
+
+    /**
+     * This function fills a buffer with audio data. All the pre-defined formats are
+     * PCM data, but this function may be used by extensions to load other data
+     * types as well.
+     * @param buffer Buffer to be filled
+     * @param format Format of the data
+     * @param data Array with the data
+     * @param freq Frequency of the sound
+     */
+    void bufferData(int buffer, Format format, ShortBuffer data, int freq);
 
     /**
      * This function fills a buffer with audio data. All the pre-defined formats are

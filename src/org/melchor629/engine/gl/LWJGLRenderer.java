@@ -1,28 +1,26 @@
 package org.melchor629.engine.gl;
 
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GLContext;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.opengl.GLContext;
 
+import java.nio.*;
+
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.*;
-//import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL11.glGetInteger;
+import static org.lwjgl.opengl.GL12.glTexImage3D;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-//import static org.lwjgl.opengl.GL21.*;
 import static org.lwjgl.opengl.GL30.*;
-//import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL32.*;
+
+//import static org.lwjgl.opengl.GL14.*;
+//import static org.lwjgl.opengl.GL21.*;
+//import static org.lwjgl.opengl.GL31.*;
 //import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Class for Render with LWJGL
@@ -30,27 +28,31 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class LWJGLRenderer implements Renderer {
 	public long window;
+    public GLContext context;
 	boolean vsync = false;
+
+    private GLFWErrorCallback errorCallback;
 	
 	public LWJGLRenderer() {
-		glfwInit();
-		glfwDefaultWindowHints();
-		
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				glfwTerminate();
-			}
-		}));
+            @Override
+            public void run() {
+                glfwTerminate();
+            }
+        }));
 
-        glfwSetErrorCallback(new GLFWErrorCallback() {
-			@Override
-			public void invoke(int error, long description) {
-				ByteBuffer native_str = org.lwjgl.system.MemoryUtil.memByteBufferNT1(description);
-				String java_str = org.lwjgl.system.MemoryUtil.memDecodeUTF8(native_str);
-				System.out.printf("GLFW [ERROR %d]: %s\n", error, java_str);
-			}
-		});
+        glfwSetErrorCallback(errorCallback = new GLFWErrorCallback() {
+            @Override
+            public void invoke(int error, long description) {
+                ByteBuffer native_str = org.lwjgl.system.MemoryUtil.memByteBufferNT1(description);
+                String java_str = org.lwjgl.system.MemoryUtil.memDecodeUTF8(native_str);
+                System.out.printf("GLFW [ERROR %d]: %s\n", error, java_str);
+            }
+        });
+
+        if(glfwInit() == 0)
+            throw new IllegalStateException("Could not initialize GLFW");
+        glfwDefaultWindowHints();
 	}
 
     /* (non-Javadoc)
@@ -69,7 +71,8 @@ public class LWJGLRenderer implements Renderer {
         	glfwMakeContextCurrent(window);
         //else
         	//glfwTerminate();
-        GLContext.createFromCurrent();
+        context = GLContext.createFromCurrent();
+        context.setupDebugMessageCallback();
         return window != 0;
     }
 
@@ -92,14 +95,15 @@ public class LWJGLRenderer implements Renderer {
         	glfwMakeContextCurrent(window);
         //else
         	//glfwTerminate();
-        GLContext.createFromCurrent();
+        context = GLContext.createFromCurrent();
+        context.setupDebugMessageCallback();
         return window != 0;
     }
 
     
     public void setVsync(boolean vsync) {
     	this.vsync = vsync;
-        //TODO VSync glfwWindowHint(GLFW_)
+        glfwSwapInterval(vsync ? 1 : 0);
     }
 
     public void setResizable(boolean resizable) {
@@ -208,7 +212,6 @@ public class LWJGLRenderer implements Renderer {
         b.compact();
         glGenBuffers(b);
         b.get(buff).clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -228,7 +231,6 @@ public class LWJGLRenderer implements Renderer {
         b.put(ebo).compact();
         glDeleteBuffers(b);
         b.clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -245,7 +247,6 @@ public class LWJGLRenderer implements Renderer {
         data.put(buff).compact();
         glBufferData(target.e, data, usage.e);
         data.clear();
-        data = null;
     }
 
     @Override
@@ -254,7 +255,6 @@ public class LWJGLRenderer implements Renderer {
         data.put(buff).compact();
         glBufferData(target.e, data, usage.e);
         data.clear();
-        data = null;
     }
 
     @Override
@@ -263,7 +263,6 @@ public class LWJGLRenderer implements Renderer {
         data.put(buff).compact();
         glBufferData(target.e, data, usage.e);
         data.clear();
-        data = null;
     }
 
     @Override
@@ -272,7 +271,6 @@ public class LWJGLRenderer implements Renderer {
         data.put(buff).compact();
         glBufferData(target.e, data, usage.e);
         data.clear();
-        data = null;
     }
 
     @Override
@@ -281,7 +279,6 @@ public class LWJGLRenderer implements Renderer {
         data.put(buff).compact();
         glBufferData(target.e, data, usage.e);
         data.clear();
-        data = null;
     }
 
     /* (non-Javadoc)
@@ -547,7 +544,6 @@ public class LWJGLRenderer implements Renderer {
         glGenTextures(b);
         b.get(texs);
         b.clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -567,7 +563,6 @@ public class LWJGLRenderer implements Renderer {
         b.put(texs).compact();
         glDeleteTextures(b);
         b.clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -620,7 +615,6 @@ public class LWJGLRenderer implements Renderer {
         ByteBuffer buff = BufferUtils.createByteBuffer(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -632,7 +626,6 @@ public class LWJGLRenderer implements Renderer {
         ShortBuffer buff = BufferUtils.createShortBuffer(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -644,7 +637,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer buff = BufferUtils.createIntBuffer(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -656,7 +648,6 @@ public class LWJGLRenderer implements Renderer {
         FloatBuffer buff = BufferUtils.createFloatBuffer(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -668,7 +659,6 @@ public class LWJGLRenderer implements Renderer {
         DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -689,7 +679,6 @@ public class LWJGLRenderer implements Renderer {
         ByteBuffer buff = BufferUtils.createByteBuffer(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -701,7 +690,6 @@ public class LWJGLRenderer implements Renderer {
         ShortBuffer buff = BufferUtils.createShortBuffer(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -713,7 +701,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer buff = BufferUtils.createIntBuffer(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -725,7 +712,6 @@ public class LWJGLRenderer implements Renderer {
         FloatBuffer buff = BufferUtils.createFloatBuffer(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -737,7 +723,6 @@ public class LWJGLRenderer implements Renderer {
         DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     @Override
@@ -752,7 +737,6 @@ public class LWJGLRenderer implements Renderer {
         ByteBuffer buff = BufferUtils.createByteBuffer(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     @Override
@@ -761,7 +745,6 @@ public class LWJGLRenderer implements Renderer {
         ShortBuffer buff = BufferUtils.createShortBuffer(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     @Override
@@ -770,7 +753,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer buff = BufferUtils.createIntBuffer(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     @Override
@@ -779,7 +761,6 @@ public class LWJGLRenderer implements Renderer {
         FloatBuffer buff = BufferUtils.createFloatBuffer(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     @Override
@@ -788,7 +769,6 @@ public class LWJGLRenderer implements Renderer {
         DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
         buff.clear();
-        buff = null;
     }
 
     /* (non-Javadoc)
@@ -807,7 +787,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer b = BufferUtils.createIntBuffer(fbs.length).compact();
         glGenFramebuffers(b);
         b.get(fbs).clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -826,7 +805,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer b = BufferUtils.createIntBuffer(fbs.length).put(fbs).compact();
         glDeleteFramebuffers(b);
         b.clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -845,7 +823,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer b = BufferUtils.createIntBuffer(fbs.length).compact();
         glGenRenderbuffers(b);
         b.get(fbs).clear();
-        b = null;
     }
 
     /* (non-Javadoc)
@@ -864,7 +841,6 @@ public class LWJGLRenderer implements Renderer {
         IntBuffer b = BufferUtils.createIntBuffer(rbs.length).put(rbs).compact();
         glGenRenderbuffers(b);
         b.clear();
-        b = null;
     }
 
     /* (non-Javadoc)

@@ -83,5 +83,8 @@ gradle-app.setting
 
 #IntelliJ Idea IDE
 .idea/*
-Java-GLEngine.eml
-Java-GLEngine.iml
+*.eml
+*.iml
+
+# C & C++
+*.o

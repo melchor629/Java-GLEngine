@@ -155,14 +155,33 @@ class Cube {
         positionBuffer.fillBuffer(vertices);
         textureCoordBuffer.fillBuffer(textureCoords);
         normalBuffer.fillBuffer(vertexNormals);
-        colorBuffer.fillBuffer(new float[] {1.0f, 0.0f, 0.0f, // Front face
+        colorBuffer.fillBuffer(new float[] {
+                1.0f, 0.0f, 0.0f, // Front face
+                1.0f, 0.0f, 0.0f, // Front face
+                1.0f, 0.0f, 0.0f, // Front face
+                1.0f, 0.0f, 0.0f, // Front face
+                1.0f, 1.0f, 0.0f, // Back face
+                1.0f, 1.0f, 0.0f, // Back face
+                1.0f, 1.0f, 0.0f, // Back face
                 1.0f, 1.0f, 0.0f, // Back face
                 0.0f, 1.0f, 0.0f, // Top face
+                0.0f, 1.0f, 0.0f, // Top face
+                0.0f, 1.0f, 0.0f, // Top face
+                0.0f, 1.0f, 0.0f, // Top face
+                1.0f, 0.5f, 0.5f, // Bottom face
+                1.0f, 0.5f, 0.5f, // Bottom face
+                1.0f, 0.5f, 0.5f, // Bottom face
                 1.0f, 0.5f, 0.5f, // Bottom face
                 1.0f, 0.0f, 1.0f, // Right face
+                1.0f, 0.0f, 1.0f, // Right face
+                1.0f, 0.0f, 1.0f, // Right face
+                1.0f, 0.0f, 1.0f, // Right face
+                0.0f, 0.0f, 1.0f, // Left face
+                0.0f, 0.0f, 1.0f, // Left face
+                0.0f, 0.0f, 1.0f, // Left face
                 0.0f, 0.0f, 1.0f, // Left face
         });
-        indexBuffer.fillBuffer(new float[] {
+        indexBuffer.fillBuffer(new int[]{
                 0, 1, 2, 0, 2, 3, // Front face
                 4, 5, 6, 4, 6, 7, // Back face
                 8, 9, 10, 8, 10, 11, // Top face
@@ -211,8 +230,7 @@ class Cube {
 
     void draw() {
         vao.bind();
-        gl.drawArrays(Renderer.DrawMode.TRIANGLES, 0, 36 * 3);
-        //gl.drawElements(Renderer.DrawMode.TRIANGLES, 36, Renderer.type.UNSIGNED_INT, 0);
+        gl.drawElements(Renderer.DrawMode.TRIANGLES, 36, Renderer.type.UNSIGNED_INT, 0);
         vao.unbind();
     }
 }

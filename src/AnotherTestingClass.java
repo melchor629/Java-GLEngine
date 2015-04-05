@@ -1,6 +1,3 @@
-import java.io.File;
-import java.util.ArrayList;
-
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
@@ -16,16 +13,16 @@ import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
-import org.melchor629.engine.loaders.collada.Geometry;
-import org.melchor629.engine.loaders.collada.Instance_Geometry;
 import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.objects.Camera;
-import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec3;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class AnotherTestingClass {
     
@@ -58,11 +55,11 @@ public class AnotherTestingClass {
 
     public static void colladaxd(String[] args) {
         Renderer gl = Game.gl = new LWJGLRenderer();
-        Timing t = new Timing();
+        Timing t = Timing.getGameTiming();
         boolean cr;
-        gl.setVsync(true);
         gl.setResizable(true);
         cr = gl.createDisplay(1280, 720, false, "Eso...");
+        gl.setVsync(true);
         Keyboard keyboard = Game.keyboard = new LWJGLKeyboard();
         Mouse mouse = Game.mouse = new LWJGLMouse();
         Camera camera = new Camera();
@@ -110,6 +107,7 @@ public class AnotherTestingClass {
         
         gl.enable(GLEnable.DEPTH_TEST);
         gl.clearColor(1, 1, 1, 1);
+        t.split("GL & data");
         
         while(!gl.windowIsClosing()) {
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
@@ -127,11 +125,13 @@ public class AnotherTestingClass {
             }
             
             gl._game_loop_sync(60);
+            t.split("gpu");
             t.update();
             keyboard.fireEvent(t.frameTime);
             mouse.update(t.frameTime);
-
-            //System.out.printf("%s %s\r", camera.getPosition(), camera.getRotation());
+            camera.updateIfNeeded();
+            t.split("cpu");
+            //System.out.printf("CPU: %.6f\tGPU: %.6f\n", t.getSplitTime("cpu"), t.getSplitTime("gpu"));
         }
         
         s.delete();
@@ -145,7 +145,7 @@ public class AnotherTestingClass {
     
     public static void cameraxd(String[] args) {
         Renderer gl = Game.gl = new LWJGLRenderer();
-        final Timing t = new Timing();
+        final Timing t = Timing.getGameTiming();
         boolean cr;
         gl.setVsync(true);
         gl.setResizable(true);
@@ -264,8 +264,8 @@ public class AnotherTestingClass {
 
     public static void printError() {
         Renderer.Error err = Game.gl.getError();
-        //if(err != Renderer.Error.NO_ERROR)
-            System.out.printf("Error %s (%d)\n", err.toString(), err.errno);
+        if(err != Renderer.Error.NO_ERROR)
+            System.out.printf("Error %s (%d) %s\n", err.toString(), err.errno, Thread.currentThread().getStackTrace()[2]);
     }
 
 }

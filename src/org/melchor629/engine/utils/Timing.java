@@ -2,6 +2,9 @@ package org.melchor629.engine.utils;
 
 import org.lwjgl.glfw.GLFW;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Util class for save FPS info and other timing related stuff
  * @author melchor9000
@@ -16,15 +19,48 @@ public class Timing {
     protected short FPS = 0;
     protected double time = 0;
     protected double startTime;
+    private Map<String, Double> particiones;
     private double tiempoAnterior;
+    private String name;
+    private static Timing instance;
 
     protected double getTime() {
     	return GLFW.glfwGetTime();
     }
 
-    public Timing() {
+    /**
+     * Returns the global instance of {@link Timing} for the game loop.
+     * If this instance doesn't exists, a new one is created.
+     * @return the instance
+     */
+    public static Timing getGameTiming() {
+        if(instance == null)
+            instance = new Timing("global");
+        return instance;
+    }
+
+    public Timing(String name) {
         time = getTime() + 0.100; //Porque si xD
         startTime = tiempoAnterior = getTime();
+        this.name = name.toLowerCase();
+        particiones = new HashMap<>();
+    }
+
+    /**
+     * Splits the time between updates with a tag.
+     * @param name Tag name
+     */
+    public void split(String name) {
+        particiones.put(name, getTime() - tiempoAnterior);
+    }
+
+    /**
+     * Gets the time spent since the last update to the split call
+     * @param name Tag name
+     * @return time spent
+     */
+    public double getSplitTime(String name) {
+        return particiones.get(name);
     }
 
     /**
@@ -49,6 +85,10 @@ public class Timing {
      */
     public double totalTime() {
         return GLFW.glfwGetTime() - startTime;
+    }
+
+    public String toString() {
+        return String.format("%c%s timing (%.1f)", name.charAt(0) - 'a' + 'A', name, totalTime());
     }
     
     /**

@@ -1,9 +1,11 @@
 package org.melchor629.engine.al.types;
 
-import static org.melchor629.engine.Game.al;
-
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.objects.PCMData;
+
+import java.nio.ShortBuffer;
+
+import static org.melchor629.engine.Game.al;
 
 /**
  * Sound buffer
@@ -20,6 +22,21 @@ public class Buffer {
 			al.bufferData(buffer, data.format, data.data, data.freq);
 		else
 			al.bufferData(buffer, data.format, data.data2, data.freq);
+	}
+
+	public Buffer(short[] data, AL.Format format, int freq) {
+		buffer = al.genBuffer();
+		al.bufferData(buffer, format, data, freq);
+	}
+
+	public Buffer(ShortBuffer data, AL.Format format, int freq) {
+		buffer = al.genBuffer();
+		al.bufferData(buffer, format, data, freq);
+	}
+
+	public Buffer(byte[] data, AL.Format format, int freq) {
+		buffer = al.genBuffer();
+		al.bufferData(buffer, format, data, freq);
 	}
 	
 	public int getBuffer() {

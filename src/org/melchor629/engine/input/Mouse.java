@@ -1,9 +1,9 @@
 package org.melchor629.engine.input;
 
-import java.util.ArrayList;
-
 import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.math.vec2;
+
+import java.util.ArrayList;
 
 /**
  * Manages the Mouse input. This abstract class has to be implemented
@@ -108,7 +108,7 @@ public abstract class Mouse {
      * @param delta Delta value
      */
     protected void fireMouseMove(double delta) {
-        if((wheel.x != 0 && wheel.y != 0) || (dPos.x != 0 && dPos.y != 0)) {
+        if(wheel.x != 0 || wheel.y != 0 || dPos.x != 0 || dPos.y != 0) {
             for(OnMouseMoveEvent e : listeners2)
                 e.invoke(this, delta);
             wheel.x = wheel.y = 0.f;
@@ -139,7 +139,6 @@ public abstract class Mouse {
      * @param delta Inverse of the FrameRate
      */
     public void update(double delta) {
-        fireMouseMove(delta);
         fireButtonPressed(delta);
     }
     

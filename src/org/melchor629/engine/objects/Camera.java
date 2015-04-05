@@ -102,6 +102,22 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         
         initListeners();
     }
+
+    /**
+     * Updates all matrices if needed. Is not necessary call this method
+     * every frame
+     */
+    public void updateIfNeeded() {
+        if(needsUpdateView) {
+            view = GLM.lookAt(pos, GLM.sum(pos, dir), up);
+            needsUpdateView = false;
+        }
+
+        if(needsUpdateProj) {
+            proj = GLM.perspective(fov, aspect, near, far);
+            needsUpdateProj = false;
+        }
+    }
     
     /**
      * @return the View Matrix with position, direction & up vectors

@@ -1,15 +1,15 @@
 package org.melchor629.engine.gl.types;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.mat4;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 
 import static org.melchor629.engine.Game.gl;
 
@@ -24,7 +24,7 @@ public class ShaderProgram {
     protected int vertexShader, fragmentShader, geometryShader, shaderProgram;
     protected HashMap<String, Integer> uniforms;
     protected Attrib[] attribs;
-    protected boolean linked = false;
+    protected boolean linked = false, binded = false;
 
     /**
      * Create a Shader program from files, and checks for errors
@@ -100,14 +100,20 @@ public class ShaderProgram {
             fetchAttribs();
             linked = true;
         }
-        gl.useProgram(shaderProgram);
+        if(!binded) {
+            gl.useProgram(shaderProgram);
+            binded = true;
+        }
     }
 
     /**
      * Unbind the program
      */
     public final void unbind() {
-        gl.useProgram(0);
+        if(binded) {
+            gl.useProgram(0);
+            binded = false;
+        }
     }
 
     /**
