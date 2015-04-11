@@ -117,7 +117,8 @@ public class Listener {
      * @param up Up vector
      */
     public static void calculateAndSetOrientation(vec3 rot, vec3 up) {
-        float x = (float) (GLM.sin(-rot.x - 90.d));
+        //TODO Comrpobar si está mal (?)
+        float x = (float) GLM.sin(-rot.x - 90.d);
         float y = (float) GLM.sin(-rot.y - 90.d);
         float z = (float) GLM.cos(-rot.x - 90.d);
         setOrientation(x, y, z, up.x, up.y, up.z);

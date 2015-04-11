@@ -21,9 +21,11 @@ public interface FlacLibraryNative extends Library {
      * @param m Callback called when metadata is read
      * @param d Callback called when FLAC is decoded
      * @param e Callback called when there's an error
+     * @param forceMono Forces the audio to be Mono
      * @return true if could decode correctly the FLAC file
      */
-    boolean engine_flac_decoder(String file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e);
+    boolean engine_flac_decoder(String file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e,
+                                boolean forceMono);
 
     /**
      * Encodes PCM to a FLAC file (buggy)

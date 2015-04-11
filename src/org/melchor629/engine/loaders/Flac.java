@@ -10,10 +10,16 @@ import java.io.FileNotFoundException;
  */
 public class Flac {
     private String file;
+    private boolean forceMono;
     private FlacLibraryNative.PCMAttr attributes;
     private FlacLibraryNative.ShortBuffer data;
 
     public Flac(String file) throws FileNotFoundException {
+        this(file, false);
+    }
+
+    public Flac(String file, boolean forceMono) throws FileNotFoundException {
+        this.forceMono = forceMono;
         File f = new File(file);
         if(f.exists()) {
             if(f.isFile()) {
@@ -30,7 +36,7 @@ public class Flac {
         return FlacLibraryNative.instance.engine_flac_decoder(file,
                 (FlacLibraryNative.PCMAttr attr) -> attributes = attr,
                 (FlacLibraryNative.ShortBuffer buff) -> data = buff,
-                (int errCode, String msg) -> System.err.printf("[Flac] (%d) %s\n", errCode, msg));
+                (int errCode, String msg) -> System.err.printf("[Flac] (%d) %s\n", errCode, msg), forceMono);
     }
 
     public int getSampleRate() {

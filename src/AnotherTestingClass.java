@@ -1,4 +1,9 @@
 import org.melchor629.engine.Game;
+import org.melchor629.engine.al.AL;
+import org.melchor629.engine.al.LWJGLAudio;
+import org.melchor629.engine.al.types.Buffer;
+import org.melchor629.engine.al.types.Listener;
+import org.melchor629.engine.al.types.Source;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.gl.Renderer.BufferTarget;
@@ -13,6 +18,7 @@ import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
+import org.melchor629.engine.loaders.Flac;
 import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.utils.Timing;
@@ -55,11 +61,13 @@ public class AnotherTestingClass {
 
     public static void colladaxd(String[] args) {
         Renderer gl = Game.gl = new LWJGLRenderer();
+        AL al = Game.al = new LWJGLAudio();
         Timing t = Timing.getGameTiming();
         boolean cr;
         gl.setResizable(true);
         cr = gl.createDisplay(1280, 720, false, "Eso...");
         gl.setVsync(true);
+        al.createContext();
         Keyboard keyboard = Game.keyboard = new LWJGLKeyboard();
         Mouse mouse = Game.mouse = new LWJGLMouse();
         Camera camera = new Camera();
@@ -69,6 +77,17 @@ public class AnotherTestingClass {
             System.out.printf("Error al crear la ventana...");
             System.exit(-1);
         }
+
+        Buffer sound_buffer;
+        Source sound_source = null;
+        try {
+            Flac sound = new Flac(FLACDecoder.archivo, true);
+            sound.decode();
+            sound_buffer = new Buffer(sound.getSampleData(), AL.Format.MONO16, sound.getSampleRate());
+            sound_source = new Source(sound_buffer);
+            sound_source.setPosition(new vec3(7.5f, 0.f, 0.f));
+            sound.clear();
+        } catch(Exception ignore) {}
         
         Collada c = null;
         try {
@@ -108,8 +127,10 @@ public class AnotherTestingClass {
         gl.enable(GLEnable.DEPTH_TEST);
         gl.clearColor(1, 1, 1, 1);
         t.split("GL & data");
+        sound_source.play();
         
         while(!gl.windowIsClosing()) {
+            sound_source.setVelocity(new vec3(0,0,0));
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
             s.setUniformMatrix("view", camera.getViewMatrix());
             s.setUniformMatrix("project", camera.getProjectionMatrix());
@@ -130,6 +151,9 @@ public class AnotherTestingClass {
             keyboard.fireEvent(t.frameTime);
             mouse.update(t.frameTime);
             camera.updateIfNeeded();
+            Listener.setPosition(camera.getPosition());
+            Listener.setOrientation(camera.getLookingAtDirection(), new vec3(0, 0, 1));
+            Listener.setVelocity(camera.getSpeed());
             t.split("cpu");
             //System.out.printf("CPU: %.6f\tGPU: %.6f\n", t.getSplitTime("cpu"), t.getSplitTime("gpu"));
         }
@@ -137,10 +161,12 @@ public class AnotherTestingClass {
         s.delete();
         for(Meshy mesh : meshies)
             mesh.delete();
-        
+        sound_source.destroy();
+
         keyboard.release();
         mouse.release();
         gl.destroyDisplay();
+        al.deleteContext();
     }
     
     public static void cameraxd(String[] args) {

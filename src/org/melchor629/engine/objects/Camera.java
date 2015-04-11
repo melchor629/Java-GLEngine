@@ -8,6 +8,7 @@ import org.melchor629.engine.input.Keyboard.OnKeyboardEvent;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.input.Mouse.OnMouseClickEvent;
 import org.melchor629.engine.input.Mouse.OnMouseMoveEvent;
+import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec3;
@@ -242,6 +243,25 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      */
     public final void setRotation(vec3 rot) {
         setRotation(rot.x, rot.y, rot.z);
+    }
+
+    /**
+     * Gets the direction where the camera is looking at
+     * @return direction
+     */
+    public final vec3 getLookingAtDirection() {
+        return dir;
+    }
+
+    /**
+     * Gets the calculated speed from the camera movement. Speed is calculated
+     * everyframe with the difference between the last frame with the current.
+     * @return speed of the camera
+     */
+    public final vec3 getSpeed() {
+        vec3 sp = new vec3(speed);
+        sp.product((float) (1f/Timing.getGameTiming().frameTime));
+        return sp;
     }
 
     

@@ -1,4 +1,4 @@
-BIN_DIR=../../bin
+BIN_DIR=../../build/resources/main
 
 OS_DIR=darwin
 PREFIX=lib

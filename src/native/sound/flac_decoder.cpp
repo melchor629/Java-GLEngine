@@ -35,11 +35,22 @@ static bool write_little_endian_uint32(ShortBuffer* f, FLAC__uint32 x) {
     }
 
     if(attr->channels == 2) {
-        for(i = 0; i < frame->header.blocksize; i++) {
-            if(!write_little_endian_int16(f, (int16_t) buffer[0][i]) || 
-                !write_little_endian_int16(f, (int16_t) buffer[1][i])) {
-                fprintf(stderr, "ERROR: error al escribir en el buffer");
-                return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+        if(_forceMono) {
+            for(i = 0; i < frame->header.blocksize; i++) {
+                //Interesante y funcional truco para convertir a mono
+                int32_t sample = (buffer[0][i] + buffer[1][i]) / 2;
+                if(!write_little_endian_int16(f, (int16_t) sample)) {
+                    fprintf(stderr, "ERROR: error al escribir en el buffer");
+                    return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+                }
+            }
+        } else {
+            for(i = 0; i < frame->header.blocksize; i++) {
+                if(!write_little_endian_int16(f, (int16_t) buffer[0][i]) ||
+                    !write_little_endian_int16(f, (int16_t) buffer[1][i])) {
+                    fprintf(stderr, "ERROR: error al escribir en el buffer");
+                    return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+                }
             }
         }
     } else if(attr->channels == 1) {
@@ -74,7 +85,7 @@ void EngineFlacDecoder::error_callback(::FLAC__StreamDecoderErrorStatus status) 
         err(status, FLAC__StreamDecoderErrorStatusString[status]);
 }
 
-bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e) {
+bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e, bool fm) {
     EngineFlacDecoder decoder;
     bool ret = true;
 
@@ -109,7 +120,7 @@ bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEve
 }
 
 extern "C" {
-bool engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e) {
-    return _engine_flac_decoder(file, m, d, e);
+bool engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e, bool fm) {
+    return _engine_flac_decoder(file, m, d, e, fm);
 }
 };
