@@ -8,3 +8,11 @@ dependencies {
     compile 'net.java.dev.jna:jna:4.+'
     compile files('../lwjgl/jar/lwjgl.jar');
 }
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
