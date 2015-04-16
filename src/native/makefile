@@ -9,11 +9,14 @@ CPPFLAGS=-O3 -I./include
 SOURCES=sound/flac_decoder.cpp sound/flac_encoder.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
-ifeq ($(OS),Darwin)
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
 	OS_DIR=darwin
+	EXT=dylib
 else
-ifeq ($(OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	OS_DIR=linux-amd64
+	EXT=so
 endif
 endif
 
