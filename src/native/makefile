@@ -5,7 +5,7 @@ PREFIX=lib
 EXT=dylib
 
 LD_FLAGS=-lFLAC++ -lFLAC
-CPPFLAGS=-O3 -I./include
+CPPFLAGS=-O3 -I./include -fPIC
 SOURCES=sound/flac_decoder.cpp sound/flac_encoder.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
