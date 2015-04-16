@@ -81,5 +81,10 @@ build/
 # Ignore Gradle GUI config
 gradle-app.setting
 
+# IntelliJ Idea
+.idea/*
+*.iml
+*.eml
+
 # C & C++
 *.o
