@@ -4,10 +4,7 @@ import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALContext;
 import org.melchor629.engine.utils.BufferUtils;
 
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 
 import static org.lwjgl.openal.AL.destroy;
 import static org.lwjgl.openal.AL10.*;
@@ -259,7 +256,7 @@ public class LWJGLAudio implements AL {
 	@Override
 	public void getDouble(Get cap, double[] doubles) {
 		DoubleBuffer buff = BufferUtils.createDoubleBuffer(doubles.length);
-		alGetDouble(cap.e, buff);
+		alGetDoublev(cap.e, buff);
 		buff.position(0);
 		buff.get(doubles);
 	}
@@ -308,8 +305,10 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getFloat(Get pname, float[] floats) {
-		// TODO Auto-generated method stub
-
+		FloatBuffer fb = BufferUtils.createFloatBuffer(floats.length);
+		alGetFloatv(pname.e, fb);
+		fb.position(0);
+		fb.get(floats);
 	}
 
 	/* (non-Javadoc)
@@ -325,8 +324,10 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getInteger(Get pname, int[] integers) {
-		// TODO Auto-generated method stub
-
+		IntBuffer fb = BufferUtils.createIntBuffer(integers.length);
+		alGetIntegerv(pname.e, fb);
+		fb.position(0);
+		fb.get(integers);
 	}
 
 	/* (non-Javadoc)
@@ -334,8 +335,10 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getListener(Get pname, float[] floats) {
-		// TODO Auto-generated method stub
-
+		FloatBuffer fb = BufferUtils.createFloatBuffer(floats.length);
+		alGetListenerfv(pname.e, fb);
+		fb.position(0);
+		fb.get(floats);
 	}
 
 	/* (non-Javadoc)
@@ -343,8 +346,10 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getListener(Get pname, int[] ints) {
-		// TODO Auto-generated method stub
-
+		IntBuffer fb = BufferUtils.createIntBuffer(ints.length);
+		alGetListeneri(pname.e, fb);
+		fb.position(0);
+		fb.get(ints);
 	}
 
 	/* (non-Javadoc)
@@ -352,8 +357,7 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public float getListenerf(Listener pname) {
-		// TODO Auto-generated method stub
-		return 0;
+		return alGetListenerf(pname.e);
 	}
 
 	/* (non-Javadoc)
@@ -361,8 +365,7 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public int getListeneri(Listener pname) {
-		// TODO Auto-generated method stub
-		return 0;
+		return alGetListeneri(pname.e);
 	}
 
 	/* (non-Javadoc)
@@ -448,7 +451,7 @@ public class LWJGLAudio implements AL {
 		if(data == null || data.length == 0)
 			throw new ALError("alListener", "Data cannot be null or empty");
 		
-		alListener(pname.e, BufferUtils.toBuffer(data));
+		alListenerfv(pname.e, BufferUtils.toBuffer(data));
 	}
 
 	/* (non-Javadoc)
@@ -496,7 +499,7 @@ public class LWJGLAudio implements AL {
 		if(!isSource(source))
 			throw new ALError("alSource", "Source is not a source");
 		
-		alSource(source, pname.e, BufferUtils.toBuffer(data));
+		alSourcefv(source, pname.e, BufferUtils.toBuffer(data));
 	}
 
 	/* (non-Javadoc)
@@ -665,7 +668,7 @@ public class LWJGLAudio implements AL {
 		if(!isBuffer(buffer))
 			throw new ALError("alBuffer", "Buffer is not a buffer");
 		
-		AL11.alBuffer(buffer, pname.e, BufferUtils.toBuffer(floats));
+		AL11.alBufferfv(buffer, pname.e, BufferUtils.toBuffer(floats));
 	}
 
 	/* (non-Javadoc)
@@ -676,7 +679,7 @@ public class LWJGLAudio implements AL {
 		if(!isBuffer(buffer))
 			throw new ALError("alBuffer", "Buffer is not a buffer");
 		
-		AL11.alBuffer(buffer, pname.e, BufferUtils.toBuffer(integers));
+		AL11.alBufferiv(buffer, pname.e, BufferUtils.toBuffer(integers));
 	}
 
 	/* (non-Javadoc)
@@ -759,7 +762,7 @@ public class LWJGLAudio implements AL {
 		if(!isSource(source))
 			throw new ALError("alSource", "Source is not a source");
 		
-		AL11.alSource(source, pname.e, BufferUtils.toBuffer(integers));
+		AL11.alSourceiv(source, pname.e, BufferUtils.toBuffer(integers));
 	}
 
 	/* (non-Javadoc)

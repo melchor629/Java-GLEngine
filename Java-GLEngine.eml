@@ -10,6 +10,6 @@
 	</contentEntry>
 	<levels>
 		<level name="LWJGL" value="project"/>
-		<level name="jna" value="project"/>
+		<level name="net.java.dev.jna:jna:4.0.0" value="project"/>
 	</levels>
 </component>

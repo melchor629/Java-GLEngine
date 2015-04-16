@@ -1104,7 +1104,7 @@ public class LWJGLRenderer implements Renderer {
     public void uniformMatrix2(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 2 * 2) throw new BufferUnderflowException();
         FloatBuffer buff = BufferUtils.createFloatBuffer(2 * 2).put(matrix).compact();
-        glUniformMatrix2(loc, trans, buff);
+        glUniformMatrix2fv(loc, trans, buff);
         buff.clear();
     }
 
@@ -1115,7 +1115,7 @@ public class LWJGLRenderer implements Renderer {
     public void uniformMatrix3(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 3 * 3) throw new BufferUnderflowException();
         FloatBuffer buff = BufferUtils.createFloatBuffer(3 * 3).put(matrix).compact();
-        glUniformMatrix3(loc, trans, buff);
+        glUniformMatrix3fv(loc, trans, buff);
         buff.clear();
     }
 
@@ -1126,7 +1126,7 @@ public class LWJGLRenderer implements Renderer {
     public void uniformMatrix4(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 4 * 4) throw new BufferUnderflowException();
         FloatBuffer buff = BufferUtils.createFloatBuffer(4 * 4).put(matrix);buff.flip();
-        glUniformMatrix4(loc, trans, buff);
+        glUniformMatrix4fv(loc, trans, buff);
         buff.clear();
     }
 
@@ -1192,8 +1192,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, byte[] buff) {
-        // TODO Auto-generated method stub
-        
+        bufferSubData(target, offset, BufferUtils.createByteBuffer(buff.length).put(buff).compact());
     }
 
     /* (non-Javadoc)
@@ -1201,8 +1200,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, short[] buff) {
-        // TODO Auto-generated method stub
-        
+        bufferSubData(target, offset, BufferUtils.createShortBuffer(buff.length).put(buff).compact());
     }
 
     /* (non-Javadoc)
@@ -1210,8 +1208,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, int[] buff) {
-        // TODO Auto-generated method stub
-        
+        bufferSubData(target, offset, BufferUtils.createIntBuffer(buff.length).put(buff).compact());
     }
 
     /* (non-Javadoc)
@@ -1219,8 +1216,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, float[] buff) {
-        // TODO Auto-generated method stub
-        
+        bufferSubData(target, offset, BufferUtils.createFloatBuffer(buff.length).put(buff).compact());
     }
 
     /* (non-Javadoc)
@@ -1228,8 +1224,7 @@ public class LWJGLRenderer implements Renderer {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, double[] buff) {
-        // TODO Auto-generated method stub
-        
+        bufferSubData(target, offset, BufferUtils.createDoubleBuffer(buff.length).put(buff).compact());
     }
 
     /* (non-Javadoc)
