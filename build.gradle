@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'cpp'
 
 repositories {
     mavenCentral()
@@ -7,6 +8,37 @@ repositories {
 dependencies {
     compile 'net.java.dev.jna:jna:4.+'
     compile files('../lwjgl/jar/lwjgl.jar');
+}
+
+model {
+    buildTypes {
+        debug
+        release
+    }
+
+    components {
+        Engine(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir 'src/engine'
+                        include '**/*.cpp'
+                    }
+                }
+            }
+
+            binaries.all {
+                if(toolChain in Gcc || toolChain in Clang) {
+                    linker.args '-lflac++', '-lflac'
+
+                    if(buildType == buildTypes.debug)
+                        cppCompiler.args "-g"
+                    else
+                        cppCompiler.args "-O3"
+                }
+            }
+        }
+    }
 }
 
 sourceSets {

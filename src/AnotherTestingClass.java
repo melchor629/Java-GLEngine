@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class AnotherTestingClass {
+    static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary"); }
     
     private final static String vertex_shader = "#version 150 core\n"
             + "in vec3 position;\n"

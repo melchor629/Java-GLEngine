@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
- * Created by melchor9000 on 4/4/15.
+ * FLAC decoding/encoding class
  */
 public class Flac {
     private String file;
@@ -14,10 +14,22 @@ public class Flac {
     private FlacLibraryNative.PCMAttr attributes;
     private FlacLibraryNative.ShortBuffer data;
 
+    /**
+     * Creates an instance of the FLAC encoder/decoder with a file
+     * @param file File to read/write
+     * @throws FileNotFoundException if the file doesn't exist
+     */
     public Flac(String file) throws FileNotFoundException {
         this(file, false);
     }
 
+    /**
+     * Creates an instance of the FLAC encoder/decoder with a file. Force
+     * Mono param is, as its name indicates, to force a stereo sound to be mono.
+     * @param file File to read/write
+     * @param forceMono Force mono
+     * @throws FileNotFoundException if the fuke doesn't exist
+     */
     public Flac(String file, boolean forceMono) throws FileNotFoundException {
         this.forceMono = forceMono;
         File f = new File(file);
@@ -32,6 +44,10 @@ public class Flac {
         }
     }
 
+    /**
+     * Decodes FLAC file
+     * @return true if could decode correctly the file
+     */
     public boolean decode() {
         return FlacLibraryNative.instance.engine_flac_decoder(file,
                 (FlacLibraryNative.PCMAttr attr) -> attributes = attr,
@@ -39,18 +55,34 @@ public class Flac {
                 (int errCode, String msg) -> System.err.printf("[Flac] (%d) %s\n", errCode, msg), forceMono);
     }
 
+    /**
+     * Gets the sample rate of the sound
+     * @return the sample rate
+     */
     public int getSampleRate() {
         return attributes.sample_rate;
     }
 
+    /**
+     * Gets the number of the channels of the sound
+     * @return channels
+     */
     public int getChannels() {
         return attributes.channels;
     }
 
+    /**
+     * Gets the number of bits per sample
+     * @return bps
+     */
     public int getBitsPerSample() {
         return attributes.bps;
     }
 
+    /**
+     * Gets the total number of samples
+     * @return total samples
+     */
     public long getTotalSamples() {
         return attributes.total_samples.longValue();
     }
@@ -63,6 +95,9 @@ public class Flac {
         return buff;
     }
 
+    /**
+     * Clear all memory stuff
+     */
     public void clear() {
         if(data != null) {
             data.clear.invoke(data);
