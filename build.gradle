@@ -29,7 +29,7 @@ model {
 
             binaries.all {
                 if(toolChain in Gcc || toolChain in Clang) {
-                    linker.args '-lflac++', '-lflac'
+                    linker.args '-lFLAC++', '-lFLAC'
 
                     if(buildType == buildTypes.debug)
                         cppCompiler.args "-g"
