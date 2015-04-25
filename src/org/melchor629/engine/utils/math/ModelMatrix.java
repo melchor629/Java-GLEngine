@@ -37,6 +37,18 @@ public class ModelMatrix {
         calculateMatrix();
         return this;
     }
+
+    /**
+     * Sets the location of the object (in the Matrix representation)
+     * in the following values of the coords.
+     * @param loc new location
+     * @return Itself, for chaining methods
+     */
+    public ModelMatrix setLocation(vec3 loc) {
+        this.loc = loc;
+        calculateMatrix();
+        return this;
+    }
     
     /**
      * Translates the object (in the Matrix representation), like OpenGL 2
@@ -147,6 +159,19 @@ public class ModelMatrix {
         scale.x = x;
         scale.y = y;
         scale.z = z;
+        calculateMatrix();
+        return this;
+    }
+
+    /**
+     * Set the scale of the object in a non uniform scaling.
+     * Scales the object an amount of desired scale over an
+     * axis.
+     * @param scale Amount of scale factor as a vector
+     * @return Itself, for chaining methods
+     */
+    public ModelMatrix setScale(vec3 scale) {
+        this.scale = scale;
         calculateMatrix();
         return this;
     }

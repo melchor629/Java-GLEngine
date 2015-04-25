@@ -112,6 +112,16 @@ public class BufferObject {
     /**
      * Fill the buffer object with data from {@code buff}. And also binds
      * this BO for more intuitive coding ;)
+     * @param buff Data to be copied as floats (32 bit floating number)
+     */
+    public void fillBuffer(FloatBuffer buff) {
+        bind();
+        Game.gl.bufferData(target, buff, usage);
+    }
+
+    /**
+     * Fill the buffer object with data from {@code buff}. And also binds
+     * this BO for more intuitive coding ;)
      * @param buff Data to be copied as double (64 bit floating number)
      */
     public void fillBuffer(double[] buff) {

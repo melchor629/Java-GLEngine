@@ -63,8 +63,9 @@ public class LWJGLRenderer implements Renderer {
         //glfwInit();
         long fourth = fullscreen ? glfwGetPrimaryMonitor() : 0l;
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        if(org.lwjgl.LWJGLUtil.getPlatform().getName().equalsIgnoreCase("macosx"))
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         window = glfwCreateWindow(width, height, title, fourth, 0l);
         if(window != 0)
