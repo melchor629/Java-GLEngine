@@ -19,8 +19,8 @@ import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.Flac;
-import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.objects.Camera;
+import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.ModelMatrix;
@@ -28,7 +28,6 @@ import org.melchor629.engine.utils.math.mat4;
 import org.melchor629.engine.utils.math.vec3;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class AnotherTestingClass {
     static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary"); }
@@ -99,18 +98,13 @@ public class AnotherTestingClass {
             System.exit(1);
         }
 
-        ArrayList<Meshy> meshies = new ArrayList<>();
-        for(Node n : c.visual_scenes.get(0).nodes) {
-            if(n.isGeometry()) {
-                meshies.add(new Meshy(c, n));
-            }
-        }
+        Model.loadModels(c);
+        ColladaScene cs = new ColladaScene(c, c.visual_scenes.get(0));
         
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);
         s.bindFragDataLocation("outColor", 0);
         s.bind();
-        for(Meshy m : meshies)
-            m.enableAttribs(s, "position", "normal", "color");
+        cs.enableAttributes(s, "position", "normal", null, "color");
         s.unbind();
 
         Cube cube = new Cube();
@@ -138,13 +132,8 @@ public class AnotherTestingClass {
 
             s.setUniformMatrix("model", cubeModel.getModelMatrix());
             cube.draw();
-            //cubeModel.rotate((float) (0.4 * Math.PI * t.frameTime), 1, 0, 0);
-            //cubeModel.rotate((float) (-.2 * Math.PI * t.frameTime), 0, 1, 0);
-            //cubeModel.rotate((float) (0.5 * Math.PI * t.frameTime), 0, 0, 1);
 
-            for(Meshy mesh : meshies) {
-                mesh.draw(s);
-            }
+            cs.render(s);
             
             gl._game_loop_sync(60);
             t.split("gpu");
@@ -160,8 +149,7 @@ public class AnotherTestingClass {
         }
         
         s.delete();
-        for(Meshy mesh : meshies)
-            mesh.delete();
+        Model.deleteModels();
         sound_source.destroy();
 
         keyboard.release();

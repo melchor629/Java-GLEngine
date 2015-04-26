@@ -1,3 +1,5 @@
+package org.melchor629.engine.objects;
+
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.gl.types.BufferObject;
@@ -10,37 +12,59 @@ import org.melchor629.engine.utils.math.ModelMatrix;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * From Dart experiment
  */
-public class Meshy {
-    VAO vao;
-    BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, colorBuffer;
-    Geometry geometry;
-    Node node;
-    ModelMatrix model;
+public class Model {
+    private VAO vao;
+    private BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, colorBuffer;
+    private final Geometry geometry;
 
-    Meshy(Collada c, Node node) {
-        if(!node.isGeometry()) {
-            throw new IllegalArgumentException("Nodo no es una instancia de Geometría");
-        }
+    private static ArrayList<Model> models;
 
-        this.node = node;
-        String url = ((Instance_Geometry) node.instance).url;
-        geometry = c.searchForGeometryWithId(url);
-        if(geometry == null)
-            throw new InternalError("No se ha encontrado objeto...");
+    /**
+     * Load all models from a Collada document
+     * @param c Collada document
+     */
+    public static void loadModels(Collada c) {
+        if(models == null)
+            models = new ArrayList<>(c.geometry.size());
+        models.addAll(c.geometry.stream().map(Model::new).collect(Collectors.toList()));
+    }
 
-        model = new ModelMatrix();
-        model.setLocation(node.location);
-        model.rotate(node.rotation.getRow(1));
-        model.rotate(node.rotation.getRow(2));
-        model.rotate(node.rotation.getRow(3));
-        model.setScale(node.scale);
+    /**
+     * Searche a model from its ID
+     * @param str model's ID
+     * @return the Model or null
+     */
+    public static Model searchModel(String str) {
+        if(models == null)
+            throw new IllegalAccessError("Cannot search for models if they are not loaded");
+        int i = 0;
+        while(i < models.size() && !models.get(i).geometry.id.equals(str))
+            i++;
+        return i < models.size() ? models.get(i) : null;
+    }
 
+    /**
+     * Deletes all models from GPU and Memory
+     */
+    public static void deleteModels() {
+        models.forEach(Model::delete);
+        models.clear();
+    }
+
+    /**
+     * Loads a model from a Collada file
+     * @param g Geometry node
+     */
+    private Model(Geometry g) {
+        geometry = g;
         generateBuffers();
         geometry.mesh.disposeData();
     }
@@ -97,17 +121,23 @@ public class Meshy {
         vao.bind();
         indexBuffer.bind();
 
-        vertexBuffer.bind();
-        s.vertexAttribPointer(attribs[0], 3, Renderer.type.FLOAT, false, 0, 0);
-        s.enableAttrib(attribs[0]);
+        if(attribs[0] != null) {
+            vertexBuffer.bind();
+            s.vertexAttribPointer(attribs[0], 3, Renderer.type.FLOAT, false, 0, 0);
+            s.enableAttrib(attribs[0]);
+        }
 
-        normalBuffer.bind();
-        s.vertexAttribPointer(attribs[1], 3, Renderer.type.FLOAT, false, 0, 0);
-        s.enableAttrib(attribs[1]);
+        if(attribs[1] != null) {
+            normalBuffer.bind();
+            s.vertexAttribPointer(attribs[1], 3, Renderer.type.FLOAT, false, 0, 0);
+            s.enableAttrib(attribs[1]);
+        }
 
-        colorBuffer.bind();
-        s.vertexAttribPointer(attribs[2], 3, Renderer.type.FLOAT, false, 0, 0);
-        s.enableAttrib(attribs[2]);
+        if(attribs[3] != null) {
+            colorBuffer.bind();
+            s.vertexAttribPointer(attribs[3], 3, Renderer.type.FLOAT, false, 0, 0);
+            s.enableAttrib(attribs[3]);
+        }
 
         vao.unbind();
         s.unbind();
@@ -115,16 +145,15 @@ public class Meshy {
         indexBuffer.unbind();
     }
 
-    public void draw(ShaderProgram s) {
+    public void draw(ShaderProgram s, ModelMatrix model) {
         int facesCount = geometry.mesh.polylist.count;
         s.setUniformMatrix("model", model.getModelMatrix());
         vao.bind();
         Game.gl.drawElements(Renderer.DrawMode.TRIANGLES, facesCount * 3, Renderer.type.UNSIGNED_INT, 0);
-        AnotherTestingClass.printError();
         vao.unbind();
     }
 
-    public void delete() {
+    private void delete() {
         vao.delete();
         indexBuffer.delete();
         vertexBuffer.delete();

@@ -47,7 +47,7 @@ public class Texture {
     /**
      * Constructor for the Texture.Builder
      */
-    Texture(File file, TextureFilter mag, TextureFilter min, TextureWrap wrap_s,
+    private Texture(File file, TextureFilter mag, TextureFilter min, TextureWrap wrap_s,
             TextureWrap wrap_t, TextureFormat ifmt, TextureExternalFormat efmt, Renderer.TextureTarget target,
             boolean mipmap, int width, int height) throws IOException {
         texture = gl.genTexture();
@@ -110,6 +110,14 @@ public class Texture {
     protected void finalize() throws Throwable {
         super.finalize();
         delete();
+    }
+
+    public boolean equals(Object o) {
+        return (o instanceof Texture) && ((Texture) o).texture == texture;
+    }
+
+    public int hashCode() {
+        return texture + super.hashCode();
     }
 
     /**
@@ -196,6 +204,16 @@ public class Texture {
         public builder setWrap_t(Renderer.TextureWrap wrap_t) {
             this.wrap_t = wrap_t;
             return this;
+        }
+
+        /**
+         * Set how the textire will be wrapped on all borders.
+         * @param wrap the wrap method to set
+         * @return the builder
+         */
+        public builder setWrap(Renderer.TextureWrap wrap) {
+            setWrap_s(wrap);
+            return setWrap_t(wrap);
         }
 
         /**

@@ -9,8 +9,8 @@ import org.w3c.dom.Element;
  * @author melchor9000
  */
 public class Effect {
-    public String emission, ambient, diffuse, specular, id;
-    public float shininess, index_of_refraction;
+    private Phong phong;
+    private String id;
     public ArrayList<newparam> params;
     
     public Effect(Element effects) {
@@ -18,7 +18,9 @@ public class Effect {
         id = effects.getAttribute("id");
         Element technique = (Element) profile_COMMON.getElementsByTagName("technique").item(0);
         if(technique.getElementsByTagName("phong").item(0) != null)
-            phong((Element) technique.getElementsByTagName("phong").item(0));
+            phong = new Phong((Element) technique.getElementsByTagName("phong").item(0));
+        else if(technique.getElementsByTagName("blinn").getLength() == 1)
+            phong = new Phong((Element) technique.getElementsByTagName("blinn").item(0));
         //else ... TODO
         params = new ArrayList<>();
         org.w3c.dom.NodeList nl = profile_COMMON.getElementsByTagName("newparam");
@@ -28,33 +30,12 @@ public class Effect {
         }
     }
 
-    private void phong(Element phong) {
-        emission = getValue((Element) phong.getElementsByTagName("emission").item(0));
-        ambient = getValue((Element) phong.getElementsByTagName("ambient").item(0));
-        diffuse = getValue((Element) phong.getElementsByTagName("diffuse").item(0));
-        specular = getValue((Element) phong.getElementsByTagName("specular").item(0));
-        shininess = getFloatValue((Element) phong.getElementsByTagName("shininess").item(0));
-        index_of_refraction = getFloatValue((Element) phong.getElementsByTagName("index_of_refraction").item(0));
+    public Phong getPhong() {
+        return phong;
     }
 
-    public static boolean isColor(String str) {
-        return str.startsWith("C");
-    }
-
-    public static boolean isTexture(String str) {
-        return str.startsWith("T");
-    }
-
-    private String getValue(Element e) {
-        if(e.getElementsByTagName("color").item(0) != null)
-            return "C"+e.getElementsByTagName("color").item(0).getTextContent();
-        else if(e.getElementsByTagName("texture").item(0) != null)
-            return "T"+e.getElementsByTagName("texture").item(0).getAttributes().getNamedItem("texture").getTextContent();
-        return null;
-    }
-    
-    private float getFloatValue(Element e) {
-        return Float.parseFloat(e.getElementsByTagName("float").item(0).getTextContent());
+    public String getId() {
+        return id;
     }
 
     public class newparam {
