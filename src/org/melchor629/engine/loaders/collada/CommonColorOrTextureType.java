@@ -15,12 +15,12 @@ public class CommonColorOrTextureType {
     public CommonColorOrTextureType(Element element) {
         NodeList list = element.getChildNodes();
         for(int i = 0; i < list.getLength(); i++) {
-            Element element1 = (Element) list.item(i);
-            if(element1.getTagName().equals("color"))
-                parseColor(element1.getTextContent());
-            else if(element1.getTagName().equals("texture"))
-                texture = new Texture(element1);
-            sid = element1.getAttribute("sid");
+            if(list.item(i) instanceof Element) {
+                Element element1 = (Element) list.item(i);
+                if(element1.getTagName().equals("color")) parseColor(element1.getTextContent());
+                else if(element1.getTagName().equals("texture")) texture = new Texture(element1);
+                sid = element1.getAttribute("sid");
+            }
         }
     }
 

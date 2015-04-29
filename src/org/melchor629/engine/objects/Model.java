@@ -133,6 +133,12 @@ public class Model {
             s.enableAttrib(attribs[1]);
         }
 
+        if(attribs[2] != null && texCoordBuffer != null) {
+            texCoordBuffer.bind();
+            s.vertexAttribPointer(attribs[2], 2, Renderer.type.FLOAT, false, 0, 0);
+            s.enableAttrib(attribs[2]);
+        }
+
         if(attribs[3] != null) {
             colorBuffer.bind();
             s.vertexAttribPointer(attribs[3], 3, Renderer.type.FLOAT, false, 0, 0);
@@ -147,7 +153,8 @@ public class Model {
 
     public void draw(ShaderProgram s, ModelMatrix model) {
         int facesCount = geometry.mesh.polylist.count;
-        s.setUniformMatrix("model", model.getModelMatrix());
+        if(s != null && model != null)
+            s.setUniformMatrix("model", model.getModelMatrix());
         vao.bind();
         Game.gl.drawElements(Renderer.DrawMode.TRIANGLES, facesCount * 3, Renderer.type.UNSIGNED_INT, 0);
         vao.unbind();

@@ -20,6 +20,7 @@ import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.Flac;
 import org.melchor629.engine.objects.Camera;
+import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
@@ -99,6 +100,7 @@ public class AnotherTestingClass {
         }
 
         Model.loadModels(c);
+        Material.loadMaterials(c);
         ColladaScene cs = new ColladaScene(c, c.visual_scenes.get(0));
         
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);

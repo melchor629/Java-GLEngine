@@ -1,5 +1,7 @@
 import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.loaders.Collada;
+import org.melchor629.engine.loaders.collada.Instance_Geometry;
+import org.melchor629.engine.loaders.collada.Material;
 import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.loaders.collada.VisualScene;
 import org.melchor629.engine.objects.Model;
@@ -14,10 +16,12 @@ import java.util.NoSuchElementException;
 public class ColladaScene {
     private ArrayList<Model> models;
     private ArrayList<ModelMatrix> modelMatrices;
+    private ArrayList<org.melchor629.engine.objects.Material> materials;
 
     public ColladaScene(Collada c, VisualScene vs) {
         models = new ArrayList<>();
         modelMatrices = new ArrayList<>();
+        materials = new ArrayList<>();
         loadModelsInScene(c, vs);
     }
 
@@ -34,7 +38,7 @@ public class ColladaScene {
     }
 
     private void loadModelsInScene(Collada c, VisualScene vs) {
-        for(Node n : vs.nodes) {
+        vs.nodes.forEach(n -> {
             if(n.isGeometry()) {
                 models.add(searchModel(n));
                 ModelMatrix model = new ModelMatrix();
@@ -44,8 +48,15 @@ public class ColladaScene {
                 model.rotate(n.rotation.getRow(3));
                 model.setScale(n.scale);
                 modelMatrices.add(model);
+
+                if(((Instance_Geometry) n.instance).instance_material_target != null) {
+                    String name = ((Instance_Geometry) n.instance).name;
+                    materials.add(org.melchor629.engine.objects.Material.getMaterial(name));
+                } else {
+                    materials.add(org.melchor629.engine.objects.Material.getMaterial("")); //Default Material
+                }
             }
-        }
+        });
     }
 
     private Model searchModel(Node node) {

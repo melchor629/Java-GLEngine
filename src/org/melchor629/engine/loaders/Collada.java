@@ -71,6 +71,24 @@ public class Collada {
             found = geometry.get(i++).id.equals(id);
         return found ? geometry.get(--i) : null;
     }
+
+    public Material searchForMaterialWithId(String id) {
+        int i = 0;
+        if(id.startsWith("#"))
+            id = id.substring(1);
+
+        while(i < materials.size() && !materials.get(i).id.equals(id)) i++;
+        return i < materials.size() ? materials.get(i) : null;
+    }
+
+    public Effect searchForEffectWithId(String id) {
+        int i = 0;
+        if(id.startsWith("#"))
+            id = id.substring(1);
+
+        while(i < effects.size() && !effects.get(i).getId().equals(id)) i++;
+        return i < effects.size() ? effects.get(i) : null;
+    }
     
     public void disposeData() {
         for(Geometry g : geometry)

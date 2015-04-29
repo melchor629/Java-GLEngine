@@ -1,17 +1,10 @@
 package org.melchor629.engine.utils;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -28,21 +21,22 @@ public class IOUtils {
      * @throws FileNotFoundException If the file doesn't exist, is a directory or (rarely) failed reading
      * @throws IOException If an I/O error happend while reading
      */
-    public static String readFile(File file) throws FileNotFoundException, IOException {
-        BufferedReader bis = null;
+    public static String readFile(File file) throws IOException {
+        return readStream(new FileInputStream(file));
+    }
+
+    /**
+     * Read the content of a text input stream and then return its contents
+     * @param is An input stream to be read
+     * @return Contents of the file
+     * @throws IOException If an I/O error happend while reading
+     */
+    public static String readStream(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
-        try {
-            bis = new BufferedReader(new FileReader(file));
-            
+        try(Scanner sc = new Scanner(is)) {
             String line;
-            while((line = bis.readLine()) != null)
+            while((line = sc.nextLine()) != null)
                 sb.append(line).append('\n');
-        } catch(FileNotFoundException e) {
-            if(bis != null)
-                bis.close();
-            throw e;
-        } finally {
-            bis.close();
         }
         return sb.toString();
     }
@@ -58,7 +52,7 @@ public class IOUtils {
      * @throws IOException If we cannot read the file, or is a directory
      */
     public static Image readImage(File file, String ext) throws IOException {
-        BufferedImage bi = null;
+        BufferedImage bi;
 
         boolean imageio = false;
         for(String fmt : ImageIO.getReaderFormatNames()) {
@@ -122,7 +116,7 @@ public class IOUtils {
      * @throws FileNotFoundException If the file cannot be created or is a directory
      * @throws IOException If an I/O error happend while writing
      */
-    public static void writeFile(File file, String content) throws FileNotFoundException, IOException {
+    public static void writeFile(File file, String content) throws IOException {
         BufferedWriter bw = null;
         boolean created = true;
         try {
@@ -151,7 +145,7 @@ public class IOUtils {
      * @throws FileNotFoundException If the file is a directory
      * @throws IOException If an I/O error happend while writing
      */
-    public static void appendFile(File file, String content) throws FileNotFoundException, IOException {
+    public static void appendFile(File file, String content) throws IOException {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(file, true));
@@ -197,8 +191,22 @@ public class IOUtils {
         return sb.toString();
     }
 
+    /**
+     * Creates a temporary file with the prefix engine and extension .tmp
+     * @return temporary file
+     * @throws IOException If the file cannot be created
+     */
     public static File createTempFile() throws IOException {
         return File.createTempFile("engine", ".tmp");
+    }
+
+    /**
+     * Looks for a resource in class path and creates an Input Stream
+     * @param path relative path to the file
+     * @return InputStream of the file
+     */
+    public static InputStream getResourceAsStream(String path) {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     }
 
     /**
