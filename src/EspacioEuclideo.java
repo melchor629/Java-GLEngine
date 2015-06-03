@@ -15,7 +15,6 @@ import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.vec3;
 
-import java.io.File;
 import java.nio.FloatBuffer;
 import java.util.Random;
 import java.util.TreeSet;
@@ -54,7 +53,8 @@ public class EspacioEuclideo {
         Mouse mouse = Game.mouse = new LWJGLMouse();
         Camera camera = new Camera();
         camera.setClipPanes(0.1, 100);
-        camera.setMovementMultiplier(5);
+        camera.setMovementMultiplier(0);
+        camera.setMouseSensibility(0);
 
         VAO puntos_vao = new VAO();
         BufferObject plano_vbo = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
@@ -73,7 +73,6 @@ public class EspacioEuclideo {
         });
         puntos_vbo.fillBuffer(puntos);
         puntos.clear();
-        puntos = null;
 
         ShaderProgram puntos_shader = new ShaderProgram(
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
@@ -105,7 +104,6 @@ public class EspacioEuclideo {
         puntos_shader.setUniform("euclides", 0);
         puntos_shader.setUniform("opacity", 1.0f);
 
-        System.gc();
         while(!gl.windowIsClosing()) {
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
             gl.clearColor(0.1f, 0.1f,0.1f,1);
@@ -115,8 +113,6 @@ public class EspacioEuclideo {
                 opacity = camera.getPosition().x / 50.f;
             else if(camera.getPosition().x > WIDTH + HEIGHT - 50.f)
                 opacity = (WIDTH + HEIGHT - camera.getPosition().x) / 50.f;
-            if(camera.getPosition().x > WIDTH + HEIGHT + 50f)
-                camera.setPosition(0, camera.getPosition().y, camera.getPosition().z);
             opacity = Math.max(0, opacity);
             puntos_shader.setUniform("opacity", opacity);
 
@@ -131,6 +127,11 @@ public class EspacioEuclideo {
                 gl.enable(Renderer.GLEnable.FRAMEBUFFER_SRGB);
             else
                 gl.disable(Renderer.GLEnable.FRAMEBUFFER_SRGB);
+
+            if(camera.getPosition().x > WIDTH + HEIGHT + 50f)
+                camera.setPosition(0, camera.getPosition().y, camera.getPosition().z);
+            if(t.frameTime < 1)
+                camera.setPosition(camera.getPosition().x + 25 * (float) t.frameTime, camera.getPosition().y, camera.getPosition().z);
 
             gl._game_loop_sync(60);
             t.update();
