@@ -29,6 +29,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     private mat4 view, proj;
     private boolean needsUpdateView = true, needsUpdateProj = true;
     private long tempDate = System.currentTimeMillis();
+    private double mouseSensibility, movementMultiplier;
     
     /**
      * Creates a camera with position (0, 0, 0) & rotation 0º & 0º,
@@ -37,7 +38,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      */
     public Camera() {
         pos = new vec3();
-        dir = new vec3();
+        dir = new vec3(1, 0, 0);
         up = new vec3(0, 0, 1);
         rot = new vec3();
         speed = new vec3();
@@ -45,6 +46,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         near = 1;
         far = 10;
         aspect = 16. / 9.;
+        mouseSensibility = movementMultiplier = 1;
         
         initListeners();
     }
@@ -69,6 +71,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         near = 1;
         far = 10;
         aspect = 16. / 9.;
+        mouseSensibility = movementMultiplier = 1;
         
         initListeners();
     }
@@ -96,6 +99,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         near = 1;
         far = 10;
         aspect = 16. / 9.;
+        mouseSensibility = movementMultiplier = 1;
         
         //Seleccionando el cuadrante correcto según donde apunta
         if(rot.x >= 90.f && dir.z < 0f)
@@ -264,7 +268,48 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         return sp;
     }
 
-    
+    /**
+     * Returns the current value of the Movement Multiplier. This value
+     * represents how faster (or slower) the camera moves from the base
+     * movement. The base movement is 5 pixels per second.
+     * @return Movement multiplier value
+     */
+    public double getMovementMultiplier() {
+        return movementMultiplier;
+    }
+
+    /**
+     * Sets the new value of the Movement Multiplier. This value
+     * represents how faster (or slower) the camera moves from the base
+     * movement. The base movement is 5 pixels per second.
+     * @param movementMultiplier new value for movement multiplier
+     */
+    public void setMovementMultiplier(double movementMultiplier) {
+        this.movementMultiplier = movementMultiplier;
+    }
+
+    /**
+     * Returns the current value of mouse sensibility. This value
+     * represents how faster (or slower) the camera rotates from the
+     * base speed, which is 4º per second per mouse movement.
+     * @return Mouse sensibility
+     */
+    public double getMouseSensibility() {
+        return mouseSensibility;
+    }
+
+    /**
+     * Sets the new value of the Mouse Sensibility. This value
+     * represents how faster (or slower) the camera rotates from the
+     * base speed, which is 4º per second per mouse movement.
+     * @param mouseSensibility new value for mouse sensibility
+     */
+    public void setMouseSensibility(double mouseSensibility) {
+        this.mouseSensibility = mouseSensibility;
+    }
+
+
+
     private void initListeners() {
         Game.keyboard.addListener(this);
         Game.mouse.addListener((OnMouseMoveEvent) this);
@@ -273,7 +318,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     }
 
     public void invoke(Keyboard self, double delta) {
-        float cameraSpeed = 5.f * (float) delta;
+        float cameraSpeed = 5.f * (float) delta * (float) movementMultiplier;
         float x = pos.x, y = pos.y, z = pos.z;
         
         if(self.isKeyPressed("W"))
@@ -299,7 +344,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     public void invoke(Mouse self, double delta) {
         if(!self.isCaptured()) return;
 
-        float sensibility = (float) delta * 4;
+        float sensibility = (float) delta * 4 * (float) mouseSensibility;
         
         rot.x += self.getMouseSpeed().x * sensibility;
         rot.y += self.getMouseSpeed().y * sensibility;

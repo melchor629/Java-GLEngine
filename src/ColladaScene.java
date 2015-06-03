@@ -1,9 +1,8 @@
-import org.melchor629.engine.gl.types.ShaderProgram;
-import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.collada.Instance_Geometry;
-import org.melchor629.engine.loaders.collada.Material;
 import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.loaders.collada.VisualScene;
+import org.melchor629.engine.objects.Camera;
+import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.math.ModelMatrix;
 
@@ -16,28 +15,30 @@ import java.util.NoSuchElementException;
 public class ColladaScene {
     private ArrayList<Model> models;
     private ArrayList<ModelMatrix> modelMatrices;
-    private ArrayList<org.melchor629.engine.objects.Material> materials;
+    private ArrayList<Material> materials;
 
-    public ColladaScene(Collada c, VisualScene vs) {
+    public ColladaScene(VisualScene vs) {
         models = new ArrayList<>();
         modelMatrices = new ArrayList<>();
         materials = new ArrayList<>();
-        loadModelsInScene(c, vs);
+        loadModelsInScene(vs);
     }
 
     //TODO Eliminar basicamente porque cada objecto tendrá un mismo shader para el material
-    public void enableAttributes(ShaderProgram sh, String... args) {
-        for(Model model : models)
-            model.enableAttribs(sh, args);
+    public void enableAttributes() {
+        for(int i = 0; i < materials.size(); i++)
+            materials.get(i).enableShaderAttributes(models.get(i));//model.enableAttribs(sh, args);
     }
 
     //TODO No pasar un shader por lo anterior...
-    public void render(ShaderProgram s) {
-        for(int i = 0; i < models.size(); i++)
-            models.get(i).draw(s, modelMatrices.get(i));
+    public void render(Camera camera) {
+        for(int i = 0; i < models.size(); i++) {
+            materials.get(i).prepareMaterialToDraw(camera, modelMatrices.get(i));
+            models.get(i).draw(null, null);
+        }
     }
 
-    private void loadModelsInScene(Collada c, VisualScene vs) {
+    private void loadModelsInScene(VisualScene vs) {
         vs.nodes.forEach(n -> {
             if(n.isGeometry()) {
                 models.add(searchModel(n));
@@ -51,9 +52,9 @@ public class ColladaScene {
 
                 if(((Instance_Geometry) n.instance).instance_material_target != null) {
                     String name = ((Instance_Geometry) n.instance).name;
-                    materials.add(org.melchor629.engine.objects.Material.getMaterial(name));
+                    materials.add(Material.getMaterial(name));
                 } else {
-                    materials.add(org.melchor629.engine.objects.Material.getMaterial("")); //Default Material
+                    materials.add(Material.getMaterial("")); //Default Material
                 }
             }
         });

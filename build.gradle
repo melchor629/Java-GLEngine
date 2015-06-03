@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'cpp'
+apply plugin: 'c'
 
 repositories {
     mavenCentral()
@@ -21,8 +22,15 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDir 'src/engine'
+                        srcDir 'src/engine/source'
                         include '**/*.cpp'
+                    }
+                }
+
+                c {
+                    source {
+                        srcDir 'src/engine/source'
+                        include '**/*.c'
                     }
                 }
             }

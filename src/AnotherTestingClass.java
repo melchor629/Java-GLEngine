@@ -31,7 +31,7 @@ import org.melchor629.engine.utils.math.vec3;
 import java.io.File;
 
 public class AnotherTestingClass {
-    static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary"); }
+    static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/release"); }
     
     private final static String vertex_shader = "#version 150 core\n"
             + "in vec3 position;\n"
@@ -101,13 +101,13 @@ public class AnotherTestingClass {
 
         Model.loadModels(c);
         Material.loadMaterials(c);
-        ColladaScene cs = new ColladaScene(c, c.visual_scenes.get(0));
+        ColladaScene cs = new ColladaScene(c.visual_scenes.get(0));
         
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);
         s.bindFragDataLocation("outColor", 0);
-        s.bind();
-        cs.enableAttributes(s, "position", "normal", null, "color");
         s.unbind();
+        cs.enableAttributes();
+        //s.unbind();
 
         Cube cube = new Cube();
 
@@ -129,13 +129,14 @@ public class AnotherTestingClass {
         while(!gl.windowIsClosing()) {
             sound_source.setVelocity(new vec3(0,0,0));
             gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
+            s.bind();
             s.setUniformMatrix("view", camera.getViewMatrix());
             s.setUniformMatrix("project", camera.getProjectionMatrix());
 
             s.setUniformMatrix("model", cubeModel.getModelMatrix());
             cube.draw();
 
-            cs.render(s);
+            cs.render(camera);
             
             gl._game_loop_sync(60);
             t.split("gpu");

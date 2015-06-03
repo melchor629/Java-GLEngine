@@ -1,5 +1,6 @@
 package org.melchor629.engine.objects;
 
+import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.gl.types.Texture;
 import org.melchor629.engine.loaders.Collada;
@@ -9,6 +10,7 @@ import org.melchor629.engine.utils.ShaderManager;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.vec4;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,8 +28,8 @@ public class Material {
 
     static {
         try {
-            phongShader = ShaderManager.getInstance().loadShader("Phong", "phong.vs", "phong.fs");
-        } catch(Exception ignore) {}
+            phongShader = ShaderManager.getInstance().loadShader("Phong", "res/phong.vs", "res/phong.fs");
+        } catch(IOException ignore) {}
         materialList = new ArrayList<>();
         defaultMaterial = new Material();
     }

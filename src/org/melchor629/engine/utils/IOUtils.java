@@ -34,9 +34,8 @@ public class IOUtils {
     public static String readStream(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
         try(Scanner sc = new Scanner(is)) {
-            String line;
-            while((line = sc.nextLine()) != null)
-                sb.append(line).append('\n');
+            while(sc.hasNextLine())
+                sb.append(sc.nextLine()).append('\n');
         }
         return sb.toString();
     }
@@ -206,7 +205,8 @@ public class IOUtils {
      * @return InputStream of the file
      */
     public static InputStream getResourceAsStream(String path) {
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+        try{return new java.io.FileInputStream(new File(path));}catch(Exception ignore){}
+        return IOUtils.class.getClassLoader().getResourceAsStream(path);
     }
 
     /**

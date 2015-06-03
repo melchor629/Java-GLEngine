@@ -1,7 +1,7 @@
 #version 150 core
 
-in vec3 color, normal;
-in vec2 texCoord;
+in vec3 f_color, f_normal;
+in vec2 f_texCoord;
 
 uniform vec4 emission, ambient, diffuse, specular, reflective;
 uniform float shininess, reflectivity, transparency, ior;
@@ -14,7 +14,7 @@ out vec4 outColor;
 
 void main() {
     if(useDiffuseTex)
-        outColor = texture2D(diffuseTex, texCoord);
+        outColor = texture(diffuseTex, f_texCoord);
     else
         outColor = diffuse;
 }

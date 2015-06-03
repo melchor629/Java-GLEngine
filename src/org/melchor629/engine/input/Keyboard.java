@@ -77,7 +77,7 @@ public abstract class Keyboard {
      * every frame.
      * @author melchor9000
      */
-    public static interface OnKeyboardEvent {
-        public void invoke(Keyboard self, double delta);
+    public interface OnKeyboardEvent {
+        void invoke(Keyboard self, double delta);
     }
 }

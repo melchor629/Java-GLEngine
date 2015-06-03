@@ -1,26 +1,25 @@
 package org.melchor629.engine.gl;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLContext;
+import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glGetInteger;
 import static org.lwjgl.opengl.GL12.glTexImage3D;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL32.*;
+import static org.lwjgl.opengl.GL33.*;
 
-//import static org.lwjgl.opengl.GL14.*;
 //import static org.lwjgl.opengl.GL21.*;
-//import static org.lwjgl.opengl.GL31.*;
-//import static org.lwjgl.opengl.GL33.*;
 
 /**
  * Class for Render with LWJGL
@@ -34,11 +33,10 @@ public class LWJGLRenderer implements Renderer {
     private GLFWErrorCallback errorCallback;
 	
 	public LWJGLRenderer() {
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                glfwTerminate();
-            }
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(window != 0)
+                destroyDisplay();
+            glfwTerminate();
         }));
 
         glfwSetErrorCallback(errorCallback = new GLFWErrorCallback() {
@@ -89,6 +87,7 @@ public class LWJGLRenderer implements Renderer {
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
         }
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.a);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.b);
         window = glfwCreateWindow(width, height, title, fourth, 0l);
@@ -119,6 +118,7 @@ public class LWJGLRenderer implements Renderer {
     	glfwDestroyWindow(window);
     	glfwMakeContextCurrent(0l);
         glfwTerminate();
+        window = 0l;
     }
 
     public void _game_loop_sync(int fps) {
@@ -290,12 +290,22 @@ public class LWJGLRenderer implements Renderer {
         glDrawArrays(mode.e, first, count);
     }
 
+    @Override
+    public void drawArraysInstanced(DrawMode mode, int first, int count, int times) {
+        glDrawArraysInstanced(mode.e, first, count, times);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.Renderer#drawElements(org.melchor629.engine.gl.Renderer.DrawMode, int, org.melchor629.engine.gl.Renderer.type, long)
      */
     @Override
     public void drawElements(DrawMode mode, int length, type type, long offset) {
         glDrawElements(mode.e, length, type.e, offset);
+    }
+
+    @Override
+    public void drawElementsInstanced(DrawMode mode, int length, type type, long offset, int times) {
+        glDrawElementsInstanced(mode.e, length, type.e, offset, times);
     }
 
     protected int shToInt(ShaderType type) {
@@ -455,8 +465,8 @@ public class LWJGLRenderer implements Renderer {
     @Override
     public String getActiveAttrib(int program, int pos, int strlen) {
         IntBuffer size, type;
-        size = IntBuffer.allocate(1);
-        type = IntBuffer.allocate(1);
+        size = BufferUtils.createIntBuffer(1);
+        type = BufferUtils.createIntBuffer(1);
         return glGetActiveAttrib(program, pos, strlen, size, type);
     }
 
@@ -476,6 +486,11 @@ public class LWJGLRenderer implements Renderer {
         return -1;//glGetActiveAttribType(program, pos); TODO
     }
 
+    @Override
+    public void vertexAttribDivisor(int loc, int divisor) {
+        glVertexAttribDivisor(loc, divisor);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.Renderer#getUniformLocation(int, java.lang.String)
      */
@@ -490,8 +505,8 @@ public class LWJGLRenderer implements Renderer {
     @Override
     public String getActiveUniform(int program, int pos, int strlen) {
         IntBuffer size, type;
-        size = IntBuffer.allocate(1);
-        type = IntBuffer.allocate(1);
+        size = BufferUtils.createIntBuffer(1);
+        type = BufferUtils.createIntBuffer(1);
         return glGetActiveUniform(program, pos, strlen, size, type);
     }
 
@@ -564,6 +579,11 @@ public class LWJGLRenderer implements Renderer {
         b.put(texs).compact();
         glDeleteTextures(b);
         b.clear();
+    }
+
+    @Override
+    public void generateMipmap(TextureTarget t) {
+        glGenerateMipmap(t.e);
     }
 
     /* (non-Javadoc)
@@ -662,6 +682,31 @@ public class LWJGLRenderer implements Renderer {
         buff.clear();
     }
 
+    @Override
+    public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, ByteBuffer b) {
+        glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, ShortBuffer b) {
+        glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, IntBuffer b) {
+        glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, FloatBuffer b) {
+        glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, DoubleBuffer b) {
+        glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, b);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type)
      */
@@ -727,6 +772,31 @@ public class LWJGLRenderer implements Renderer {
     }
 
     @Override
+    public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, ByteBuffer b) {
+        glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, ShortBuffer b) {
+        glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, IntBuffer b) {
+        glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, FloatBuffer b) {
+        glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, DoubleBuffer b) {
+        glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, b);
+    }
+
+    @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int depth, int border, TextureExternalFormat efmt, type t) {
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, (ByteBuffer) null);
@@ -770,6 +840,31 @@ public class LWJGLRenderer implements Renderer {
         DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
         buff.clear();
+    }
+
+    @Override
+    public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, ByteBuffer b) {
+        glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, ShortBuffer b) {
+        glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, IntBuffer b) {
+        glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, FloatBuffer b) {
+        glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, DoubleBuffer b) {
+        glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, b);
     }
 
     /* (non-Javadoc)
@@ -1008,6 +1103,26 @@ public class LWJGLRenderer implements Renderer {
             default: m = -1;
         }
         glCullFace(m);
+    }
+
+    @Override
+    public void blendFunc(BlendOption sourceFactor, BlendOption destinationFactor) {
+        glBlendFunc(sourceFactor.e, destinationFactor.e);
+    }
+
+    @Override
+    public void blendFuncSeparate(BlendOption rgbSrcFactor, BlendOption rgbDestFactor, BlendOption aSrcFactor, BlendOption aDestFactor) {
+        glBlendFuncSeparate(rgbSrcFactor.e, rgbDestFactor.e, aSrcFactor.e, aDestFactor.e);
+    }
+
+    @Override
+    public void blendEquation(BlendEquation eq) {
+        glBlendEquation(eq.e);
+    }
+
+    @Override
+    public void blendEquationSeparate(BlendEquation colorEq, BlendEquation alphaEq) {
+        glBlendEquationSeparate(colorEq.e, alphaEq.e);
     }
 
     /* (non-Javadoc)

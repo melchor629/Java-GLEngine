@@ -7,7 +7,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-//import static org.lwjgl.opengl.GL11.*;
+//import static org.lwjgl.opengl.GL14.*;
 
 /**
  * Enclosing interface for every renderer, and a bunch of variables in enums
@@ -598,9 +598,42 @@ public interface Renderer {
         GLGetProgram(int t) { e = t; }
     }
 
-    public final int COLOR_CLEAR_BIT = 0x4000;
-    public final int DEPTH_BUFFER_BIT = 0x100;
-    public final int STENCIL_BUFFER_BIT = 0x400;
+    /**
+     * Enum for glBlendFunc and glBlendFuncSeparate
+     * @author melchor9000
+     */
+    enum BlendOption {
+        ZERO (0),
+        ONE (1),
+        SRC_COLOR (0x300),
+        ONE_MINUS_SRC_COLOR (0x301),
+        DST_COLOR (0x306),
+        ONE_MINUS_DST_COLOR (0x307),
+        SRC_ALPHA (0x302),
+        ONE_MINUS_SRC_ALPHA (0x303),
+        DST_ALPHA (0x304),
+        ONE_MINUS_DST_ALPHA (0x305),
+        CONSTANT_COLOR (0x8001),
+        ONE_MINUS_CONSTANT_COLOR (0x8002),
+        CONSTANT_ALPHA (0x8003),
+        ONE_MINUS_CONSTANT_ALPHA (0x8004);
+
+        final int e;
+        BlendOption(int t) { e = t; }
+    }
+
+    enum BlendEquation {
+        ADD (0x8006),
+        SUSTRACT (0x800A),
+        REVERSE_SUBSTRACT (0x800B);
+
+        final int e;
+        BlendEquation(int t) { e = t; }
+    }
+
+    int COLOR_CLEAR_BIT = 0x4000;
+    int DEPTH_BUFFER_BIT = 0x100;
+    int STENCIL_BUFFER_BIT = 0x400;
 
     /**
      * Create a window with a context with OpenGL 3.2 (Core), an orthographic projection
@@ -707,7 +740,9 @@ public interface Renderer {
     void bufferSubData(BufferTarget target, long offset, FloatBuffer buff);
     void bufferSubData(BufferTarget target, long offset, DoubleBuffer buff);
     void drawArrays(DrawMode mode, int first, int count);
+    void drawArraysInstanced(DrawMode mode, int first, int count, int times);
     void drawElements(DrawMode mode, int length, type type, long offset);
+    void drawElementsInstanced(DrawMode mode, int length, type type, long offset, int times);
     int getBufferParameteri(BufferTarget target, GLGetBuffer param);
     long getBufferParameteri64(BufferTarget target, GLGetBuffer param);
 
@@ -735,6 +770,7 @@ public interface Renderer {
     String getActiveAttrib(int program, int pos, int strlen);
     int getActiveAttribSize(int program, int pos);
     int getActiveAttribType(int program, int pos);
+    void vertexAttribDivisor(int loc, int divisor);
 
     int getUniformLocation(int program, String name);
     String getActiveUniform(int program, int pos, int strlen);
@@ -760,6 +796,7 @@ public interface Renderer {
     void genTextures(int[] texs);
     void deleteTexture(int tex);
     void deleteTextures(int[] texs);
+    void generateMipmap(TextureTarget t);
     void bindTexture(TextureTarget target, int tex);
     void texParameteri(TextureTarget target, TextureParameter pName, int param);
     void texParameteri(TextureTarget target, TextureParameter pName, TextureWrap p);
@@ -772,6 +809,11 @@ public interface Renderer {
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, int[] b);
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, float[] b);
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, double[] b);
+    void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, ByteBuffer b);
+    void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, ShortBuffer b);
+    void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, IntBuffer b);
+    void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, FloatBuffer b);
+    void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, DoubleBuffer b);
 
     void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t);
     void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, byte[] b);
@@ -779,6 +821,11 @@ public interface Renderer {
     void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, int[] b);
     void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, float[] b);
     void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, double[] b);
+    void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, ByteBuffer b);
+    void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, ShortBuffer b);
+    void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, IntBuffer b);
+    void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, FloatBuffer b);
+    void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int border, TextureExternalFormat efmt, type t, DoubleBuffer b);
 
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t);
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, byte[] b);
@@ -786,6 +833,11 @@ public interface Renderer {
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, int[] b);
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, float[] b);
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, double[] b);
+    void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, ByteBuffer b);
+    void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, ShortBuffer b);
+    void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, IntBuffer b);
+    void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, FloatBuffer b);
+    void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, DoubleBuffer b);
 
     //Framebuffer & Renderbuffer
     int genFramebuffer();
@@ -820,6 +872,10 @@ public interface Renderer {
     void viewport(int x, int y, int width, int height);
     void colorMask(boolean r, boolean g, boolean b, boolean a);
     void cullFace(CullFaceMode mode);
+    void blendFunc(BlendOption sourceFactor, BlendOption destinationFactor);
+    void blendFuncSeparate(BlendOption rgbSrcFactor, BlendOption rgbDestFactor, BlendOption aSrcFactor, BlendOption aDestFactor);
+    void blendEquation(BlendEquation eq);
+    void blendEquationSeparate(BlendEquation colorEq, BlendEquation alphaEq);
     boolean getBoolean(GLGet get);
     int getInt(GLGet get);
     long getLong(GLGet get);

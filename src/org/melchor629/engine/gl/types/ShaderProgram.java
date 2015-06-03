@@ -34,7 +34,7 @@ public class ShaderProgram {
      * @throws IOException If an error occurred while reading files
      * @throws GLError If an error was found while compiling shaders or linking program
      */
-    public ShaderProgram(File vertex, File fragment) throws FileNotFoundException, IOException {
+    public ShaderProgram(File vertex, File fragment) throws IOException {
         this(IOUtils.readFile(vertex), IOUtils.readFile(fragment));
     }
 
@@ -47,7 +47,7 @@ public class ShaderProgram {
      * @throws IOException If an error occurred while reading files
      * @throws GLError If an error was found while compiling shaders or linking program
      */
-    public ShaderProgram(File vertex, File fragment, File geometry) throws FileNotFoundException, IOException {
+    public ShaderProgram(File vertex, File fragment, File geometry) throws IOException {
         this(IOUtils.readFile(vertex), IOUtils.readFile(fragment), IOUtils.readFile(geometry));
     }
 
@@ -76,10 +76,10 @@ public class ShaderProgram {
         fragmentShader = createShader(Renderer.ShaderType.FRAGMENT, fragment);
         if(geometry != null) {
             geometryShader = createShader(Renderer.ShaderType.GEOMETRY, geometry);
-            shaderCheckForErrors(geometryShader);
+            shaderCheckForErrors(Renderer.ShaderType.GEOMETRY, geometryShader);
         }
-        shaderCheckForErrors(vertexShader);
-        shaderCheckForErrors(fragmentShader);
+        shaderCheckForErrors(Renderer.ShaderType.VERTEX, vertexShader);
+        shaderCheckForErrors(Renderer.ShaderType.FRAGMENT, fragmentShader);
 
         shaderProgram = createProgram();
     }
@@ -218,7 +218,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, int v0) {
         bind();
-        gl.uniform1i(uniforms.get(name), v0);
+        if(uniforms.containsKey(name))
+            gl.uniform1i(uniforms.get(name), v0);
     }
 
     /**
@@ -229,7 +230,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, int v0, int v1) {
         bind();
-        gl.uniform2i(uniforms.get(name), v0, v1);
+        if(uniforms.containsKey(name))
+            gl.uniform2i(uniforms.get(name), v0, v1);
     }
 
     /**
@@ -241,7 +243,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, int v0, int v1, int v2) {
         bind();
-        gl.uniform3i(uniforms.get(name), v0, v1, v2);
+        if(uniforms.containsKey(name))
+            gl.uniform3i(uniforms.get(name), v0, v1, v2);
     }
 
     /**
@@ -254,7 +257,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, int v0, int v1, int v2, int v3) {
         bind();
-        gl.uniform4i(uniforms.get(name), v0, v1, v2, v3);
+        if(uniforms.containsKey(name))
+            gl.uniform4i(uniforms.get(name), v0, v1, v2, v3);
     }
 
     /**
@@ -264,7 +268,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, float v0) {
         bind();
-        gl.uniform1f(uniforms.get(name), v0);
+        if(uniforms.containsKey(name))
+            gl.uniform1f(uniforms.get(name), v0);
     }
 
     /**
@@ -275,7 +280,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, float v0, float v1) {
         bind();
-        gl.uniform2f(uniforms.get(name), v0, v1);
+        if(uniforms.containsKey(name))
+            gl.uniform2f(uniforms.get(name), v0, v1);
     }
 
     /**
@@ -287,7 +293,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, float v0, float v1, float v2) {
         bind();
-        gl.uniform3f(uniforms.get(name), v0, v1, v2);
+        if(uniforms.containsKey(name))
+            gl.uniform3f(uniforms.get(name), v0, v1, v2);
     }
 
     /**
@@ -300,7 +307,8 @@ public class ShaderProgram {
      */
     public void setUniform(String name, float v0, float v1, float v2, float v3) {
         bind();
-        gl.uniform4f(uniforms.get(name), v0, v1, v2, v3);
+        if(uniforms.containsKey(name))
+            gl.uniform4f(uniforms.get(name), v0, v1, v2, v3);
     }
 
     //TODO hacer para mat2 y mat3
@@ -311,7 +319,8 @@ public class ShaderProgram {
      */
     public void setUniformMatrix(String name, mat4 matrix) {
         bind();
-        gl.uniformMatrix4(uniforms.get(name), false, GLM.matrixAsArray(matrix));
+        if(uniforms.containsKey(name))
+            gl.uniformMatrix4(uniforms.get(name), false, GLM.matrixAsArray(matrix));
     }
 
     /**
@@ -357,10 +366,10 @@ public class ShaderProgram {
      * @throws GLError If COMPILE_STATUS is not GL_TRUE (an error occurred
      *                 while compiling)
      */
-    protected final void shaderCheckForErrors(int shader) {
+    protected final void shaderCheckForErrors(Renderer.ShaderType type, int shader) {
         int status = gl.getShader(shader, Renderer.GLGetShader.COMPILE_STATUS);
         if(status != 1)
-            throw new GLError(gl.getShaderInfoLog(shader));
+            throw new GLError(type.name(), gl.getShaderInfoLog(shader));
     }
 
     /**
@@ -370,8 +379,7 @@ public class ShaderProgram {
      */
     protected final void programCheckForErrors() {
         int status = gl.getProgram(shaderProgram, Renderer.GLGetProgram.LINK_STATUS);
-        if(status != 1)
-            throw new GLError(gl.getShaderInfoLog(shaderProgram));
+        if(status != 1) throw new GLError(gl.getProgramInfoLog(shaderProgram));
     }
 
     /**
