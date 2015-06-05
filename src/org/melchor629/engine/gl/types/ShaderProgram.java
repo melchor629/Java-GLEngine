@@ -26,6 +26,8 @@ public class ShaderProgram {
     protected Attrib[] attribs;
     protected boolean linked = false, binded = false;
 
+    private static ShaderProgram currentBindedShader;
+
     /**
      * Create a Shader program from files, and checks for errors
      * @param vertex Vertex shader file
@@ -100,9 +102,10 @@ public class ShaderProgram {
             fetchAttribs();
             linked = true;
         }
-        if(!binded) {
+        if(currentBindedShader == null || !currentBindedShader.equals(this)) {
             gl.useProgram(shaderProgram);
             binded = true;
+            currentBindedShader = this;
         }
     }
 
@@ -113,6 +116,7 @@ public class ShaderProgram {
         if(binded) {
             gl.useProgram(0);
             binded = false;
+            currentBindedShader = null;
         }
     }
 
@@ -339,6 +343,10 @@ public class ShaderProgram {
      */
     public int getAttributeLocation(String name) {
         return gl.getAttribLocation(shaderProgram, name);
+    }
+
+    public boolean equals(Object o) {
+        return o instanceof ShaderProgram && ((ShaderProgram) o).shaderProgram == shaderProgram;
     }
 
     @Override

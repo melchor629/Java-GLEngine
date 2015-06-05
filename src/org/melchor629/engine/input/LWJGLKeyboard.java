@@ -28,15 +28,18 @@ public class LWJGLKeyboard extends Keyboard {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if(key == -1) key = 1023;
-                if(action == GLFW_PRESS)
+                if(action == GLFW_PRESS) {
                     LWJGLKeyboard.this.keysPressed[key] = true;
-                else if(action == GLFW_RELEASE)
+                    LWJGLKeyboard.this.firePressEvent(key);
+                } else if(action == GLFW_RELEASE) {
                     LWJGLKeyboard.this.keysPressed[key] = false;
+                    LWJGLKeyboard.this.fireReleaseEvent(key);
+                }
 
                 LWJGLKeyboard.this.shiftPressed = (mods & GLFW_MOD_SHIFT) == 1 || key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT;
-                LWJGLKeyboard.this.controlPressed = (mods & GLFW_MOD_CONTROL) == 1;
-                LWJGLKeyboard.this.altPressed = (mods & GLFW_MOD_ALT) == 1;
-                LWJGLKeyboard.this.superPressed = (mods & GLFW_MOD_SUPER) == 1;
+                LWJGLKeyboard.this.controlPressed = (mods & GLFW_MOD_CONTROL) == GLFW_MOD_CONTROL;
+                LWJGLKeyboard.this.altPressed = (mods & GLFW_MOD_ALT) == GLFW_MOD_ALT;
+                LWJGLKeyboard.this.superPressed = (mods & GLFW_MOD_SUPER) == GLFW_MOD_SUPER;
             }
         });
     }
@@ -51,9 +54,28 @@ public class LWJGLKeyboard extends Keyboard {
             Field f = GLFW.class.getDeclaredField("GLFW_KEY_" + key.toUpperCase());
             pos = f.getInt(null);
         } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
+            e.printStackTrace();
             pos = -1;
         }
         return this.keysPressed[pos];
+    }
+
+    @Override
+    public String getStringRepresentation(int keycode) {
+        String key = null;
+
+        try {
+            for(Field f : GLFW.class.getFields()) {
+                int code = f.getInt(null);
+                if(code == keycode)
+                    key = f.getName().substring(9);
+            }
+        } catch(SecurityException | IllegalAccessException e) {
+            e.printStackTrace();
+            key = null;
+        }
+
+        return key;
     }
 
     /* (non-Javadoc)

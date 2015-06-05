@@ -288,7 +288,8 @@ public interface Renderer {
         STENCIL_INDEX1 (0x8D46),
         STENCIL_INDEX4 (0x8D47),
         STENCIL_INDEX8 (0x8D48),
-        STENCIL_INDEX16 (0x8D49);
+        STENCIL_INDEX16 (0x8D49),
+        DEPTH24_STENCIL8 (0x8CAD);
 
         final int e;
         TextureFormat(int t) { e = t; }
@@ -801,8 +802,9 @@ public interface Renderer {
     void texParameteri(TextureTarget target, TextureParameter pName, int param);
     void texParameteri(TextureTarget target, TextureParameter pName, TextureWrap p);
     void texParameteri(TextureTarget target, TextureParameter pName, TextureFilter p);
+    void copyTexImage1D(TextureTarget t, int level, TextureFormat ifmt, int x, int y, int width);
+    void copyTexImage2D(TextureTarget t, int level, TextureFormat ifmt, int x, int y, int width, int height);
 
-    //TODO Con texturas usar tambien Buffers, a parte de arrays
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t);
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, byte[] b);
     void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width, int border, TextureExternalFormat efmt, type t, short[] b);

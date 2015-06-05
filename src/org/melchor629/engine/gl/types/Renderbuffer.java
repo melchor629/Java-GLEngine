@@ -17,6 +17,7 @@ public class Renderbuffer {
         format = fmt;
         gl.bindRenderbuffer(rbo);
         gl.renderbufferStorage(fmt, width, height);
+        gl.bindRenderbuffer(0);
     }
 
     public void delete() {

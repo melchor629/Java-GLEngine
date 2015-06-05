@@ -26,11 +26,15 @@ public abstract class Keyboard {
      * An array with listeners
      */
     protected final ArrayList<OnKeyboardEvent> listeners;
+    protected final ArrayList<OnPressKeyEvent> listeners2;
+    protected final ArrayList<OnReleaseKeyEvent> listeners3;
     
     public Keyboard() {
         keysPressed = new boolean[1024];
         shiftPressed = controlPressed = altPressed = superPressed = false;
         listeners = new ArrayList<>();
+        listeners2 = new ArrayList<>();
+        listeners3 = new ArrayList<>();
     }
     
     /**
@@ -39,6 +43,24 @@ public abstract class Keyboard {
      */
     public final void addListener(OnKeyboardEvent l) {
         listeners.add(l);
+    }
+
+    /**
+     * Adds a listener for the {@code OnPressKeyEvent} event.
+     * This event is fired every time a key is pressed.
+     * @param l Listener
+     */
+    public final void addListener(OnPressKeyEvent l) {
+        listeners2.add(l);
+    }
+
+    /**
+     * Adds a listener for the {@code OnReleaseKeyEvent}.
+     * This event is fired every time a key is released.
+     * @param l Listener
+     */
+    public final void addListener(OnReleaseKeyEvent l) {
+        listeners3.add(l);
     }
     
     /**
@@ -63,6 +85,18 @@ public abstract class Keyboard {
      * @return true if the key is pressed, or false otherwise
      */
     public abstract boolean isKeyPressed(String key);
+
+    /**
+     * Converts the keycode to its String representation. For example,
+     * of you pass the keycode 32, this method could return "SPACE" or
+     * "SPACEBAR". This method is useful when it is wanted to know
+     * what key is pressed or released on both events.<br>
+     * Some implementations could return {@code null} if it is not
+     * fully implemented. All invalid keycodes have to return {@code null}.
+     * @param keycode Keycode to be converted
+     * @return its String representation or null if cannot be found
+     */
+    public abstract String getStringRepresentation(int keycode);
     
     /**
      * Use this method when you will not use anymore th keyboard
@@ -71,6 +105,24 @@ public abstract class Keyboard {
      * and related stuff.
      */
     public abstract void release();
+
+    /**
+     * Implementors should call this method every time a key
+     * is pressed to propagate the event to all listeners
+     * @param key the key pressed
+     */
+    protected final void firePressEvent(int key) {
+        listeners2.forEach((l) -> l.invoke(this, key));
+    }
+
+    /**
+     * Implementors should call this method every time a key
+     * is released to propagate the event to all listeners
+     * @param key the key released
+     */
+    protected final void fireReleaseEvent(int key) {
+        listeners3.forEach((l) -> l.invoke(this, key));
+    }
     
     /**
      * {@code OnKeyboardEvent} interface. This Event is fired
@@ -79,5 +131,21 @@ public abstract class Keyboard {
      */
     public interface OnKeyboardEvent {
         void invoke(Keyboard self, double delta);
+    }
+
+    /**
+     * {@code OnPressKeyEvent} interface. Event fired
+     * every time a key is pressed.
+     */
+    public interface OnPressKeyEvent {
+        void invoke(Keyboard self, int key);
+    }
+
+    /**
+     * {@code OnReleaseKeyEvent} interface. Event fired
+     * every time a key is released.
+     */
+    public interface OnReleaseKeyEvent {
+        void invoke(Keyboard self, int key);
     }
 }

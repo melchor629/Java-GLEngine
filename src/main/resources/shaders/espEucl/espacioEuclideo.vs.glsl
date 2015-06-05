@@ -13,6 +13,6 @@ void main() {
     vec3 posae = puntos;
     vec4 relativePos = view * vec4(punto + posae, 1.0);
     gl_Position = projection * relativePos;
-    texCoord = texcoord;
+    texCoord = vec2(texcoord.x, 1.0 - texcoord.y); //Hack para tener la texture bien
     zVal = gl_Position.z;
 }

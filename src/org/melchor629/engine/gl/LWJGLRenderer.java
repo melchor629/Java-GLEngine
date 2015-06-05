@@ -618,6 +618,16 @@ public class LWJGLRenderer implements Renderer {
         glTexParameteri(target.e, pName.e, p.e);
     }
 
+    @Override
+    public void copyTexImage1D(TextureTarget t, int level, TextureFormat ifmt, int x, int y, int width) {
+        glCopyTexImage1D(t.e, level, ifmt.e, x, y, width, 0);
+    }
+
+    @Override
+    public void copyTexImage2D(TextureTarget t, int level, TextureFormat ifmt, int x, int y, int width, int height) {
+        glCopyTexImage2D(t.e, level, ifmt.e, x, y, width, height, 0);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type)
      */

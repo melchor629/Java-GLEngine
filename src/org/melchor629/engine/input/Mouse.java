@@ -237,7 +237,7 @@ public abstract class Mouse {
      * a mouse button is clicked or released.
      * @author melchor9000
      */
-    public static interface OnMouseClickEvent {
+    public interface OnMouseClickEvent {
         void invoke(Mouse self);
     }
     
@@ -246,7 +246,7 @@ public abstract class Mouse {
      * frame with a mouse movement.
      * @author melchor9000
      */
-    public static interface OnMouseMoveEvent {
+    public interface OnMouseMoveEvent {
         void invoke(Mouse self, double delta);
     }
 
@@ -257,7 +257,7 @@ public abstract class Mouse {
      * because this event is called all time the button is pressed, whilst
      * the other is called only when the button is pressed and released.
      */
-    public static interface OnButtonPressedEvent {
+    public interface OnButtonPressedEvent {
         void invoke(Mouse self, double delta);
     }
 }
