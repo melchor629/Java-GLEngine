@@ -2,6 +2,8 @@ package org.melchor629.engine.gl.types;
 
 import static org.melchor629.engine.Game.gl;
 
+import org.melchor629.engine.Erasable;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
 
@@ -9,7 +11,7 @@ import org.melchor629.engine.gl.Renderer;
  * Class for create and manage Framebuffers
  * @author melchor9000
  */
-public class Framebuffer {
+public class Framebuffer implements Erasable {
     protected int fb = -1;
     protected boolean checked;
 
@@ -20,6 +22,7 @@ public class Framebuffer {
      */
     public Framebuffer() {
         fb = gl.genFramebuffer();
+        Game.erasableList.add(this);
     }
 
     /**

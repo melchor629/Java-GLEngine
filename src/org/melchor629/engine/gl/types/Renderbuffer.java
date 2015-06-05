@@ -2,13 +2,15 @@ package org.melchor629.engine.gl.types;
 
 import static org.melchor629.engine.Game.gl;
 
+import org.melchor629.engine.Erasable;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.Renderer;
 
 /**
  * Class for manage Renderbuffers
  * @author melchor9000
  */
-public class Renderbuffer {
+public class Renderbuffer implements Erasable {
     protected int rbo;
     protected Renderer.TextureFormat format;
 
@@ -18,6 +20,7 @@ public class Renderbuffer {
         gl.bindRenderbuffer(rbo);
         gl.renderbufferStorage(fmt, width, height);
         gl.bindRenderbuffer(0);
+        Game.erasableList.add(this);
     }
 
     public void delete() {

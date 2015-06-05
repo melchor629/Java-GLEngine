@@ -43,7 +43,7 @@ public class FLACDecoder {
         if(!ok) System.err.printf("[FLACENCODER] Ha habido un error\n");*/
 
         sd_source.stop();
-        sd_source.destroy();
+        sd_source.delete();
         decoder.clear();
         al.deleteContext();
     }

@@ -1,5 +1,6 @@
 package org.melchor629.engine.al.types;
 
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.objects.PCMData;
 
@@ -11,7 +12,7 @@ import static org.melchor629.engine.Game.al;
  * Sound buffer
  * @author melchor9000
  */
-public class Buffer {
+public class Buffer implements Erasable {
 	protected int buffer;
 	
 	public Buffer(PCMData data) {
@@ -50,7 +51,7 @@ public class Buffer {
 		return al.getBufferi(buffer, AL.Buffer.SIZE) != 0;
 	}
 	
-	public void destroy() {
+	public void delete() {
 		al.deleteBuffer(buffer);
 	}
 }

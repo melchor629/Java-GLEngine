@@ -1,3 +1,4 @@
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLRenderer;
 import org.melchor629.engine.gl.Renderer;
@@ -13,6 +14,7 @@ import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.vec3;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -41,6 +43,7 @@ public class EspacioEuclideo {
     }
 
     public static void _main() throws Throwable {
+        Game.erasableList = new ArrayList<>();
         Game.gl = gl = new LWJGLRenderer();
         Timing t = Timing.getGameTiming();
         gl.setResizable(false);
@@ -206,17 +209,7 @@ public class EspacioEuclideo {
             camera.updateIfNeeded();
         }
 
-        sceneFB.delete();
-        currentFrameDepth.delete();
-        currentFrame.delete();
-        previousFrame.delete();
-        phosphorEffect.delete();
-        screen_vbo.delete();
-        phosphorEffectVao.delete();
-        puntos_shader.delete();
-        puntos_vbo.delete();
-        plano_vbo.delete();
-        puntos_shader.delete();
+        Game.erasableList.forEach(Erasable::delete);
     }
 
     private static FloatBuffer generarEspacioEuclídeo() {

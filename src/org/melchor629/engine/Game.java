@@ -6,6 +6,8 @@ import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;
 
+import java.util.List;
+
 /**
  * Basic class for every game
  * @author melchor9000
@@ -18,6 +20,7 @@ public abstract class Game {
     public static AL al;
     public static Keyboard keyboard;
     public static Mouse mouse;
+    public static List<Erasable> erasableList;
 
     protected void setDisplay() {
         gl = new LWJGLRenderer();

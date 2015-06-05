@@ -1,5 +1,6 @@
 package org.melchor629.engine.gl.types;
 
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLError;
 
@@ -7,7 +8,7 @@ import org.melchor629.engine.gl.GLError;
  * Vertex Array Object class
  * @author melchor9000
  */
-public class VAO {
+public class VAO implements Erasable {
     protected int vao = -1;
 
     /**
@@ -15,6 +16,7 @@ public class VAO {
      */
     public VAO() {
         vao = Game.gl.genVertexArray();
+        Game.erasableList.add(this);
     }
 
     /**

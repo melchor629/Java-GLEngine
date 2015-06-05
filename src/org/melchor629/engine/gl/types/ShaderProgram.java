@@ -1,5 +1,7 @@
 package org.melchor629.engine.gl.types;
 
+import org.melchor629.engine.Erasable;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.utils.IOUtils;
@@ -20,7 +22,7 @@ import static org.melchor629.engine.Game.gl;
  * TODO comprobar si el nombre del UNIFORM existe, y si no THROW
  * @author melchor9000
  */
-public class ShaderProgram {
+public class ShaderProgram implements Erasable {
     protected int vertexShader, fragmentShader, geometryShader, shaderProgram;
     protected HashMap<String, Integer> uniforms;
     protected Attrib[] attribs;
@@ -84,6 +86,8 @@ public class ShaderProgram {
         shaderCheckForErrors(Renderer.ShaderType.FRAGMENT, fragmentShader);
 
         shaderProgram = createProgram();
+
+        Game.erasableList.add(this);
     }
 
     /**

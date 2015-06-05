@@ -3,6 +3,7 @@ package org.melchor629.engine.gl.types;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
@@ -13,7 +14,7 @@ import org.melchor629.engine.gl.Renderer;
  * Incomplete, but 100% usable TODO (Buffers and glBufferSubData)
  * @author melchor9000
  */
-public class BufferObject {
+public class BufferObject implements Erasable {
     protected int bo;
     protected Renderer.BufferTarget target;
     protected Renderer.BufferUsage usage;
@@ -29,6 +30,8 @@ public class BufferObject {
         this.usage = usage != null ? usage : Renderer.BufferUsage.STATIC_DRAW;
         bo = Game.gl.genBuffer();
         Game.gl.bindBuffer(target, bo);
+
+        Game.erasableList.add(this);
     }
 
     /**

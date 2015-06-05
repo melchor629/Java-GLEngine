@@ -153,7 +153,7 @@ public class AnotherTestingClass {
         
         s.delete();
         Model.deleteModels();
-        sound_source.destroy();
+        sound_source.delete();
 
         keyboard.release();
         mouse.release();

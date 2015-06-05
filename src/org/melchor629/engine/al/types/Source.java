@@ -1,5 +1,7 @@
 package org.melchor629.engine.al.types;
 
+import org.melchor629.engine.Erasable;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.objects.PCMData;
 import org.melchor629.engine.utils.math.vec3;
@@ -12,7 +14,7 @@ import static org.melchor629.engine.Game.al;
  * @author melchor9000
  */
 //TODO Clamp values within their intervals
-public class Source {
+public class Source implements Erasable {
     protected Buffer buffer;
     protected int source;
     protected boolean relative = false;
@@ -34,10 +36,13 @@ public class Source {
         velocity = new vec3();
         source = al.genSource();
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
+
+        Game.erasableList.add(this);
     }
     
     public Source(PCMData data) {
     	this(new Buffer(data));
+        Game.erasableList.add(this);
     }
     
     public void setPosition(vec3 pos) {
@@ -234,11 +239,11 @@ public class Source {
             source.rewind();
     }
 
-    public void destroy() {
+    public void delete() {
         if(source != 0)
             al.deleteSource(source);
         if(buffer != null)
-        	buffer.destroy();
+        	buffer.delete();
         source = 0;
         buffer = null;
     }

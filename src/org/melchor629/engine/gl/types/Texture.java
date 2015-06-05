@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.sun.jna.Pointer;
+import org.melchor629.engine.Erasable;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.clib.STBLoader;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.Renderer;
@@ -23,7 +25,7 @@ import org.melchor629.engine.utils.IOUtils;
  * the internet, or simply empty textures for use in Framebuffers.
  * @author melchor9000
  */
-public class Texture {
+public class Texture implements Erasable {
     protected int texture = -1;
     protected Renderer.TextureTarget target;
     protected int dimensions;
@@ -46,6 +48,8 @@ public class Texture {
         gl.texParameteri(target, Renderer.TextureParameter.MIN_FILTER, Renderer.TextureFilter.LINEAR);
         gl.texParameteri(target, Renderer.TextureParameter.MAG_FILTER, Renderer.TextureFilter.LINEAR);
         gl.texImage2D(target, 0, format, width, height, 0, eformat, Renderer.type.UNSIGNED_BYTE);
+
+        Game.erasableList.add(this);
     }
 
     /**
@@ -86,6 +90,8 @@ public class Texture {
         STBLoader.instance.stb_clear_image(data);
         buffer.clear();
         gl.bindTexture(target, 0);
+
+        Game.erasableList.add(this);
     }
 
     public void bind() {
