@@ -58,7 +58,6 @@ public class Collada {
         effects(collada);
         visual_scenes(collada);
         controllers(collada);
-        collada = null;
     }
 
     public Geometry searchForGeometryWithId(String id) {
@@ -94,15 +93,14 @@ public class Collada {
         for(Geometry g : geometry)
             g.mesh.disposeData();
 
-        new Thread(new Runnable() {
-            public void run() {
-                Timing.sleep(1000);
-                System.gc();
-            }
+        new Thread(() -> {
+            Timing.sleep(1000);
+            System.gc();
         }).start();
     }
 
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         disposeData();
     }
 

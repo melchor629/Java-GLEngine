@@ -1099,6 +1099,41 @@ public class LWJGLGLContext implements GLContext {
     }
 
     @Override
+    public void getBoolean(GLGet get, boolean[] v) {
+        ByteBuffer b = BufferUtils.createByteBuffer(v.length);
+        glGetBooleanv(get.e, b);
+        BufferUtils.fillArray(b, v);
+    }
+
+    @Override
+    public void getInt(GLGet get, int[] v) {
+        IntBuffer b = BufferUtils.createIntBuffer(v.length);
+        glGetIntegerv(get.e, b);
+        b.get(v);
+    }
+
+    @Override
+    public void getLong(GLGet get, long[] v) {
+        LongBuffer b = BufferUtils.createLongBuffer(v.length);
+        glGetInteger64v(get.e, b);
+        b.get(v);
+    }
+
+    @Override
+    public void getFloat(GLGet get, float[] v) {
+        FloatBuffer b = BufferUtils.createFloatBuffer(v.length);
+        glGetFloatv(get.e, b);
+        b.get(v);
+    }
+
+    @Override
+    public void getDouble(GLGet get, double[] v) {
+        DoubleBuffer b = BufferUtils.createDoubleBuffer(v.length);
+        glGetDoublev(get.e, b);
+        b.get(v);
+    }
+
+    @Override
     public void readBuffer(CullFaceMode mode) {
         glReadBuffer(mode == CullFaceMode.FRONT ? GL_FRONT : GL_BACK);
     }

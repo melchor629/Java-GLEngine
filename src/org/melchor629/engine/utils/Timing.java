@@ -12,7 +12,7 @@ import java.util.Map;
 public class Timing {
     /** Total rendered frames during the session **/
     public long totalFrames = 0;
-    /** Time wasted for render a frame (all stuff: Graphic & CPU) **/
+    /** Time wasted for render a frame (all stuff: Graphic &amp; CPU) **/
     public double frameTime = 0;
     /** Last Frames per Second **/
     public short fps = 60;

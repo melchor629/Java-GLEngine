@@ -345,11 +345,11 @@ public class GLM {
     /**
      * Create a rotation matrix with the angle and the axis on which rotate
      * @param angle rotate angle (in radians)
-     * @param rot axis vector
+     * @param axis axis vector
      * @return matrix with rotation transformation
      */
-    public static mat4 rotateMatrix(float angle, vec3 rot) {
-        mat4 rotate = new mat4(0.f), result = new mat4();
+    public static mat4 rotateMatrix(mat4 matrix, float angle, vec3 axis) {
+        /*mat4 rotate = new mat4(0.f), result = new mat4();
         final float c = (float) Math.cos(angle), s = (float) Math.sin(angle);
         vec3 axis = normalize(rot);
         vec3 temp = product(1.f - c, axis);
@@ -381,7 +381,39 @@ public class GLM {
         );
         result.setRow(3, v3);
         
-        return result;
+        return result;*/
+        float len = axis.length();
+        float x = axis.x / len;
+        float y = axis.y / len;
+        float z = axis.z / len;
+        float c = (float) cos(angle);
+        float s = (float) sin(angle);
+        float C = 1.f - c;
+        float m11 = x * x * C + c;
+        float m12 = x * y * C - z * s;
+        float m13 = x * z * C + y * s;
+        float m21 = y * x * C + z * s;
+        float m22 = y * y * C + c;
+        float m23 = y * z * C - x * s;
+        float m31 = z * x * C - y * s;
+        float m32 = z * y * C + x * s;
+        float m33 = z * z * C + c;
+        float t1 = matrix.get(0, 0) * m11 + matrix.get(1, 0) * m21 + matrix.get(2, 0) * m31;
+        float t2 = matrix.get(0, 1) * m11 + matrix.get(1, 1) * m21 + matrix.get(2, 1) * m31;
+        float t3 = matrix.get(0, 2) * m11 + matrix.get(1, 2) * m21 + matrix.get(2, 2) * m31;
+        float t4 = matrix.get(0, 3) * m11 + matrix.get(1, 3) * m21 + matrix.get(2, 3) * m31;
+        float t5 = matrix.get(0, 0) * m12 + matrix.get(1, 0) * m22 + matrix.get(2, 0) * m32;
+        float t6 = matrix.get(0, 1) * m12 + matrix.get(1, 1) * m22 + matrix.get(2, 1) * m32;
+        float t7 = matrix.get(0, 2) * m12 + matrix.get(1, 2) * m22 + matrix.get(2, 2) * m32;
+        float t8 = matrix.get(0, 3) * m12 + matrix.get(1, 3) * m22 + matrix.get(2, 3) * m32;
+        float t9 = matrix.get(0, 0) * m13 + matrix.get(1, 0) * m23 + matrix.get(2, 0) * m33;
+        float t10 = matrix.get(0, 1) * m13 + matrix.get(1, 1) * m23 + matrix.get(2, 1) * m33;
+        float t11 = matrix.get(0, 2) * m13 + matrix.get(1, 2) * m23 + matrix.get(2, 2) * m33;
+        float t12 = matrix.get(0, 3) * m13 + matrix.get(1, 3) * m23 + matrix.get(2, 3) * m33;
+        matrix.setRow(0, t1, t2, t3, t4);
+        matrix.setRow(1, t5, t6, t7, t8);
+        matrix.setRow(2, t9, t10, t11, t12);
+        return matrix;
     }
 
     /**
@@ -615,8 +647,8 @@ public class GLM {
     
     /**
      * Because calculing float numbers are really imprecise, this function
-     * checks for a little difference between them:<b>
-     * <code> |a-b| < 0.00001 </code><br>
+     * checks for a little difference between them:<br>
+     * <code> |a-b| &lt; 0.00001 </code><br>
      * @param a first float
      * @param b second float
      **/
@@ -627,8 +659,8 @@ public class GLM {
     
     /**
      * Because calculing float numbers are really imprecise, this function
-     * checks for a little difference between them:<b>
-     * <code> |a-b| < 0.00001 </code><br>
+     * checks for a little difference between them:<br>
+     * <code> |a-b| &lt; 0.00001 </code><br>
      * @param a first float
      * @param b second float
      **/

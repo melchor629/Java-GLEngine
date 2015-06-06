@@ -1,8 +1,6 @@
 package org.melchor629.engine.objects;
 
-import org.lwjgl.glfw.GLFW;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.LWJGLGLContext;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Keyboard.OnKeyboardEvent;
 import org.melchor629.engine.input.Mouse;
@@ -28,11 +26,10 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     
     private mat4 view, proj;
     private boolean needsUpdateView = true, needsUpdateProj = true;
-    private long tempDate = System.currentTimeMillis();
     private double mouseSensibility, movementMultiplier;
     
     /**
-     * Creates a camera with position (0, 0, 0) & rotation 0º & 0º,
+     * Creates a camera with position (0, 0, 0) &amp; rotation 0º &amp; 0º,
      * a FOV of 45º, an aspect ratio of 16:9, and a near distance of
      * 1 and far 10.
      */
@@ -52,7 +49,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     }
     
     /**
-     * Creates a camera with position {@code pos} & rotation defined
+     * Creates a camera with position {@code pos} &amp; rotation defined
      * by {@code rot} in degrees. A FOV of 45º, an aspect ratio of 16:9,
      * and a near distance of 1 and far 10.
      * @param pos Initial position
@@ -125,7 +122,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     }
     
     /**
-     * @return the View Matrix with position, direction & up vectors
+     * @return the View Matrix with position, direction &amp; up vectors
      */
     public mat4 getViewMatrix() {
         if(needsUpdateView) {
@@ -364,7 +361,6 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     public void invoke(Mouse self) {
         if(self.isKeyPressed("LEFT")) {
             self.setCaptured(!self.isCaptured());
-            tempDate = System.currentTimeMillis();
         }
     }
 

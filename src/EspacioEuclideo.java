@@ -32,8 +32,10 @@ public class EspacioEuclideo {
     }
 
     private static final Random rand = new Random();
-    public static int WIDTH = 1280, HEIGHT = 720;
-    public static int glWIDTH, glHEIGHT;
+    private static int WIDTH = 1280;
+    private static int HEIGHT = 720;
+    private static int glWIDTH;
+    private static int glHEIGHT;
     private static Window window;
     private static boolean phosphorEffectEnabler = false;
 
@@ -48,7 +50,7 @@ public class EspacioEuclideo {
         System.exit(0);
     }
 
-    public static void _main() throws Throwable {
+    private static void _main() throws Throwable {
         Game.erasableList = new ArrayList<>();
         Game.window = window = new LWJGLWindow();
         window.setResizable(false);
@@ -160,24 +162,22 @@ public class EspacioEuclideo {
         phosphorEffect.unbind();
         plano_vbo.unbind();
 
-        keyboard.addListener(new Keyboard.OnPressKeyEvent() {
-            public void invoke(Keyboard self, int key) {
-                if(self.getStringRepresentation(key) == null) return;
-                if(self.getStringRepresentation(key).equals("F"))
-                    phosphorEffectEnabler = !phosphorEffectEnabler;
-                if(self.getStringRepresentation(key).equals("P")) {
-                    IntBuffer data = BufferUtils.createIntBuffer(glWIDTH * glHEIGHT);
-                    gl.readBuffer(GLContext.CullFaceMode.FRONT);
-                    gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data);
-                    new Thread(() -> {
-                        STBLoader.ImageData d = new STBLoader.ImageData();
-                        d.components = 3;
-                        d.width = glWIDTH;
-                        d.height = glHEIGHT;
-                        d.data = new Pointer(MemoryUtil.memAddress(data));
-                        STBLoader.instance.stb_write_image("/Users/melchor9000/Desktop/mae.png", "png", d);
-                    }, "Screenshot saver").start();
-                }
+        keyboard.addListener((Keyboard.OnPressKeyEvent) (self, key) -> {
+            if(self.getStringRepresentation(key) == null) return;
+            if(self.getStringRepresentation(key).equals("F"))
+                phosphorEffectEnabler = !phosphorEffectEnabler;
+            if(self.getStringRepresentation(key).equals("P")) {
+                IntBuffer data = BufferUtils.createIntBuffer(glWIDTH * glHEIGHT);
+                gl.readBuffer(GLContext.CullFaceMode.FRONT);
+                gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data);
+                new Thread(() -> {
+                    STBLoader.ImageData d = new STBLoader.ImageData();
+                    d.components = 3;
+                    d.width = glWIDTH;
+                    d.height = glHEIGHT;
+                    d.data = new Pointer(MemoryUtil.memAddress(data));
+                    STBLoader.instance.stb_write_image("/Users/melchor9000/Desktop/mae.png", "png", d);
+                }, "Screenshot saver").start();
             }
         });
 

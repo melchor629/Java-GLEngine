@@ -1,7 +1,6 @@
 package org.melchor629.engine;
 
 import org.melchor629.engine.al.AL;
-import org.melchor629.engine.gl.LWJGLGLContext;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.input.Keyboard;

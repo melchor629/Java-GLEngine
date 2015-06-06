@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Implementors should modify the {@link #keysPressed}
  * array and the booleans for the modifiers. For the
  * {@link #isKeyPressed(String)} method, implementors should
- * check it using the array before with the map <i>index -> Key</i>. TODO glfwSetCharCallback
+ * check it using the array before with the map <i>index -&gt; Key</i>.
  * @author melchor9000
  */
 public abstract class Keyboard {

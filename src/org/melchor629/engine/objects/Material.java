@@ -1,6 +1,5 @@
 package org.melchor629.engine.objects;
 
-import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.gl.types.Texture;
 import org.melchor629.engine.loaders.Collada;

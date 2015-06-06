@@ -1,15 +1,12 @@
 package org.melchor629.engine.utils;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
 
-import javax.imageio.ImageIO;
-
 /**
- * I/O Utils for reading & writing data from all type of streams
+ * I/O Utils for reading &amp; writing data from all type of streams
  * @author melchor9000
  */
 public class IOUtils {
@@ -38,74 +35,6 @@ public class IOUtils {
                 sb.append(sc.nextLine()).append('\n');
         }
         return sb.toString();
-    }
-
-    /**
-     * Read an image to a ByteBuffer, ready for use as a texture
-     * or other stuff. Automatically detect if the image is
-     * RGB or RGBA. This method can read files with random extensions,
-     * but the format ({@code ext}), has to be valid, like PNG or JPG.
-     * @param file Image to decode
-     * @param ext Format of the image
-     * @return {@link IOUtils.Image} with the image decoded
-     * @throws IOException If we cannot read the file, or is a directory
-     */
-    public static Image readImage(File file, String ext) throws IOException {
-        BufferedImage bi;
-
-        boolean imageio = false;
-        for(String fmt : ImageIO.getReaderFormatNames()) {
-            if(fmt.toLowerCase().equals(ext)) {
-                imageio = true;
-                break;
-            }
-        }
-        if(imageio)
-            bi = ImageIO.read(file);
-        else {
-            throw new IOException("Cannot read file with extension: " + ext);
-        }
-        
-        int[] pixels = new int[bi.getWidth() * bi.getHeight()];
-        boolean alpha = bi.getColorModel().hasAlpha();
-        int channels = alpha ? 4 : 3;
-        bi.getRGB(0, 0, bi.getWidth(), bi.getHeight(), pixels, 0, bi.getWidth());
-        byte[] buffer = new byte[bi.getWidth() * bi.getHeight() * channels];
-        int i = 0;
-
-        for(int y = 0; y < bi.getHeight(); y++) {
-            for(int x = 0; x < bi.getWidth(); x++) {
-                int pos = y * bi.getHeight() + x;
-                int pixel = pixels[pos];
-                buffer[i++] = (byte) ((pixel >> 16) & 0xFF);
-                buffer[i++] = (byte) ((pixel >> 8) & 0xFF);
-                buffer[i++] = (byte) (pixel & 0xFF);
-                if(alpha)
-                    buffer[i++] = ((byte) ((pixel >> 24) & 0xFF));
-            }
-        }
-        Image img = new Image();
-        img.buffer = buffer;
-        img.width = bi.getWidth();
-        img.height = bi.getHeight();
-        img.channels = channels;
-        img.alpha = alpha;
-        return img;
-    }
-
-    /**
-     * Read an image to a ByteBuffer, ready for use as a texture
-     * or other stuff. Automatically detect if the image is
-     * RGB or RGBA. This method detects the format of the file
-     * depending on its extension.
-     * @param file Image to decode
-     * @return {@link IOUtils.Image} with the image decoded
-     * @throws IOException If we cannot read the file, or is a directory
-     */
-    public static Image readImage(File file) throws IOException {
-        String ext = file.getName();
-        ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
-        return readImage(file, ext);
     }
 
     /**

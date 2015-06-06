@@ -2,7 +2,7 @@ package org.melchor629.engine.utils.math;
 
 /**
  * Class that manages transformation for some object. It has
- * three properties: Location, Rotation & Scale. Modifing any
+ * three properties: Location, Rotation &amp; Scale. Modifing any
  * of this values will not create the final matrix, only when
  * it is wanted to get the matrix. Is posible to create more
  * than one ModelMatrix instance, is not like OpenGL 2.
@@ -247,9 +247,9 @@ public class ModelMatrix {
     
     private mat4 rotationMatrix() {
         mat4 rot = new mat4();
-        rot = GLM.rotateMatrix(this.rot.x, new vec3(1, 0, 0));
-        rot = GLM.rotateMatrix(this.rot.y, new vec3(0, 1, 0));
-        rot = GLM.rotateMatrix(this.rot.z, new vec3(0, 0, 1));
+        GLM.rotateMatrix(rot, this.rot.x, new vec3(1, 0, 0));
+        GLM.rotateMatrix(rot, this.rot.y, new vec3(0, 1, 0));
+        GLM.rotateMatrix(rot, this.rot.z, new vec3(0, 0, 1));
         return rot;
     }
     
