@@ -85,6 +85,22 @@ public interface Window {
     }
 
     /**
+     * Represents size of something about the Screen. Framebuffer's size,
+     * Window size, Viewport size, Screen size...
+     */
+    class Size {
+        public int width, height;
+
+        protected Size(int w, int h) {
+            width = w; height = h;
+        }
+
+        public String toString() {
+            return String.format("(%d, %d)", width, height);
+        }
+    }
+
+    /**
      * Specifies whether the window will be resizable or not by the user.
      * Ignored for fullscreen games
      * @param resizable enable or disable resizable window
@@ -148,8 +164,9 @@ public interface Window {
      * @param width width of the window
      * @param height height of the window
      * @param title title of the window
+     * @return the context created from the window
      */
-    void createWindow(int width, int height, String title);
+    GLContext createWindow(int width, int height, String title);
 
     /**
      * Creates a Fullscreen display with the given width, height and title.
@@ -157,16 +174,18 @@ public interface Window {
      * @param width width of the window
      * @param height height of the window
      * @param title title of the window
+     * @return the context created from the window
      */
-    void createFullscreenWindow(int width, int height, String title);
+    GLContext createFullscreenWindow(int width, int height, String title);
 
     /**
      * Creates a Fullscreen display with the given title. The width and
      * height will be the same as monitor's
      * Also creates OpenGL context.
      * @param title title of the window
+     * @return the context created from the window
      */
-    void createFullScreenWindow(String title);
+    GLContext createFullscreenWindow(String title);
 
     /**
      * Determines if the window should close in the future or not
@@ -209,6 +228,11 @@ public interface Window {
     }
 
     /**
+     * Sets if the context will run on Vertical Synchronization
+     */
+    void setVsync(boolean vsync);
+
+    /**
      * Changes the title of the window to a new one
      * @param title new window title
      */
@@ -236,7 +260,29 @@ public interface Window {
      * with a DPI different to the usual.
      * @return the DPI of the screen
      */
-    double getDPI();
+    default double getDPI() { return 76; }
+
+    /**
+     * Its default value is 1. But some screens have high-DPI,
+     * on this ones, this value will be higher than 1. This value
+     * is calculated using the real Framebuffer width with the
+     * window width.<br><br>
+     *     {@code screenDensityMultiplier = fbo.width / window.width};
+     * @return the above quocient value
+     */
+    double getPixelScaleFactor();
+
+    /**
+     * @return window's size
+     */
+    Size getWindowSize();
+
+    /**
+     * This framebuffer is not the current binded framebuffer, is
+     * the window framebuffer, the main one.
+     * @return framebuffer's size
+     */
+    Size getFramebufferSize();
 
     /**
      * Destroys the Window and the context.

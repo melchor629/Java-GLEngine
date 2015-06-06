@@ -2,7 +2,7 @@ package org.melchor629.engine.objects;
 
 import org.lwjgl.glfw.GLFW;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.LWJGLRenderer;
+import org.melchor629.engine.gl.LWJGLGLContext;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Keyboard.OnKeyboardEvent;
 import org.melchor629.engine.input.Mouse;
@@ -334,7 +334,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         if(self.isKeyPressed("E"))
             pos.z -= cameraSpeed;
         if(self.isKeyPressed("ESCAPE"))
-            GLFW.glfwSetWindowShouldClose(((LWJGLRenderer) Game.gl).window, 1);
+            Game.window.setWindowShouldClose(true);
         
         speed.x = pos.x - x; speed.y = pos.y - y; speed.z = pos.z - z;
         if(speed.x != 0.f || speed.y != 0.f || speed.z != 0.f)

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import org.melchor629.engine.gl.Renderer;
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.types.BufferObject;
 import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.gl.types.VAO;
@@ -146,11 +146,11 @@ class Cube {
                 0.0f, 1.0f}
         ;
 
-        positionBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        normalBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        textureCoordBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        colorBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        indexBuffer = new BufferObject(Renderer.BufferTarget.ELEMENT_ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
+        positionBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        normalBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        textureCoordBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        colorBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        indexBuffer = new BufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
 
         positionBuffer.fillBuffer(vertices);
         textureCoordBuffer.fillBuffer(textureCoords);
@@ -200,25 +200,25 @@ class Cube {
 
         if (vertex != null) {
             positionBuffer.bind();
-            s.vertexAttribPointer(vertex, 3, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(vertex, 3, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(vertex);
         }
 
         if (normal != null) {
             normalBuffer.bind();
-            s.vertexAttribPointer(normal, 3, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(normal, 3, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(normal);
         }
 
         if (coord != null) {
             textureCoordBuffer.bind();
-            s.vertexAttribPointer(coord, 2, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(coord, 2, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(coord);
         }
 
         if (color != null) {
             colorBuffer.bind();
-            s.vertexAttribPointer(color, 3, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(color, 3, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(color);
         }
 
@@ -230,7 +230,7 @@ class Cube {
 
     void draw() {
         vao.bind();
-        gl.drawElements(Renderer.DrawMode.TRIANGLES, 36, Renderer.type.UNSIGNED_INT, 0);
+        gl.drawElements(GLContext.DrawMode.TRIANGLES, 36, GLContext.type.UNSIGNED_INT, 0);
         vao.unbind();
     }
 }

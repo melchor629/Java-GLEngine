@@ -1,6 +1,6 @@
 package org.melchor629.engine.utils;
 
-import org.melchor629.engine.gl.Renderer;
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.types.Texture;
 
 import java.io.File;
@@ -34,8 +34,8 @@ public class TextureManager {
             textureWrapper.name = name;
             textureWrapper.url = url;
             textureWrapper.texture = texture = new Texture.builder().setFile(new File(url)).setMipmap(true).
-                    setWrap(Renderer.TextureWrap.CLAMP_TO_BORDER).setMin(Renderer.TextureFilter.NEAREST_MIPMAP_LINEAR)
-                    .setMag(Renderer.TextureFilter.LINEAR_MIPMAP_LINEAR).build();
+                    setWrap(GLContext.TextureWrap.CLAMP_TO_BORDER).setMin(GLContext.TextureFilter.NEAREST_MIPMAP_LINEAR)
+                    .setMag(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).build();
         }
 
         return texture;

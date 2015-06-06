@@ -2,8 +2,8 @@ package org.melchor629.engine.gl.types;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLError;
-import org.melchor629.engine.gl.Renderer;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.mat4;
@@ -76,14 +76,14 @@ public class ShaderProgram implements Erasable {
     public ShaderProgram(String vertex, String fragment, String geometry) {
         vertexShader = fragmentShader = geometryShader = shaderProgram = -1;
         
-        vertexShader = createShader(Renderer.ShaderType.VERTEX, vertex);
-        fragmentShader = createShader(Renderer.ShaderType.FRAGMENT, fragment);
+        vertexShader = createShader(GLContext.ShaderType.VERTEX, vertex);
+        fragmentShader = createShader(GLContext.ShaderType.FRAGMENT, fragment);
         if(geometry != null) {
-            geometryShader = createShader(Renderer.ShaderType.GEOMETRY, geometry);
-            shaderCheckForErrors(Renderer.ShaderType.GEOMETRY, geometryShader);
+            geometryShader = createShader(GLContext.ShaderType.GEOMETRY, geometry);
+            shaderCheckForErrors(GLContext.ShaderType.GEOMETRY, geometryShader);
         }
-        shaderCheckForErrors(Renderer.ShaderType.VERTEX, vertexShader);
-        shaderCheckForErrors(Renderer.ShaderType.FRAGMENT, fragmentShader);
+        shaderCheckForErrors(GLContext.ShaderType.VERTEX, vertexShader);
+        shaderCheckForErrors(GLContext.ShaderType.FRAGMENT, fragmentShader);
 
         shaderProgram = createProgram();
 
@@ -191,7 +191,7 @@ public class ShaderProgram implements Erasable {
      * @param stride Specifies the byte offset between consecutive generic vertex attributes.
      * @param offset Specifies a offset of the first component of the first generic vertex attribute in the array
      */
-    public void vertexAttribPointer(String attribName, int type, Renderer.type t, boolean norm, int stride, long offset) {
+    public void vertexAttribPointer(String attribName, int type, GLContext.type t, boolean norm, int stride, long offset) {
         int loc = gl.getAttribLocation(shaderProgram, attribName);
         if(loc == -1) throw new GLError("glVertexAttribLocation", "Attrib named '" + attribName + "' does not exist");
         gl.vertexAttribPointer(loc, type, t, norm, stride, offset);
@@ -365,7 +365,7 @@ public class ShaderProgram implements Erasable {
      * @param str Source code
      * @return Shader
      */
-    protected final int createShader(Renderer.ShaderType type, String str) {
+    protected final int createShader(GLContext.ShaderType type, String str) {
         int shader = gl.createShader(type);
         gl.shaderSource(shader, str);
         gl.compileShader(shader);
@@ -378,8 +378,8 @@ public class ShaderProgram implements Erasable {
      * @throws GLError If COMPILE_STATUS is not GL_TRUE (an error occurred
      *                 while compiling)
      */
-    protected final void shaderCheckForErrors(Renderer.ShaderType type, int shader) {
-        int status = gl.getShader(shader, Renderer.GLGetShader.COMPILE_STATUS);
+    protected final void shaderCheckForErrors(GLContext.ShaderType type, int shader) {
+        int status = gl.getShader(shader, GLContext.GLGetShader.COMPILE_STATUS);
         if(status != 1)
             throw new GLError(type.name(), gl.getShaderInfoLog(shader));
     }
@@ -390,7 +390,7 @@ public class ShaderProgram implements Erasable {
      *                 while linking)
      */
     protected final void programCheckForErrors() {
-        int status = gl.getProgram(shaderProgram, Renderer.GLGetProgram.LINK_STATUS);
+        int status = gl.getProgram(shaderProgram, GLContext.GLGetProgram.LINK_STATUS);
         if(status != 1) throw new GLError(gl.getProgramInfoLog(shaderProgram));
     }
 
@@ -415,9 +415,9 @@ public class ShaderProgram implements Erasable {
      * them into a HashMap.
      */
     private void fetchUniforms() {
-        int count = gl.getProgram(shaderProgram, Renderer.GLGetProgram.ACTIVE_UNIFORMS);
+        int count = gl.getProgram(shaderProgram, GLContext.GLGetProgram.ACTIVE_UNIFORMS);
         uniforms = new HashMap<>(count);
-        int strlen = gl.getProgram(shaderProgram, Renderer.GLGetProgram.ACTIVE_UNIFORM_MAX_LENGTH);
+        int strlen = gl.getProgram(shaderProgram, GLContext.GLGetProgram.ACTIVE_UNIFORM_MAX_LENGTH);
         for(int i = 0; i < count; i++) {
             String name = gl.getActiveUniform(shaderProgram, i, strlen);
             int loc = gl.getUniformLocation(shaderProgram, name);
@@ -426,8 +426,8 @@ public class ShaderProgram implements Erasable {
     }
 
     private void fetchAttribs() {
-        int count = gl.getProgram(shaderProgram, Renderer.GLGetProgram.ACTIVE_ATTRIBUTES);
-        int strlen = gl.getProgram(shaderProgram, Renderer.GLGetProgram.ACTIVE_ATTRIBUTE_MAX_LENGTH);
+        int count = gl.getProgram(shaderProgram, GLContext.GLGetProgram.ACTIVE_ATTRIBUTES);
+        int strlen = gl.getProgram(shaderProgram, GLContext.GLGetProgram.ACTIVE_ATTRIBUTE_MAX_LENGTH);
         attribs = new Attrib[count];
         for(int i = 0; i < count; i++) {
             Attrib a = new Attrib();

@@ -1,7 +1,7 @@
 package org.melchor629.engine.objects;
 
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.Renderer;
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.types.BufferObject;
 import org.melchor629.engine.gl.types.ShaderProgram;
 import org.melchor629.engine.gl.types.VAO;
@@ -94,12 +94,12 @@ public class Model {
         Mesh m = geometry.mesh;
         int sources = m.sources.size();
         vao = new VAO();
-        vertexBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        normalBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        colorBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        indexBuffer = new BufferObject(Renderer.BufferTarget.ELEMENT_ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
+        vertexBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        normalBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        colorBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        indexBuffer = new BufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         if(sources == 3)
-            texCoordBuffer = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
+            texCoordBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
 
         IntBuffer ibuff = BufferUtils.createIntBuffer(m.polylist.p.capacity() / sources);
         for(int i = 0; i < m.polylist.p.capacity(); i += sources)
@@ -123,25 +123,25 @@ public class Model {
 
         if(attribs[0] != null) {
             vertexBuffer.bind();
-            s.vertexAttribPointer(attribs[0], 3, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(attribs[0], 3, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(attribs[0]);
         }
 
         if(attribs[1] != null) {
             normalBuffer.bind();
-            s.vertexAttribPointer(attribs[1], 3, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(attribs[1], 3, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(attribs[1]);
         }
 
         if(attribs[2] != null && texCoordBuffer != null) {
             texCoordBuffer.bind();
-            s.vertexAttribPointer(attribs[2], 2, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(attribs[2], 2, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(attribs[2]);
         }
 
         if(attribs[3] != null) {
             colorBuffer.bind();
-            s.vertexAttribPointer(attribs[3], 3, Renderer.type.FLOAT, false, 0, 0);
+            s.vertexAttribPointer(attribs[3], 3, GLContext.type.FLOAT, false, 0, 0);
             s.enableAttrib(attribs[3]);
         }
 
@@ -156,7 +156,7 @@ public class Model {
         if(s != null && model != null)
             s.setUniformMatrix("model", model.getModelMatrix());
         vao.bind();
-        Game.gl.drawElements(Renderer.DrawMode.TRIANGLES, facesCount * 3, Renderer.type.UNSIGNED_INT, 0);
+        Game.gl.drawElements(GLContext.DrawMode.TRIANGLES, facesCount * 3, GLContext.type.UNSIGNED_INT, 0);
         vao.unbind();
     }
 

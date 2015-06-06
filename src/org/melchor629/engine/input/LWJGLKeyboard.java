@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.LWJGLRenderer;
+import org.melchor629.engine.gl.LWJGLWindow;
 
 /**
  * Implementation of {@link Keyboard} class for GLFW
@@ -24,7 +24,7 @@ public class LWJGLKeyboard extends Keyboard {
 
     public LWJGLKeyboard() {
         super();
-        glfwSetKeyCallback(((LWJGLRenderer) Game.gl).window, kCbk = new GLFWKeyCallback() {
+        glfwSetKeyCallback(((LWJGLWindow) Game.window).window, kCbk = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if(key == -1) key = 1023;

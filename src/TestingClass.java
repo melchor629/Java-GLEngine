@@ -1,7 +1,8 @@
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.LWJGLRenderer;
-import org.melchor629.engine.gl.Renderer;
-import org.melchor629.engine.gl.Renderer.*;
+import org.melchor629.engine.gl.GLContext;
+import org.melchor629.engine.gl.GLContext.*;
+import org.melchor629.engine.gl.LWJGLWindow;
+import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.gl.types.*;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.ModelMatrix;
@@ -81,17 +82,11 @@ public final class TestingClass {
             + "}\n";
 
     public static void main(String[] args) throws IOException {
-        Renderer gl = Game.gl = new LWJGLRenderer();
+        Window window = Game.window = new LWJGLWindow();
         Timing t = Timing.getGameTiming();
-        boolean cr;
-        gl.setVsync(true);
-        gl.setResizable(true);
-        cr = gl.createDisplay((short) 1280, (short) 720, false, "G5 to engine test");
-        
-        if(!cr) {
-        	System.out.printf("Error al crear la ventana...");
-        	System.exit(-1);
-        }
+        window.setVsync(true);
+        window.setResizable(true);
+        GLContext gl = Game.gl = window.createWindow(1280, 720, "G5 to engine test");
 
         VAO vao = new VAO();
         vao.bind();
@@ -210,7 +205,7 @@ public final class TestingClass {
         org.lwjgl.glfw.GLFW.glfwSwapInterval(1);
 
         t.update();
-        while(!gl.windowIsClosing()) {
+        while(!window.windowShouldClose()) {
             fbo.bind();
             vao.bind();
             gl.enable(GLEnable.DEPTH_TEST);
@@ -222,7 +217,7 @@ public final class TestingClass {
             perro.bind();
             
             gl.clearColor(1, 1, 1, 1);
-            gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
+            gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
 
             model.setIdentity();
             time = (float) Math.sin(2 * Math.PI * x++ / ((float) t.fps * 4));
@@ -238,7 +233,7 @@ public final class TestingClass {
                 gl.stencilOp(StencilOp.KEEP, StencilOp.KEEP, StencilOp.REPLACE);
                 gl.stencilMask(0xFF);
                 gl.depthMask(false);
-                gl.clear(Renderer.STENCIL_BUFFER_BIT);
+                gl.clear(GLContext.STENCIL_BUFFER_BIT);
                 gl.drawArrays(DrawMode.TRIANGLES, 36, 6);
 
                 gl.stencilFunc(StencilFunc.EQUAL, 1, 0xFF);
@@ -276,7 +271,7 @@ public final class TestingClass {
         fbo.delete();
         rbo.delete();
         texColor.delete();
-        gl.destroyDisplay();
+        window.destroyWindow();
         System.exit(0);
     }
 }

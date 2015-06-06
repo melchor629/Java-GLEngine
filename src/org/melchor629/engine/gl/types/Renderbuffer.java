@@ -4,7 +4,7 @@ import static org.melchor629.engine.Game.gl;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.Renderer;
+import org.melchor629.engine.gl.GLContext;
 
 /**
  * Class for manage Renderbuffers
@@ -12,9 +12,9 @@ import org.melchor629.engine.gl.Renderer;
  */
 public class Renderbuffer implements Erasable {
     protected int rbo;
-    protected Renderer.TextureFormat format;
+    protected GLContext.TextureFormat format;
 
-    public Renderbuffer(Renderer.TextureFormat fmt, int width, int height) {
+    public Renderbuffer(GLContext.TextureFormat fmt, int width, int height) {
         rbo = gl.genRenderbuffer();
         format = fmt;
         gl.bindRenderbuffer(rbo);

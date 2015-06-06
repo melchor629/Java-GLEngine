@@ -1,7 +1,11 @@
+import com.sun.jna.Pointer;
+import org.lwjgl.system.MemoryUtil;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.LWJGLRenderer;
-import org.melchor629.engine.gl.Renderer;
+import org.melchor629.engine.clib.STBLoader;
+import org.melchor629.engine.gl.GLContext;
+import org.melchor629.engine.gl.LWJGLWindow;
+import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.gl.types.*;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.LWJGLKeyboard;
@@ -14,6 +18,7 @@ import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.vec3;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeSet;
@@ -27,8 +32,9 @@ public class EspacioEuclideo {
     }
 
     private static final Random rand = new Random();
-    public static final int WIDTH = 1280, HEIGHT = 720;
-    private static Renderer gl;
+    public static int WIDTH = 1280, HEIGHT = 720;
+    public static int glWIDTH, glHEIGHT;
+    private static Window window;
     private static boolean phosphorEffectEnabler = false;
 
     public static void main(String... args) {
@@ -38,28 +44,37 @@ public class EspacioEuclideo {
             e.printStackTrace();
         }
 
-        gl.destroyDisplay();
+        window.destroyWindow();
         System.exit(0);
     }
 
     public static void _main() throws Throwable {
         Game.erasableList = new ArrayList<>();
-        Game.gl = gl = new LWJGLRenderer();
+        Game.window = window = new LWJGLWindow();
+        window.setResizable(false);
+        window.setVisible(false);
+        window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
+        GLContext gl = Game.gl = window.createWindow(1280, 720, "Espacio Euclídeo");
+        window.setVsync(true);
         Timing t = Timing.getGameTiming();
-        gl.setResizable(false);
-        gl.createDisplay(WIDTH, HEIGHT, false, "Espacio Euclídeo", Renderer.GLVersion.GL33);
-        gl.setVsync(true);
+
+        WIDTH = window.getWindowSize().width;
+        HEIGHT = window.getWindowSize().height;
+        glWIDTH = window.getFramebufferSize().width;
+        glHEIGHT = window.getFramebufferSize().height;
+        System.out.printf("%s %s %f\n", window.getWindowSize(), window.getFramebufferSize(), window.getPixelScaleFactor());
 
         Keyboard keyboard = Game.keyboard = new LWJGLKeyboard();
         Mouse mouse = Game.mouse = new LWJGLMouse();
         Camera camera = new Camera();
+        camera.setAspectRation(glWIDTH, glHEIGHT);
         camera.setClipPanes(0.1, 100);
         camera.setMovementMultiplier(0);
         camera.setMouseSensibility(0);
 
         VAO puntos_vao = new VAO();
-        BufferObject plano_vbo = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
-        BufferObject puntos_vbo = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
+        BufferObject plano_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        BufferObject puntos_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
 
         FloatBuffer puntos = generarEspacioEuclídeo();
         int cantidad = puntos.capacity() / 3;
@@ -79,15 +94,15 @@ public class EspacioEuclideo {
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.fs.glsl")));
         Texture euclides_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/euklid.png"))
-                .setMin(Renderer.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
 
         puntos_vao.bind();
         puntos_shader.bind();
         plano_vbo.bind();
-        puntos_shader.vertexAttribPointer("punto", 3, Renderer.type.FLOAT, false, 5<<2, 0);
-        puntos_shader.vertexAttribPointer("texcoord", 2, Renderer.type.FLOAT, false, 5<<2, 3<<2);
+        puntos_shader.vertexAttribPointer("punto", 3, GLContext.type.FLOAT, false, 5<<2, 0);
+        puntos_shader.vertexAttribPointer("texcoord", 2, GLContext.type.FLOAT, false, 5<<2, 3<<2);
         puntos_vbo.bind();
-        puntos_shader.vertexAttribPointer("puntos", 3, Renderer.type.FLOAT, false, 3*4, 0);
+        puntos_shader.vertexAttribPointer("puntos", 3, GLContext.type.FLOAT, false, 3*4, 0);
         gl.vertexAttribDivisor(puntos_shader.getAttributeLocation("puntos"), 1);
         puntos_shader.enableAttrib("punto");
         puntos_shader.enableAttrib("texcoord");
@@ -95,10 +110,10 @@ public class EspacioEuclideo {
         puntos_vbo.unbind();
         puntos_vao.unbind();
 
-        gl.enable(Renderer.GLEnable.DEPTH_TEST);
-        gl.enable(Renderer.GLEnable.BLEND);
-        gl.enable(Renderer.GLEnable.CULL_FACE);
-        gl.blendFunc(Renderer.BlendOption.SRC_ALPHA, Renderer.BlendOption.ONE_MINUS_SRC_ALPHA);
+        gl.enable(GLContext.GLEnable.DEPTH_TEST);
+        gl.enable(GLContext.GLEnable.BLEND);
+        gl.enable(GLContext.GLEnable.CULL_FACE);
+        gl.blendFunc(GLContext.BlendOption.SRC_ALPHA, GLContext.BlendOption.ONE_MINUS_SRC_ALPHA);
         gl.clearColor(0.1f, 0.1f, 0.1f, 1);
 
         puntos_shader.setColorOutput("color", 0);
@@ -109,7 +124,7 @@ public class EspacioEuclideo {
         /**
          * Post-processing effects
          */
-        BufferObject screen_vbo = new BufferObject(Renderer.BufferTarget.ARRAY_BUFFER, Renderer.BufferUsage.STATIC_DRAW);
+        BufferObject screen_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         screen_vbo.fillBuffer(new float[] {
                 1, -1, 0, 0,
                 1,  1, 1, 0,
@@ -118,9 +133,9 @@ public class EspacioEuclideo {
                 1, -1, 0, 0,
                -1,  1, 1, 1
         });
-        Renderbuffer currentFrameDepth = new Renderbuffer(Renderer.TextureFormat.DEPTH24_STENCIL8, WIDTH * 2, HEIGHT * 2);
-        Texture currentFrame = new Texture(Renderer.TextureFormat.RGB, WIDTH*2, HEIGHT*2, Renderer.TextureExternalFormat.RGB);
-        Texture previousFrame = new Texture(Renderer.TextureFormat.RGB, WIDTH*2, HEIGHT*2, Renderer.TextureExternalFormat.RGB);
+        Renderbuffer currentFrameDepth = new Renderbuffer(GLContext.TextureFormat.DEPTH24_STENCIL8, glWIDTH, glHEIGHT);
+        Texture currentFrame = new Texture(GLContext.TextureFormat.RGB, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
+        Texture previousFrame = new Texture(GLContext.TextureFormat.RGB, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
         Framebuffer sceneFB =  new Framebuffer();
         sceneFB.attachColorTexture(currentFrame, 0);
         sceneFB.attachDepthStencilRenderbuffer(currentFrameDepth);
@@ -136,8 +151,8 @@ public class EspacioEuclideo {
         phosphorEffect.setColorOutput("color", 0);
         phosphorEffectVao.bind();
         screen_vbo.bind();
-        phosphorEffect.vertexAttribPointer("position", 2, Renderer.type.FLOAT, false, 4*4, 0);
-        phosphorEffect.vertexAttribPointer("tex_coord", 2, Renderer.type.FLOAT, false, 4*4, 2*4);
+        phosphorEffect.vertexAttribPointer("position", 2, GLContext.type.FLOAT, false, 4*4, 0);
+        phosphorEffect.vertexAttribPointer("tex_coord", 2, GLContext.type.FLOAT, false, 4*4, 2*4);
         phosphorEffect.enableAttrib("position");
         phosphorEffect.enableAttrib("tex_coord");
         phosphorEffect.setUniform("phosphor", 0.8f);
@@ -147,12 +162,27 @@ public class EspacioEuclideo {
 
         keyboard.addListener(new Keyboard.OnPressKeyEvent() {
             public void invoke(Keyboard self, int key) {
+                if(self.getStringRepresentation(key) == null) return;
                 if(self.getStringRepresentation(key).equals("F"))
                     phosphorEffectEnabler = !phosphorEffectEnabler;
+                if(self.getStringRepresentation(key).equals("P")) {
+                    IntBuffer data = BufferUtils.createIntBuffer(glWIDTH * glHEIGHT);
+                    gl.readBuffer(GLContext.CullFaceMode.FRONT);
+                    gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data);
+                    new Thread(() -> {
+                        STBLoader.ImageData d = new STBLoader.ImageData();
+                        d.components = 3;
+                        d.width = glWIDTH;
+                        d.height = glHEIGHT;
+                        d.data = new Pointer(MemoryUtil.memAddress(data));
+                        STBLoader.instance.stb_write_image("/Users/melchor9000/Desktop/mae.png", "png", d);
+                    }, "Screenshot saver").start();
+                }
             }
         });
 
-        while(!gl.windowIsClosing()) {
+        window.showWindow();
+        while(!window.windowShouldClose()) {
             float opacity = 1.f;
             if(camera.getPosition().x < 50.f)
                 opacity = camera.getPosition().x / 50.f;
@@ -164,38 +194,38 @@ public class EspacioEuclideo {
 
             if(phosphorEffectEnabler)
             sceneFB.bind();
-                gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
+                gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
                 puntos_shader.setUniformMatrix("view", camera.getViewMatrix());
                 gl.setActiveTexture(0);
                 euclides_tex.bind();
                 puntos_vao.bind();
-                gl.drawArraysInstanced(Renderer.DrawMode.TRIANGLES, 0, 6, cantidad);
+                gl.drawArraysInstanced(GLContext.DrawMode.TRIANGLES, 0, 6, cantidad);
                 puntos_vao.unbind();
             sceneFB.unbind();
 
             if(phosphorEffectEnabler) {
-                gl.clear(Renderer.COLOR_CLEAR_BIT | Renderer.DEPTH_BUFFER_BIT);
-                gl.disable(Renderer.GLEnable.DEPTH_TEST);
+                gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
+                gl.disable(GLContext.GLEnable.DEPTH_TEST);
                 phosphorEffect.bind();
                 phosphorEffectVao.bind();
                 gl.setActiveTexture(0);
                 currentFrame.bind();
                 gl.setActiveTexture(1);
                 previousFrame.bind();
-                gl.drawArrays(Renderer.DrawMode.TRIANGLES, 0, 6);
+                gl.drawArrays(GLContext.DrawMode.TRIANGLES, 0, 6);
                 phosphorEffectVao.unbind();
                 phosphorEffect.unbind();
-                gl.enable(Renderer.GLEnable.DEPTH_TEST);
+                gl.enable(GLContext.GLEnable.DEPTH_TEST);
+
+                gl.setActiveTexture(0);
+                previousFrame.bind();
+                gl.copyTexImage2D(GLContext.TextureTarget.TEXTURE_2D, 0, GLContext.TextureFormat.RGB, 0, 0, glWIDTH, glHEIGHT);
             }
 
-            gl.setActiveTexture(0);
-            previousFrame.bind();
-            gl.copyTexImage2D(Renderer.TextureTarget.TEXTURE_2D, 0, Renderer.TextureFormat.RGB, 0, 0, WIDTH * 2, HEIGHT*2);
-
             if(keyboard.isKeyPressed("k"))
-                gl.enable(Renderer.GLEnable.FRAMEBUFFER_SRGB);
+                gl.enable(GLContext.GLEnable.FRAMEBUFFER_SRGB);
             else
-                gl.disable(Renderer.GLEnable.FRAMEBUFFER_SRGB);
+                gl.disable(GLContext.GLEnable.FRAMEBUFFER_SRGB);
 
             if(camera.getPosition().x > WIDTH + HEIGHT + 50f)
                 camera.setPosition(0, camera.getPosition().y, camera.getPosition().z);

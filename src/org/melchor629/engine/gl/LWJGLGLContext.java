@@ -1,7 +1,6 @@
 package org.melchor629.engine.gl;
 
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.opengl.GLContext;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
@@ -25,114 +24,38 @@ import static org.lwjgl.opengl.GL33.*;
  * Class for Render with LWJGL
  * @author melchor9000
  */
-public class LWJGLRenderer implements Renderer {
-	public long window;
-    public GLContext context;
-	boolean vsync = false;
+public class LWJGLGLContext implements GLContext {
+    private org.lwjgl.opengl.GLContext context;
 
-    private GLFWErrorCallback errorCallback;
-	
-	public LWJGLRenderer() {
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if(window != 0)
-                destroyDisplay();
-            glfwTerminate();
-        }));
-
-        glfwSetErrorCallback(errorCallback = new GLFWErrorCallback() {
-            @Override
-            public void invoke(int error, long description) {
-                ByteBuffer native_str = org.lwjgl.system.MemoryUtil.memByteBufferNT1(description);
-                String java_str = org.lwjgl.system.MemoryUtil.memDecodeUTF8(native_str);
-                System.out.printf("GLFW [ERROR %d]: %s\n", error, java_str);
-            }
-        });
-
-        if(glfwInit() == 0)
-            throw new IllegalStateException("Could not initialize GLFW");
-        glfwDefaultWindowHints();
-	}
-
-    /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#createDisplay(short, short, boolean, java.lang.String)
-     */
-    @Override
-    public boolean createDisplay(int width, int height, boolean fullscreen, String title) {
-        //glfwInit();
-        long fourth = fullscreen ? glfwGetPrimaryMonitor() : 0l;
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        if(org.lwjgl.LWJGLUtil.getPlatform().getName().equalsIgnoreCase("macosx"))
-            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        window = glfwCreateWindow(width, height, title, fourth, 0l);
-        if(window != 0)
-        	glfwMakeContextCurrent(window);
-        //else
-        	//glfwTerminate();
-        context = GLContext.createFromCurrent();
+    public LWJGLGLContext() {
+        context = org.lwjgl.opengl.GLContext.createFromCurrent();
         context.setupDebugMessageCallback();
-        return window != 0;
     }
 
-    /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#createDisplay(short, short, boolean, java.lang.String, org.melchor629.engine.gl.Renderer.GLVersion)
-     */
     @Override
-    public boolean createDisplay(int width, int height, boolean fullscreen, String title,
-            GLVersion version) {
-    	//glfwInit();
-        long fourth = fullscreen ? glfwGetPrimaryMonitor() : 0l;
-        if(version.a >= 3) {
-            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    public void destroyContext() {
+        context.destroy();
+    }
+
+    @Override
+    public boolean hasCapability(String name) {
+        boolean ret = false;
+        try {
+            ret = context.getCapabilities().getClass().getField(name).getBoolean(context.getCapabilities());
+        } catch(NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
         }
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.a);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.b);
-        window = glfwCreateWindow(width, height, title, fourth, 0l);
-        if(window != 0)
-        	glfwMakeContextCurrent(window);
-        //else
-        	//glfwTerminate();
-        context = GLContext.createFromCurrent();
-        context.setupDebugMessageCallback();
-        return window != 0;
-    }
-
-    
-    public void setVsync(boolean vsync) {
-    	this.vsync = vsync;
-        glfwSwapInterval(vsync ? 1 : 0);
-    }
-
-    public void setResizable(boolean resizable) {
-        glfwWindowHint(GLFW_RESIZABLE, resizable ? 1 : 0);
-    }
-
-    /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteDisplay()
-     */
-    @Override
-    public void destroyDisplay() {
-    	glfwDestroyWindow(window);
-    	glfwMakeContextCurrent(0l);
-        glfwTerminate();
-        window = 0l;
+        return ret;
     }
 
     public void _game_loop_sync(int fps) {
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(((LWJGLWindow) Game.window).window);
         glfwPollEvents();
         //TODO Sync with FPS
     }
 
-    public boolean windowIsClosing() {
-        return glfwWindowShouldClose(window) == 1;
-    }
-
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#enable(org.melchor629.engine.gl.Renderer.GLEnable)
+     * @see org.melchor629.engine.gl.GLContext#enable(org.melchor629.engine.gl.GLContext.GLEnable)
      */
     @Override
     public void enable(GLEnable enable) {
@@ -140,7 +63,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#disable(org.melchor629.engine.gl.Renderer.GLEnable)
+     * @see org.melchor629.engine.gl.GLContext#disable(org.melchor629.engine.gl.GLContext.GLEnable)
      */
     @Override
     public void disable(GLEnable disable) {
@@ -148,7 +71,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#isEnabled(org.melchor629.engine.gl.Renderer.GLEnable)
+     * @see org.melchor629.engine.gl.GLContext#isEnabled(org.melchor629.engine.gl.GLContext.GLEnable)
      */
     @Override
     public boolean isEnabled(GLEnable enabled) {
@@ -156,7 +79,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genVertexArray()
+     * @see org.melchor629.engine.gl.GLContext#genVertexArray()
      */
     @Override
     public int genVertexArray() {
@@ -164,7 +87,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genVertexArrays(int[])
+     * @see org.melchor629.engine.gl.GLContext#genVertexArrays(int[])
      */
     @Override
     public void genVertexArrays(int[] buff) {
@@ -173,7 +96,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteVertexArray(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteVertexArray(int)
      */
     @Override
     public void deleteVertexArray(int vao) {
@@ -181,7 +104,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteVertexArrays(int[])
+     * @see org.melchor629.engine.gl.GLContext#deleteVertexArrays(int[])
      */
     @Override
     public void deleteVertexArrays(int[] buff) {
@@ -189,7 +112,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bindVertexArray(int)
+     * @see org.melchor629.engine.gl.GLContext#bindVertexArray(int)
      */
     @Override
     public void bindVertexArray(int vao) {
@@ -197,7 +120,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genBuffer()
+     * @see org.melchor629.engine.gl.GLContext#genBuffer()
      */
     @Override
     public int genBuffer() {
@@ -205,7 +128,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genBuffers(int[])
+     * @see org.melchor629.engine.gl.GLContext#genBuffers(int[])
      */
     @Override
     public void genBuffers(int[] buff) {
@@ -216,7 +139,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteBuffer(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteBuffer(int)
      */
     @Override
     public void deleteBuffer(int vbo) {
@@ -224,7 +147,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteBuffers(int[])
+     * @see org.melchor629.engine.gl.GLContext#deleteBuffers(int[])
      */
     @Override
     public void deleteBuffers(int[] ebo) {
@@ -235,7 +158,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bindBuffer(org.melchor629.engine.gl.Renderer.BufferTarget, int)
+     * @see org.melchor629.engine.gl.GLContext#bindBuffer(org.melchor629.engine.gl.GLContext.BufferTarget, int)
      */
     @Override
     public void bindBuffer(BufferTarget target, int bo) {
@@ -283,7 +206,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#drawArrays(org.melchor629.engine.gl.Renderer.DrawMode, int, int)
+     * @see org.melchor629.engine.gl.GLContext#drawArrays(org.melchor629.engine.gl.GLContext.DrawMode, int, int)
      */
     @Override
     public void drawArrays(DrawMode mode, int first, int count) {
@@ -296,7 +219,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#drawElements(org.melchor629.engine.gl.Renderer.DrawMode, int, org.melchor629.engine.gl.Renderer.type, long)
+     * @see org.melchor629.engine.gl.GLContext#drawElements(org.melchor629.engine.gl.GLContext.DrawMode, int, org.melchor629.engine.gl.GLContext.type, long)
      */
     @Override
     public void drawElements(DrawMode mode, int length, type type, long offset) {
@@ -322,7 +245,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#createShader(org.melchor629.engine.gl.Renderer.ShaderType)
+     * @see org.melchor629.engine.gl.GLContext#createShader(org.melchor629.engine.gl.GLContext.ShaderType)
      */
     @Override
     public int createShader(ShaderType type) {
@@ -330,7 +253,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#createProgram()
+     * @see org.melchor629.engine.gl.GLContext#createProgram()
      */
     @Override
     public int createProgram() {
@@ -338,7 +261,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteShader(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteShader(int)
      */
     @Override
     public void deleteShader(int shader) {
@@ -346,7 +269,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteProgram(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteProgram(int)
      */
     @Override
     public void deleteProgram(int program) {
@@ -354,7 +277,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#shaderSource(int, java.lang.String)
+     * @see org.melchor629.engine.gl.GLContext#shaderSource(int, java.lang.String)
      */
     @Override
     public void shaderSource(int shader, String src) {
@@ -362,7 +285,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#compileShader(int)
+     * @see org.melchor629.engine.gl.GLContext#compileShader(int)
      */
     @Override
     public void compileShader(int shader) {
@@ -370,7 +293,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#attachShader(int, int)
+     * @see org.melchor629.engine.gl.GLContext#attachShader(int, int)
      */
     @Override
     public void attachShader(int program, int shader) {
@@ -378,7 +301,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#linkProgram(int)
+     * @see org.melchor629.engine.gl.GLContext#linkProgram(int)
      */
     @Override
     public void linkProgram(int program) {
@@ -386,7 +309,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#useProgram(int)
+     * @see org.melchor629.engine.gl.GLContext#useProgram(int)
      */
     @Override
     public void useProgram(int program) {
@@ -394,32 +317,32 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getShader(int, org.melchor629.engine.gl.Renderer.GLGetShader)
+     * @see org.melchor629.engine.gl.GLContext#getShader(int, org.melchor629.engine.gl.GLContext.GLGetShader)
      */
     @Override
-    public int getShader(int shader, Renderer.GLGetShader pName) {
+    public int getShader(int shader, GLContext.GLGetShader pName) {
         return glGetShaderi(shader, pName.e);
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getShaderInfoLog(int)
+     * @see org.melchor629.engine.gl.GLContext#getShaderInfoLog(int)
      */
     @Override
     public String getShaderInfoLog(int shader) {
-        int length = getShader(shader, Renderer.GLGetShader.INFO_LOG_LENGTH);
+        int length = getShader(shader, GLContext.GLGetShader.INFO_LOG_LENGTH);
         return glGetShaderInfoLog(shader, length);
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getProgram(int, org.melchor629.engine.gl.Renderer.GLGetShader)
+     * @see org.melchor629.engine.gl.GLContext#getProgram(int, org.melchor629.engine.gl.GLContext.GLGetShader)
      */
     @Override
-    public int getProgram(int program, Renderer.GLGetProgram pName) {
+    public int getProgram(int program, GLContext.GLGetProgram pName) {
         return glGetProgrami(program, pName.e);
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getProgramInfoLog(int)
+     * @see org.melchor629.engine.gl.GLContext#getProgramInfoLog(int)
      */
     @Override
     public String getProgramInfoLog(int program) {
@@ -428,7 +351,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getAttribLocation(int, java.lang.String)
+     * @see org.melchor629.engine.gl.GLContext#getAttribLocation(int, java.lang.String)
      */
     @Override
     public int getAttribLocation(int program, String name) {
@@ -436,7 +359,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#enableVertexAttribArray(int)
+     * @see org.melchor629.engine.gl.GLContext#enableVertexAttribArray(int)
      */
     @Override
     public void enableVertexAttribArray(int loc) {
@@ -444,7 +367,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#vertexAttribPointer(int, int, org.melchor629.engine.gl.Renderer.type, boolean, int, long)
+     * @see org.melchor629.engine.gl.GLContext#vertexAttribPointer(int, int, org.melchor629.engine.gl.GLContext.type, boolean, int, long)
      */
     @Override
     public void vertexAttribPointer(int loc, int size, type type, boolean norm, int stride, long off) {
@@ -452,7 +375,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bindFragDataLocation(int, int, java.lang.String)
+     * @see org.melchor629.engine.gl.GLContext#bindFragDataLocation(int, int, java.lang.String)
      */
     @Override
     public void bindFragDataLocation(int program, int colorNumber, String name) {
@@ -460,7 +383,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getActiveAttrib(int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#getActiveAttrib(int, int, int)
      */
     @Override
     public String getActiveAttrib(int program, int pos, int strlen) {
@@ -471,7 +394,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getActiveAttribSize(int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#getActiveAttribSize(int, int, int)
      */
     @Override
     public int getActiveAttribSize(int program, int pos) {
@@ -479,7 +402,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getActiveAttribType(int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#getActiveAttribType(int, int, int)
      */
     @Override
     public int getActiveAttribType(int program, int pos) {
@@ -492,7 +415,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getUniformLocation(int, java.lang.String)
+     * @see org.melchor629.engine.gl.GLContext#getUniformLocation(int, java.lang.String)
      */
     @Override
     public int getUniformLocation(int program, String name) {
@@ -500,7 +423,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getActiveUniform(int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#getActiveUniform(int, int, int)
      */
     @Override
     public String getActiveUniform(int program, int pos, int strlen) {
@@ -511,7 +434,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform1f(int, float)
+     * @see org.melchor629.engine.gl.GLContext#uniform1f(int, float)
      */
     @Override
     public void uniform1f(int loc, float value) {
@@ -519,7 +442,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform1i(int, int)
+     * @see org.melchor629.engine.gl.GLContext#uniform1i(int, int)
      */
     @Override
     public void uniform1i(int loc, int value) {
@@ -527,7 +450,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#setActiveTexture(int)
+     * @see org.melchor629.engine.gl.GLContext#setActiveTexture(int)
      */
     @Override
     public void setActiveTexture(int num) {
@@ -535,7 +458,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getMaxTextureUnits()
+     * @see org.melchor629.engine.gl.GLContext#getMaxTextureUnits()
      */
     @Override
     public short getMaxTextureUnits() {
@@ -543,7 +466,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genTexture()
+     * @see org.melchor629.engine.gl.GLContext#genTexture()
      */
     @Override
     public int genTexture() {
@@ -551,7 +474,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genTextures(int[])
+     * @see org.melchor629.engine.gl.GLContext#genTextures(int[])
      */
     @Override
     public void genTextures(int[] texs) {
@@ -563,7 +486,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteTexture(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteTexture(int)
      */
     @Override
     public void deleteTexture(int tex) {
@@ -571,7 +494,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteTextures(int[])
+     * @see org.melchor629.engine.gl.GLContext#deleteTextures(int[])
      */
     @Override
     public void deleteTextures(int[] texs) {
@@ -587,7 +510,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bindTexture(org.melchor629.engine.gl.Renderer.TextureTarget, int)
+     * @see org.melchor629.engine.gl.GLContext#bindTexture(org.melchor629.engine.gl.GLContext.TextureTarget, int)
      */
     @Override
     public void bindTexture(TextureTarget target, int tex) {
@@ -595,26 +518,26 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texParameteri(org.melchor629.engine.gl.Renderer.TextureTarget, int, int)
+     * @see org.melchor629.engine.gl.GLContext#texParameteri(org.melchor629.engine.gl.GLContext.TextureTarget, int, int)
      */
     @Override
-    public void texParameteri(TextureTarget target, Renderer.TextureParameter pName, int param) {
+    public void texParameteri(TextureTarget target, GLContext.TextureParameter pName, int param) {
         glTexParameteri(target.e, pName.e, param);
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texParameteri(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureWrap)
+     * @see org.melchor629.engine.gl.GLContext#texParameteri(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureWrap)
      */
     @Override
-    public void texParameteri(TextureTarget target, Renderer.TextureParameter pName, TextureWrap p) {
+    public void texParameteri(TextureTarget target, GLContext.TextureParameter pName, TextureWrap p) {
         glTexParameteri(target.e, pName.e, p.e);
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texParameteri(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFilter)
+     * @see org.melchor629.engine.gl.GLContext#texParameteri(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFilter)
      */
     @Override
-    public void texParameteri(TextureTarget target, Renderer.TextureParameter pName, TextureFilter p) {
+    public void texParameteri(TextureTarget target, GLContext.TextureParameter pName, TextureFilter p) {
         glTexParameteri(target.e, pName.e, p.e);
     }
 
@@ -629,7 +552,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type)
+     * @see org.melchor629.engine.gl.GLContext#texImage1D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type)
      */
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -638,7 +561,7 @@ public class LWJGLRenderer implements Renderer {
     }
             
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, byte[])
+     * @see org.melchor629.engine.gl.GLContext#texImage1D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, byte[])
      */
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -649,7 +572,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, short[])
+     * @see org.melchor629.engine.gl.GLContext#texImage1D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, short[])
      */
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -660,7 +583,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, int[])
+     * @see org.melchor629.engine.gl.GLContext#texImage1D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, int[])
      */
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -671,7 +594,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, float[])
+     * @see org.melchor629.engine.gl.GLContext#texImage1D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, float[])
      */
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -682,7 +605,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage1D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, double[])
+     * @see org.melchor629.engine.gl.GLContext#texImage1D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, double[])
      */
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -718,7 +641,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type)
+     * @see org.melchor629.engine.gl.GLContext#texImage2D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type)
      */
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -727,7 +650,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, byte[])
+     * @see org.melchor629.engine.gl.GLContext#texImage2D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, byte[])
      */
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -738,7 +661,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, short[])
+     * @see org.melchor629.engine.gl.GLContext#texImage2D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, short[])
      */
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -749,7 +672,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, int[])
+     * @see org.melchor629.engine.gl.GLContext#texImage2D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, int[])
      */
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -760,7 +683,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, float[])
+     * @see org.melchor629.engine.gl.GLContext#texImage2D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, float[])
      */
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -771,7 +694,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#texImage2D(org.melchor629.engine.gl.Renderer.TextureTarget, int, org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int, org.melchor629.engine.gl.Renderer.TextureExternalFormat, org.melchor629.engine.gl.Renderer.type, double[])
+     * @see org.melchor629.engine.gl.GLContext#texImage2D(org.melchor629.engine.gl.GLContext.TextureTarget, int, org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int, org.melchor629.engine.gl.GLContext.TextureExternalFormat, org.melchor629.engine.gl.GLContext.type, double[])
      */
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
@@ -878,7 +801,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genFramebuffer()
+     * @see org.melchor629.engine.gl.GLContext#genFramebuffer()
      */
     @Override
     public int genFramebuffer() {
@@ -886,7 +809,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genFramebuffers(int[])
+     * @see org.melchor629.engine.gl.GLContext#genFramebuffers(int[])
      */
     @Override
     public void genFramebuffers(int[] fbs) {
@@ -896,7 +819,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteFramebuffer(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteFramebuffer(int)
      */
     @Override
     public void deleteFramebuffer(int fb) {
@@ -904,7 +827,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteFramebuffers(int[])
+     * @see org.melchor629.engine.gl.GLContext#deleteFramebuffers(int[])
      */
     @Override
     public void deleteFramebuffers(int[] fbs) {
@@ -914,7 +837,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genRenderbuffer()
+     * @see org.melchor629.engine.gl.GLContext#genRenderbuffer()
      */
     @Override
     public int genRenderbuffer() {
@@ -922,7 +845,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#genRenderbuffers(int[])
+     * @see org.melchor629.engine.gl.GLContext#genRenderbuffers(int[])
      */
     @Override
     public void genRenderbuffers(int[] fbs) {
@@ -932,7 +855,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteRenderbuffer(int)
+     * @see org.melchor629.engine.gl.GLContext#deleteRenderbuffer(int)
      */
     @Override
     public void deleteRenderbuffer(int rb) {
@@ -940,7 +863,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#deleteRendebuffers(int[])
+     * @see org.melchor629.engine.gl.GLContext#deleteRendebuffers(int[])
      */
     @Override
     public void deleteRendebuffers(int[] rbs) {
@@ -950,7 +873,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bindFramebuffer(int)
+     * @see org.melchor629.engine.gl.GLContext#bindFramebuffer(int)
      */
     @Override
     public void bindFramebuffer(int framebuffer) {
@@ -958,7 +881,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bindRenderbuffer(int)
+     * @see org.melchor629.engine.gl.GLContext#bindRenderbuffer(int)
      */
     @Override
     public void bindRenderbuffer(int framebuffer) {
@@ -966,29 +889,29 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#checkFramebufferStatus()
+     * @see org.melchor629.engine.gl.GLContext#checkFramebufferStatus()
      */
     @Override
-    public Renderer.FramebufferStatus checkFramebufferStatus() {
+    public GLContext.FramebufferStatus checkFramebufferStatus() {
         int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         switch(status) {
-            case GL_FRAMEBUFFER_COMPLETE: return Renderer.FramebufferStatus.COMPLETE;
-            case GL_FRAMEBUFFER_UNDEFINED: return Renderer.FramebufferStatus.UNDEFINED;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: return Renderer.FramebufferStatus.INCOMPLETE_ATTACHMENT;
+            case GL_FRAMEBUFFER_COMPLETE: return GLContext.FramebufferStatus.COMPLETE;
+            case GL_FRAMEBUFFER_UNDEFINED: return GLContext.FramebufferStatus.UNDEFINED;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: return GLContext.FramebufferStatus.INCOMPLETE_ATTACHMENT;
             case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                return Renderer.FramebufferStatus.INCOMPLETE_MISSING_ATTACHMENT;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: return Renderer.FramebufferStatus.INCOMPLETE_DRAW_BUFFER;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: return Renderer.FramebufferStatus.INCOMPLETE_READ_BUFFER;
-            case GL_FRAMEBUFFER_UNSUPPORTED: return Renderer.FramebufferStatus.UNSUPPORTED;
-            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: return Renderer.FramebufferStatus.INCOMPLETE_MULTISAMPLE;
+                return GLContext.FramebufferStatus.INCOMPLETE_MISSING_ATTACHMENT;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: return GLContext.FramebufferStatus.INCOMPLETE_DRAW_BUFFER;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: return GLContext.FramebufferStatus.INCOMPLETE_READ_BUFFER;
+            case GL_FRAMEBUFFER_UNSUPPORTED: return GLContext.FramebufferStatus.UNSUPPORTED;
+            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: return GLContext.FramebufferStatus.INCOMPLETE_MULTISAMPLE;
             case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-                return Renderer.FramebufferStatus.INCOMPLETE_LAYER_TARGETS;
-            default: return Renderer.FramebufferStatus.UNDEFINED;
+                return GLContext.FramebufferStatus.INCOMPLETE_LAYER_TARGETS;
+            default: return GLContext.FramebufferStatus.UNDEFINED;
         }
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#framebufferTexture1D(org.melchor629.engine.gl.Renderer.FramebufferAttachment, org.melchor629.engine.gl.Renderer.TextureTarget, int, int)
+     * @see org.melchor629.engine.gl.GLContext#framebufferTexture1D(org.melchor629.engine.gl.GLContext.FramebufferAttachment, org.melchor629.engine.gl.GLContext.TextureTarget, int, int)
      */
     @Override
     public void framebufferTexture1D(FramebufferAttachment at, TextureTarget tg, int tex, int level) {
@@ -996,7 +919,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#framebufferTexture2D(org.melchor629.engine.gl.Renderer.FramebufferAttachment, org.melchor629.engine.gl.Renderer.TextureTarget, int, int)
+     * @see org.melchor629.engine.gl.GLContext#framebufferTexture2D(org.melchor629.engine.gl.GLContext.FramebufferAttachment, org.melchor629.engine.gl.GLContext.TextureTarget, int, int)
      */
     @Override
     public void framebufferTexture2D(FramebufferAttachment at, TextureTarget tg, int tex, int level) {
@@ -1004,7 +927,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#framebufferTexture3D(org.melchor629.engine.gl.Renderer.FramebufferAttachment, org.melchor629.engine.gl.Renderer.TextureTarget, int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#framebufferTexture3D(org.melchor629.engine.gl.GLContext.FramebufferAttachment, org.melchor629.engine.gl.GLContext.TextureTarget, int, int, int)
      */
     @Override
     public void framebufferTexture3D(FramebufferAttachment at, TextureTarget tg, int tex,
@@ -1013,7 +936,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#framebufferRenderbuffer(org.melchor629.engine.gl.Renderer.FramebufferAttachment, int)
+     * @see org.melchor629.engine.gl.GLContext#framebufferRenderbuffer(org.melchor629.engine.gl.GLContext.FramebufferAttachment, int)
      */
     @Override
     public void framebufferRenderbuffer(FramebufferAttachment at, int rbo) {
@@ -1021,7 +944,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#renderbufferStorage(org.melchor629.engine.gl.Renderer.TextureFormat, int, int)
+     * @see org.melchor629.engine.gl.GLContext#renderbufferStorage(org.melchor629.engine.gl.GLContext.TextureFormat, int, int)
      */
     @Override
     public void renderbufferStorage(TextureFormat fmt, int width, int height) {
@@ -1029,7 +952,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#renderbufferStorageMultisample(org.melchor629.engine.gl.Renderer.TextureFormat, int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#renderbufferStorageMultisample(org.melchor629.engine.gl.GLContext.TextureFormat, int, int, int)
      */
     @Override
     public void renderbufferStorageMultisample(TextureFormat fmt, int samples, int w, int h) {
@@ -1037,7 +960,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#stencilFunc(org.melchor629.engine.gl.Renderer.StencilFunc, int, int)
+     * @see org.melchor629.engine.gl.GLContext#stencilFunc(org.melchor629.engine.gl.GLContext.StencilFunc, int, int)
      */
     @Override
     public void stencilFunc(StencilFunc func, int ref, int mask) {
@@ -1045,7 +968,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#stencilOp(org.melchor629.engine.gl.Renderer.StencilOp, org.melchor629.engine.gl.Renderer.StencilOp, org.melchor629.engine.gl.Renderer.StencilOp)
+     * @see org.melchor629.engine.gl.GLContext#stencilOp(org.melchor629.engine.gl.GLContext.StencilOp, org.melchor629.engine.gl.GLContext.StencilOp, org.melchor629.engine.gl.GLContext.StencilOp)
      */
     @Override
     public void stencilOp(StencilOp sfail, StencilOp dfail, StencilOp pass) {
@@ -1053,7 +976,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#stencilMask(int)
+     * @see org.melchor629.engine.gl.GLContext#stencilMask(int)
      */
     @Override
     public void stencilMask(int mask) {
@@ -1061,7 +984,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#depthMask(boolean)
+     * @see org.melchor629.engine.gl.GLContext#depthMask(boolean)
      */
     @Override
     public void depthMask(boolean a) {
@@ -1069,7 +992,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#clear(int)
+     * @see org.melchor629.engine.gl.GLContext#clear(int)
      */
     @Override
     public void clear(int mask) {
@@ -1077,7 +1000,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#clearColor(float, float, float, float)
+     * @see org.melchor629.engine.gl.GLContext#clearColor(float, float, float, float)
      */
     @Override
     public void clearColor(float r, float g, float b, float a) {
@@ -1085,7 +1008,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#viewport(int, int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#viewport(int, int, int, int)
      */
     @Override
     public void viewport(int x, int y, int width, int height) {
@@ -1093,7 +1016,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#colorMask(boolean, boolean, boolean, boolean)
+     * @see org.melchor629.engine.gl.GLContext#colorMask(boolean, boolean, boolean, boolean)
      */
     @Override
     public void colorMask(boolean r, boolean g, boolean b, boolean a) {
@@ -1101,7 +1024,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#cullFace(org.melchor629.engine.gl.Renderer.CullFaceMode)
+     * @see org.melchor629.engine.gl.GLContext#cullFace(org.melchor629.engine.gl.GLContext.CullFaceMode)
      */
     @Override
     public void cullFace(CullFaceMode mode) {
@@ -1136,7 +1059,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getBoolean(org.melchor629.engine.gl.Renderer.GLGet)
+     * @see org.melchor629.engine.gl.GLContext#getBoolean(org.melchor629.engine.gl.GLContext.GLGet)
      */
     @Override
     public boolean getBoolean(GLGet get) {
@@ -1144,7 +1067,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getInt(org.melchor629.engine.gl.Renderer.GLGet)
+     * @see org.melchor629.engine.gl.GLContext#getInt(org.melchor629.engine.gl.GLContext.GLGet)
      */
     @Override
     public int getInt(GLGet get) {
@@ -1152,7 +1075,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getLong(org.melchor629.engine.gl.Renderer.GLGet)
+     * @see org.melchor629.engine.gl.GLContext#getLong(org.melchor629.engine.gl.GLContext.GLGet)
      */
     @Override
     public long getLong(GLGet get) {
@@ -1160,7 +1083,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getFloat(org.melchor629.engine.gl.Renderer.GLGet)
+     * @see org.melchor629.engine.gl.GLContext#getFloat(org.melchor629.engine.gl.GLContext.GLGet)
      */
     @Override
     public float getFloat(GLGet get) {
@@ -1168,15 +1091,40 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getDouble(org.melchor629.engine.gl.Renderer.GLGet)
+     * @see org.melchor629.engine.gl.GLContext#getDouble(org.melchor629.engine.gl.GLContext.GLGet)
      */
     @Override
     public double getDouble(GLGet get) {
         return glGetDouble(get.e);
     }
 
+    @Override
+    public void readBuffer(CullFaceMode mode) {
+        glReadBuffer(mode == CullFaceMode.FRONT ? GL_FRONT : GL_BACK);
+    }
+
+    @Override
+    public void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ByteBuffer data) {
+        glReadPixels(x, y, width, height, fmt.e, type.e, data);
+    }
+
+    @Override
+    public void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ShortBuffer data) {
+        glReadPixels(x, y, width, height, fmt.e, type.e, data);
+    }
+
+    @Override
+    public void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, IntBuffer data) {
+        glReadPixels(x, y, width, height, fmt.e, type.e, data);
+    }
+
+    @Override
+    public void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, FloatBuffer data) {
+        glReadPixels(x, y, width, height, fmt.e, type.e, data);
+    }
+
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform2f(int, float, float)
+     * @see org.melchor629.engine.gl.GLContext#uniform2f(int, float, float)
      */
     @Override
     public void uniform2f(int loc, float v1, float v2) {
@@ -1184,7 +1132,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform2i(int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#uniform2i(int, int, int)
      */
     @Override
     public void uniform2i(int loc, int v1, int v2) {
@@ -1192,7 +1140,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform3f(int, float, float, float)
+     * @see org.melchor629.engine.gl.GLContext#uniform3f(int, float, float, float)
      */
     @Override
     public void uniform3f(int loc, float v1, float v2, float v3) {
@@ -1200,7 +1148,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform3i(int, int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#uniform3i(int, int, int, int)
      */
     @Override
     public void uniform3i(int loc, int v1, int v2, int v3) {
@@ -1208,7 +1156,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform4f(int, float, float, float, float)
+     * @see org.melchor629.engine.gl.GLContext#uniform4f(int, float, float, float, float)
      */
     @Override
     public void uniform4f(int loc, float v1, float v2, float v3, float v4) {
@@ -1216,7 +1164,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniform4i(int, int, int, int, int)
+     * @see org.melchor629.engine.gl.GLContext#uniform4i(int, int, int, int, int)
      */
     @Override
     public void uniform4i(int loc, int v1, int v2, int v3, int v4) {
@@ -1224,7 +1172,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniformMatrix2(int, boolean, float[])
+     * @see org.melchor629.engine.gl.GLContext#uniformMatrix2(int, boolean, float[])
      */
     @Override
     public void uniformMatrix2(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
@@ -1235,7 +1183,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniformMatrix3(int, boolean, float[])
+     * @see org.melchor629.engine.gl.GLContext#uniformMatrix3(int, boolean, float[])
      */
     @Override
     public void uniformMatrix3(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
@@ -1246,7 +1194,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#uniformMatrix4(int, boolean, float[])
+     * @see org.melchor629.engine.gl.GLContext#uniformMatrix4(int, boolean, float[])
      */
     @Override
     public void uniformMatrix4(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
@@ -1257,7 +1205,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getBufferParameteri(org.melchor629.engine.gl.Renderer.BufferTarget, org.melchor629.engine.gl.Renderer.GLGetBuffer)
+     * @see org.melchor629.engine.gl.GLContext#getBufferParameteri(org.melchor629.engine.gl.GLContext.BufferTarget, org.melchor629.engine.gl.GLContext.GLGetBuffer)
      */
     @Override
     public int getBufferParameteri(BufferTarget target, GLGetBuffer param) {
@@ -1266,7 +1214,7 @@ public class LWJGLRenderer implements Renderer {
     
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getBufferParameteri64(org.melchor629.engine.gl.Renderer.BufferTarget, org.melchor629.engine.gl.Renderer.GLGetBuffer)
+     * @see org.melchor629.engine.gl.GLContext#getBufferParameteri64(org.melchor629.engine.gl.GLContext.BufferTarget, org.melchor629.engine.gl.GLContext.GLGetBuffer)
      */
     @Override
     public long getBufferParameteri64(BufferTarget target, GLGetBuffer param) {
@@ -1274,7 +1222,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.ByteBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, java.nio.ByteBuffer, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
     @Override
     public void bufferData(BufferTarget target, ByteBuffer buff, BufferUsage usage) {
@@ -1282,7 +1230,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.ShortBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, java.nio.ShortBuffer, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
     @Override
     public void bufferData(BufferTarget target, ShortBuffer buff, BufferUsage usage) {
@@ -1290,7 +1238,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.IntBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, java.nio.IntBuffer, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
     @Override
     public void bufferData(BufferTarget target, IntBuffer buff, BufferUsage usage) {
@@ -1298,7 +1246,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.FloatBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, java.nio.FloatBuffer, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
     @Override
     public void bufferData(BufferTarget target, FloatBuffer buff, BufferUsage usage) {
@@ -1306,7 +1254,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, java.nio.DoubleBuffer, org.melchor629.engine.gl.Renderer.BufferUsage)
+     * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, java.nio.DoubleBuffer, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
     @Override
     public void bufferData(BufferTarget target, DoubleBuffer buff, BufferUsage usage) {
@@ -1314,7 +1262,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, byte[])
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, byte[])
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, byte[] buff) {
@@ -1322,7 +1270,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, short[])
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, short[])
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, short[] buff) {
@@ -1330,7 +1278,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, int[])
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, int[])
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, int[] buff) {
@@ -1338,7 +1286,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, float[])
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, float[])
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, float[] buff) {
@@ -1346,7 +1294,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, double[])
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, double[])
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, double[] buff) {
@@ -1354,7 +1302,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.ByteBuffer)
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, java.nio.ByteBuffer)
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, ByteBuffer buff) {
@@ -1362,7 +1310,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.ShortBuffer)
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, java.nio.ShortBuffer)
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, ShortBuffer buff) {
@@ -1370,7 +1318,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.IntBuffer)
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, java.nio.IntBuffer)
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, IntBuffer buff) {
@@ -1378,7 +1326,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.FloatBuffer)
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, java.nio.FloatBuffer)
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, FloatBuffer buff) {
@@ -1386,7 +1334,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferSubData(org.melchor629.engine.gl.Renderer.BufferTarget, long, java.nio.DoubleBuffer)
+     * @see org.melchor629.engine.gl.GLContext#bufferSubData(org.melchor629.engine.gl.GLContext.BufferTarget, long, java.nio.DoubleBuffer)
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, DoubleBuffer buff) {
@@ -1394,7 +1342,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#getError()
+     * @see org.melchor629.engine.gl.GLContext#getError()
      */
     @Override
     public Error getError() {
@@ -1431,7 +1379,7 @@ public class LWJGLRenderer implements Renderer {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.gl.Renderer#bufferData(org.melchor629.engine.gl.Renderer.BufferTarget, int, org.melchor629.engine.gl.Renderer.BufferUsage)
+     * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, int, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
     @Override
     public void bufferData(BufferTarget target, int count, BufferUsage usage) {

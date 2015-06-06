@@ -15,7 +15,7 @@ import java.nio.ShortBuffer;
  * functional.
  * @author melchor9000
  */
-public interface Renderer {
+public interface GLContext {
     /**
      * Enum for select a OpenGL Version for the context
      * @author melchor9000
@@ -637,43 +637,19 @@ public interface Renderer {
     int STENCIL_BUFFER_BIT = 0x400;
 
     /**
-     * Create a window with a context with OpenGL 3.2 (Core), an orthographic projection
-     * of type 1:1 and screen completly black.
-     * @param width Width of the window
-     * @param height Height of the window
-     * @param fullscreen Set if the window should be fullscreen
-     * @param title Title of the window
-     * @return True if a window is created or false otherwise
+     * Destroys the current context. Any OpenGL api won't
+     * work after that.
      */
-    boolean createDisplay(int width, int height, boolean fullscreen, String title);
+    void destroyContext();
 
     /**
-     * Create a window with an orthographic projection of type 1:1 and screen completly black.
-     * @param width Width of the window
-     * @param height Height of the window
-     * @param fullscreen Set if the window should be fullscreen
-     * @param title Title of the window
-     * @param version OpenGL version of the context
-     * @return True if a window is created or false otherwise
+     * Checks if the current context has an extension capability.
+     * If the extension name is invalid, the method will return
+     * false.
+     * @param name name of the extension
+     * @return true if has the extension
      */
-    boolean createDisplay(int width, int height, boolean fullscreen, String title, GLVersion version);
-
-    /**
-     * Sets if Vertical Synchronization is activated or not
-     * @param vsync whether set vsync or not
-     */
-    void setVsync(boolean vsync);
-
-    /**
-     * Makes the window resizable or not
-     * @param resizable whether to set the window resizable or not
-     */
-    void setResizable(boolean resizable);
-
-    /**
-     * Destroy the window and the context
-     */
-    void destroyDisplay();
+    boolean hasCapability(String name);
 
     /**
      * Enable a capability
@@ -701,7 +677,7 @@ public interface Renderer {
      * code and symbolic name. When an error occurs,
      * the error flag is set to the appropriate error
      * code value. All values returner by this method
-     * are in {@link Renderer.Error} enum.
+     * are in {@link GLContext.Error} enum.
      * @return the value of the error flag
      */
     Error getError();
@@ -883,15 +859,15 @@ public interface Renderer {
     long getLong(GLGet get);
     float getFloat(GLGet get);
     double getDouble(GLGet get);
+    void readBuffer(CullFaceMode mode);
+    void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ByteBuffer data);
+    void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ShortBuffer data);
+    void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, IntBuffer data);
+    void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, FloatBuffer data);
 
     /**
      * Function called at the end of the game loop
      * @param fps Frame per second of the game (maybe is util)
      */
     void _game_loop_sync(int fps);
-
-    /**
-     * @return If window is closing (for game loop)
-     */
-    boolean windowIsClosing();
 }

@@ -5,7 +5,7 @@ import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.LWJGLRenderer;
+import org.melchor629.engine.gl.LWJGLWindow;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.vec2;
 
@@ -25,7 +25,7 @@ public class LWJGLMouse extends Mouse {
     
     public LWJGLMouse() {
         super();
-        window = ((LWJGLRenderer) Game.gl).window;
+        window = ((LWJGLWindow) Game.window).window;
         
         glfwSetMouseButtonCallback(window, mbCbk = new GLFWMouseButtonCallback() {
             @Override

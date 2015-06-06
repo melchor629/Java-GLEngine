@@ -7,17 +7,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.sun.jna.Pointer;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.clib.STBLoader;
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLError;
-import org.melchor629.engine.gl.Renderer;
-import org.melchor629.engine.gl.Renderer.TextureExternalFormat;
-import org.melchor629.engine.gl.Renderer.TextureFilter;
-import org.melchor629.engine.gl.Renderer.TextureFormat;
-import org.melchor629.engine.gl.Renderer.TextureParameter;
-import org.melchor629.engine.gl.Renderer.TextureWrap;
+import org.melchor629.engine.gl.GLContext.TextureExternalFormat;
+import org.melchor629.engine.gl.GLContext.TextureFilter;
+import org.melchor629.engine.gl.GLContext.TextureFormat;
+import org.melchor629.engine.gl.GLContext.TextureParameter;
+import org.melchor629.engine.gl.GLContext.TextureWrap;
 import org.melchor629.engine.utils.IOUtils;
 
 /**
@@ -27,7 +26,7 @@ import org.melchor629.engine.utils.IOUtils;
  */
 public class Texture implements Erasable {
     protected int texture = -1;
-    protected Renderer.TextureTarget target;
+    protected GLContext.TextureTarget target;
     protected int dimensions;
 
     /**
@@ -39,15 +38,15 @@ public class Texture implements Erasable {
      * @param eformat External format of the texture (should be the same
      *                or similar from {@code format} parameter.
      */
-    public Texture(Renderer.TextureFormat format, int width, int height, Renderer.TextureExternalFormat eformat) {
+    public Texture(GLContext.TextureFormat format, int width, int height, GLContext.TextureExternalFormat eformat) {
         texture = gl.genTexture();
-        target = Renderer.TextureTarget.TEXTURE_2D;
+        target = GLContext.TextureTarget.TEXTURE_2D;
         dimensions = 2;
 
         gl.bindTexture(target, texture);
-        gl.texParameteri(target, Renderer.TextureParameter.MIN_FILTER, Renderer.TextureFilter.LINEAR);
-        gl.texParameteri(target, Renderer.TextureParameter.MAG_FILTER, Renderer.TextureFilter.LINEAR);
-        gl.texImage2D(target, 0, format, width, height, 0, eformat, Renderer.type.UNSIGNED_BYTE);
+        gl.texParameteri(target, GLContext.TextureParameter.MIN_FILTER, GLContext.TextureFilter.LINEAR);
+        gl.texParameteri(target, GLContext.TextureParameter.MAG_FILTER, GLContext.TextureFilter.LINEAR);
+        gl.texImage2D(target, 0, format, width, height, 0, eformat, GLContext.type.UNSIGNED_BYTE);
 
         Game.erasableList.add(this);
     }
@@ -56,7 +55,7 @@ public class Texture implements Erasable {
      * Constructor for the Texture.Builder
      */
     private Texture(File file, TextureFilter mag, TextureFilter min, TextureWrap wrap_s,
-            TextureWrap wrap_t, TextureFormat ifmt, TextureExternalFormat efmt, Renderer.TextureTarget target,
+            TextureWrap wrap_t, TextureFormat ifmt, TextureExternalFormat efmt, GLContext.TextureTarget target,
             boolean mipmap, int width, int height) throws IOException {
         texture = gl.genTexture();
         this.target = target;
@@ -83,7 +82,7 @@ public class Texture implements Erasable {
             efmt = data.components == 3 ? TextureExternalFormat.RGB : TextureExternalFormat.RGBA;
             buffer = data.data.getByteBuffer(0, width * height * data.components);
         }
-        gl.texImage2D(target, 0, ifmt, width, height, 0, efmt, Renderer.type.UNSIGNED_BYTE, buffer); //TODO Determinar 1D, 2D, 3D
+        gl.texImage2D(target, 0, ifmt, width, height, 0, efmt, GLContext.type.UNSIGNED_BYTE, buffer); //TODO Determinar 1D, 2D, 3D
 
         if(mipmap)
             gl.generateMipmap(target);
@@ -109,7 +108,7 @@ public class Texture implements Erasable {
         texture = -1;
     }
 
-    public Renderer.TextureTarget getTarget() {
+    public GLContext.TextureTarget getTarget() {
         return target;
     }
 
@@ -148,11 +147,11 @@ public class Texture implements Erasable {
     public static class builder {
         private File file;
         private InputStream imageStream;
-        private Renderer.TextureFilter mag, min;
-        private Renderer.TextureWrap wrap_s, wrap_t;
-        private Renderer.TextureFormat ifmt;
-        private Renderer.TextureExternalFormat efmt;
-        private Renderer.TextureTarget target;
+        private GLContext.TextureFilter mag, min;
+        private GLContext.TextureWrap wrap_s, wrap_t;
+        private GLContext.TextureFormat ifmt;
+        private GLContext.TextureExternalFormat efmt;
+        private GLContext.TextureTarget target;
         private boolean mipmap;
         private int width, height;
 
@@ -170,16 +169,16 @@ public class Texture implements Erasable {
         public builder() {
             this.file = null;
             this.imageStream = null;
-            this.mag = Renderer.TextureFilter.LINEAR;
-            this.min = Renderer.TextureFilter.LINEAR;
-            this.wrap_s = Renderer.TextureWrap.REPEAT;
-            this.wrap_t = Renderer.TextureWrap.REPEAT;
-            this.ifmt = Renderer.TextureFormat.RGBA;
-            this.efmt = Renderer.TextureExternalFormat.RGBA;
+            this.mag = GLContext.TextureFilter.LINEAR;
+            this.min = GLContext.TextureFilter.LINEAR;
+            this.wrap_s = GLContext.TextureWrap.REPEAT;
+            this.wrap_t = GLContext.TextureWrap.REPEAT;
+            this.ifmt = GLContext.TextureFormat.RGBA;
+            this.efmt = GLContext.TextureExternalFormat.RGBA;
             this.mipmap = false;
             this.width = -1000;
             this.height = -1000;
-            this.target = Renderer.TextureTarget.TEXTURE_2D;
+            this.target = GLContext.TextureTarget.TEXTURE_2D;
         }
 
         /**
@@ -216,7 +215,7 @@ public class Texture implements Erasable {
          * Sets the magnifier filter for the texture
          * @param mag the filter to set
          */
-        public builder setMag(Renderer.TextureFilter mag) {
+        public builder setMag(GLContext.TextureFilter mag) {
             this.mag = mag;
             return this;
         }
@@ -225,7 +224,7 @@ public class Texture implements Erasable {
          * Set the minifier filter for the texture
          * @param min the filter to set
          */
-        public builder setMin(Renderer.TextureFilter min) {
+        public builder setMin(GLContext.TextureFilter min) {
             this.min = min;
             return this;
         }
@@ -235,7 +234,7 @@ public class Texture implements Erasable {
          * right borders.
          * @param wrap_s the wrap method to set
          */
-        public builder setWrap_s(Renderer.TextureWrap wrap_s) {
+        public builder setWrap_s(GLContext.TextureWrap wrap_s) {
             this.wrap_s = wrap_s;
             return this;
         }
@@ -245,7 +244,7 @@ public class Texture implements Erasable {
          * bottom borders.
          * @param wrap_t the wrap method to set
          */
-        public builder setWrap_t(Renderer.TextureWrap wrap_t) {
+        public builder setWrap_t(GLContext.TextureWrap wrap_t) {
             this.wrap_t = wrap_t;
             return this;
         }
@@ -255,7 +254,7 @@ public class Texture implements Erasable {
          * @param wrap the wrap method to set
          * @return the builder
          */
-        public builder setWrap(Renderer.TextureWrap wrap) {
+        public builder setWrap(GLContext.TextureWrap wrap) {
             setWrap_s(wrap);
             return setWrap_t(wrap);
         }
@@ -264,7 +263,7 @@ public class Texture implements Erasable {
          * Set the format of the image internally.
          * @param ifmt the format to set
          */
-        public builder setIfmt(Renderer.TextureFormat ifmt) {
+        public builder setIfmt(GLContext.TextureFormat ifmt) {
             this.ifmt = ifmt;
             return this;
         }
@@ -274,7 +273,7 @@ public class Texture implements Erasable {
          * this function if you load a texture from disk.
          * @param efmt the format to set
          */
-        public builder setEfmt(Renderer.TextureExternalFormat efmt) {
+        public builder setEfmt(GLContext.TextureExternalFormat efmt) {
             this.efmt = efmt;
             return this;
         }
@@ -306,7 +305,7 @@ public class Texture implements Erasable {
             return this;
         }
 
-        public builder setTarget(Renderer.TextureTarget target) {
+        public builder setTarget(GLContext.TextureTarget target) {
             this.target = target;
             return this;
         }

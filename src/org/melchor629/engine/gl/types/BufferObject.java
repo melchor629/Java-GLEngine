@@ -5,8 +5,8 @@ import java.nio.IntBuffer;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLError;
-import org.melchor629.engine.gl.Renderer;
 
 /**
  * Class for manage all types of *BO (<i>Buffer Objects</i>) like VBO
@@ -16,8 +16,8 @@ import org.melchor629.engine.gl.Renderer;
  */
 public class BufferObject implements Erasable {
     protected int bo;
-    protected Renderer.BufferTarget target;
-    protected Renderer.BufferUsage usage;
+    protected GLContext.BufferTarget target;
+    protected GLContext.BufferUsage usage;
 
     /**
      * Create and bind a Buffer object of type {@code target}. Binding the
@@ -25,9 +25,9 @@ public class BufferObject implements Erasable {
      * @param target Type of the Buffer Object
      * @param usage Specifies the expected usage pattern of the data store, can be null (default STATIC_DRAW)
      */
-    public BufferObject(Renderer.BufferTarget target, Renderer.BufferUsage usage) {
+    public BufferObject(GLContext.BufferTarget target, GLContext.BufferUsage usage) {
         this.target = target;
-        this.usage = usage != null ? usage : Renderer.BufferUsage.STATIC_DRAW;
+        this.usage = usage != null ? usage : GLContext.BufferUsage.STATIC_DRAW;
         bo = Game.gl.genBuffer();
         Game.gl.bindBuffer(target, bo);
 
@@ -164,13 +164,13 @@ public class BufferObject implements Erasable {
      * @return the size of the buffer object, measured in bytes
      */
     public long getBufferSize() {
-        return Game.gl.getBufferParameteri64(target, Renderer.GLGetBuffer.BUFFER_SIZE);
+        return Game.gl.getBufferParameteri64(target, GLContext.GLGetBuffer.BUFFER_SIZE);
     }
 
     /**
      * @return Usage pattern of the data store of this buffer object.
      */
-    public Renderer.BufferUsage getBufferUsage() {
+    public GLContext.BufferUsage getBufferUsage() {
         return usage;
     }
 
