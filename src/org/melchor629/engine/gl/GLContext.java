@@ -1081,7 +1081,7 @@ public interface GLContext {
     void getLong(GLGet get, long[] v);
     void getFloat(GLGet get, float[] v);
     void getDouble(GLGet get, double[] v);
-    default long getInt64(GLGet get, long[] v) { getLong(get, v); }
+    default void getInt64(GLGet get, long[] v) { getLong(get, v); }
     void readBuffer(CullFaceMode mode);
     void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ByteBuffer data);
     void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ShortBuffer data);

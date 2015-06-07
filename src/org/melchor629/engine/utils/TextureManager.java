@@ -10,6 +10,7 @@ import java.util.ArrayList;
 /**
  * Manager for textures. It will load texture and save a its reference
  * for reuse.
+ * TODO Añadir que para cargar una textura use un json con la información requerida para cargarla
  */
 public class TextureManager {
     private ArrayList<TextureWrapper> textures;

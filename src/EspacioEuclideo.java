@@ -38,6 +38,7 @@ public class EspacioEuclideo {
     private static int glHEIGHT;
     private static Window window;
     private static boolean phosphorEffectEnabler = false;
+    private static Texture current;
 
     public static void main(String... args) {
         try {
@@ -95,7 +96,17 @@ public class EspacioEuclideo {
         ShaderProgram puntos_shader = new ShaderProgram(
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.fs.glsl")));
-        Texture euclides_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/euklid.png"))
+        Texture euclides_tex = current = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/euklid.png"))
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+        Texture aleks_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/aleks.png"))
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+        Texture falloutPipboy_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/fallout-pipboy.png"))
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+        Texture melchor_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/melchor.png"))
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+        Texture pato_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/pato.png"))
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+        Texture doge_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/doge.png"))
                 .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
 
         puntos_vao.bind();
@@ -179,6 +190,19 @@ public class EspacioEuclideo {
                     STBLoader.instance.stb_write_image("/Users/melchor9000/Desktop/mae.png", "png", d);
                 }, "Screenshot saver").start();
             }
+
+            if(self.getStringRepresentation(key).equals("1"))
+                current = euclides_tex;
+            if(self.getStringRepresentation(key).equals("2"))
+                current = falloutPipboy_tex;
+            if(self.getStringRepresentation(key).equals("3"))
+                current = pato_tex;
+            if(self.getStringRepresentation(key).equals("4"))
+                current = melchor_tex;
+            if(self.getStringRepresentation(key).equals("5"))
+                current = aleks_tex;
+            if(self.getStringRepresentation(key).equals("6"))
+                current = doge_tex;
         });
 
         window.showWindow();
@@ -197,7 +221,7 @@ public class EspacioEuclideo {
                 gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
                 puntos_shader.setUniformMatrix("view", camera.getViewMatrix());
                 gl.setActiveTexture(0);
-                euclides_tex.bind();
+                current.bind();
                 puntos_vao.bind();
                 gl.drawArraysInstanced(GLContext.DrawMode.TRIANGLES, 0, 6, cantidad);
                 puntos_vao.unbind();
