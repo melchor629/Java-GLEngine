@@ -1,7 +1,5 @@
 package org.melchor629.engine.utils;
 
-import com.sun.istack.internal.NotNull;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
@@ -149,7 +147,7 @@ public class BufferUtils {
      * @param buffer ByteBuffer with data
      * @param array Array to be filled
      */
-	public static void fillArray(@NotNull ByteBuffer buffer, @NotNull boolean[] array) {
+	public static void fillArray(ByteBuffer buffer, boolean[] array) {
         for(int i = 0; i < buffer.capacity(); i++)
             array[i] = buffer.get(i) != 0;
     }
