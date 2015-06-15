@@ -6,14 +6,14 @@ import java.nio.FloatBuffer;
  * Matrix 4x4 Class
  * @author melchor9000
  */
-public class mat4 {
+public class Matrix4 {
     /** Matrix as array of floats **/
     public float[][] matrix = new float[4][4];
     
     /**
      * Create a Identity Matrix 4x4
      */
-    public mat4() {
+    public Matrix4() {
         matrix[0][0] = 1;
         matrix[1][1] = 1;
         matrix[2][2] = 1;
@@ -24,7 +24,7 @@ public class mat4 {
      * Create a copy of the Matrix given
      * @param m Matrix to be copied
      */
-    public mat4(mat4 m) {
+    public Matrix4(Matrix4 m) {
         for(int i = 0; i < 4; i++)
             this.setColumn(i, m.getColumn(i));
     }
@@ -32,10 +32,7 @@ public class mat4 {
     /**
      * Create a matrix with the values given
      */
-    public mat4(float v00, float v01, float v02, float v03,
-                float v10, float v11, float v12, float v13,
-                float v20, float v21, float v22, float v23,
-                float v30, float v31, float v32, float v33) {
+    public Matrix4(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33) {
         matrix[0][0] = v00;
         matrix[0][1] = v01;
         matrix[0][2] = v02;
@@ -58,7 +55,7 @@ public class mat4 {
      * Create a matrix filled all with the value v
      * @param v Value
      */
-    public mat4(float v) {
+    public Matrix4(float v) {
         matrix[0][0] = v;
         matrix[0][1] = v;
         matrix[0][2] = v;
@@ -78,12 +75,12 @@ public class mat4 {
     }
 
     /**
-     * Get the row number {@code row} as {@link vec4}
+     * Get the row number {@code row} as {@link Vector4}
      * @param row Row
      * @return the row as vector
      */
-    public vec4 getRow(int row) {
-        vec4 v = new vec4();
+    public Vector4 getRow(int row) {
+        Vector4 v = new Vector4();
         v.x = matrix[row][0];
         v.y = matrix[row][1];
         v.z = matrix[row][2];
@@ -96,7 +93,7 @@ public class mat4 {
      * @param row Row to be changed
      * @param v The new row
      */
-    public void setRow(int row, vec4 v) {
+    public void setRow(int row, Vector4 v) {
         matrix[row][0] = v.x;
         matrix[row][1] = v.y;
         matrix[row][2] = v.z;
@@ -125,7 +122,7 @@ public class mat4 {
      * @param v Part of the new row
      * @param d Last value to be changed
      */
-    public void setRow(int row, vec3 v, float d) {
+    public void setRow(int row, Vector3 v, float d) {
         matrix[row][0] = v.x;
         matrix[row][1] = v.y;
         matrix[row][2] = v.z;
@@ -133,12 +130,12 @@ public class mat4 {
     }
 
     /**
-     * Obtains the column as a {@link vec4}
+     * Obtains the column as a {@link Vector4}
      * @param col Column
      * @return The column as vector
      */
-    public vec4 getColumn(int col) {
-        vec4 vec = new vec4();
+    public Vector4 getColumn(int col) {
+        Vector4 vec = new Vector4();
         vec.x = matrix[0][col];
         vec.y = matrix[1][col];
         vec.z = matrix[2][col];
@@ -151,7 +148,7 @@ public class mat4 {
      * @param col Column to be changed
      * @param vec The new column
      */
-    public void setColumn(int col, vec4 vec) {
+    public void setColumn(int col, Vector4 vec) {
         matrix[0][col] = vec.x;
         matrix[1][col] = vec.y;
         matrix[2][col] = vec.z;
@@ -180,7 +177,7 @@ public class mat4 {
      * @param vec Part of the new column
      * @param d Last value to be changed
      */
-    public void setColumn(int col, vec3 vec, float d) {
+    public void setColumn(int col, Vector3 vec, float d) {
         matrix[0][col] = vec.x;
         matrix[1][col] = vec.y;
         matrix[2][col] = vec.z;
@@ -211,7 +208,7 @@ public class mat4 {
      * Transposes the matrix
      */
     public void transpose() {
-        vec4 c0 = getColumn(0), c1 = getColumn(1), c2 = getColumn(2), c3 = getColumn(3);
+        Vector4 c0 = getColumn(0), c1 = getColumn(1), c2 = getColumn(2), c3 = getColumn(3);
         setRow(0, c0);
         setRow(1, c1);
         setRow(2, c2);
@@ -219,7 +216,7 @@ public class mat4 {
     }
 
     /**
-     * Computes the determinant of the matrix (shortcut of {@link GLM#determinant(mat4)})
+     * Computes the determinant of the matrix (shortcut of {@link GLM#determinant(Matrix4)})
      * @return the matrix determinant
      */
     public float determinant() {
@@ -250,7 +247,7 @@ public class mat4 {
         float SubFactor17 = matrix[1][0] * matrix[2][2] - matrix[2][0] * matrix[1][2];
         float SubFactor18 = matrix[1][0] * matrix[2][1] - matrix[2][0] * matrix[1][1];
 
-        mat4 Inv = new mat4();
+        Matrix4 Inv = new Matrix4();
         float[][] Inverse = Inv.matrix;
         Inverse[0][0] = + (matrix[1][1] * SubFactor00 - matrix[1][2] * SubFactor01 + matrix[1][3] * SubFactor02);
         Inverse[0][1] = - (matrix[1][0] * SubFactor00 - matrix[1][2] * SubFactor03 + matrix[1][3] * SubFactor04);
@@ -288,7 +285,7 @@ public class mat4 {
      * Sum that matrix with other
      * @param mat The other matrix
      */
-    public void add(mat4 mat) {
+    public void add(Matrix4 mat) {
         for(byte i = 0; i < 4; i++)
             this.setColumn(i, this.getColumn(i).add(mat.getColumn(i)));
     }
@@ -306,7 +303,7 @@ public class mat4 {
      * Substracts that matrix with other matrix
      * @param mat The other matrix
      */
-    public void substract(mat4 mat) {
+    public void substract(Matrix4 mat) {
         for(byte i = 0; i < 4; i++)
             this.setColumn(i, this.getColumn(i).substract(mat.getColumn(i)));
     }
@@ -333,11 +330,11 @@ public class mat4 {
      * Multiply that matrix with other matrix
      * @param mat The other matrix
      */
-    public void product(mat4 mat) {
-        vec4 SrcA0 = getColumn(0);
-        vec4 SrcA1 = getColumn(1);
-        vec4 SrcA2 = getColumn(2);
-        vec4 SrcA3 = getColumn(3);
+    public void product(Matrix4 mat) {
+        Vector4 SrcA0 = getColumn(0);
+        Vector4 SrcA1 = getColumn(1);
+        Vector4 SrcA2 = getColumn(2);
+        Vector4 SrcA3 = getColumn(3);
 
         float[] SrcB0 = mat.matrix[0];
         float[] SrcB1 = mat.matrix[1];
@@ -393,11 +390,11 @@ public class mat4 {
 
     /**
      * Clone that matrix. Is a shortcut of
-     * {@code new mat4(this); }
+     * {@code new Matrix4(this); }
      */
     @Override
-    public mat4 clone() {
-        return new mat4(this);
+    public Matrix4 clone() {
+        return new Matrix4(this);
     }
 
     /**

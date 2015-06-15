@@ -8,8 +8,8 @@ import org.melchor629.engine.input.Mouse.OnMouseClickEvent;
 import org.melchor629.engine.input.Mouse.OnMouseMoveEvent;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.GLM;
-import org.melchor629.engine.utils.math.mat4;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Matrix4;
+import org.melchor629.engine.utils.math.Vector3;
 
 /**
  * Simple Camera class
@@ -17,14 +17,14 @@ import org.melchor629.engine.utils.math.vec3;
  */
 //TODO add to OnResize Listener for projection to change
 public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEvent {
-    protected vec3 pos, dir, up;
-    protected vec3 rot;
-    protected vec3 speed;
+    protected Vector3 pos, dir, up;
+    protected Vector3 rot;
+    protected Vector3 speed;
     protected double aspect;
     protected double fov;
     protected double near, far;
     
-    private mat4 view, proj;
+    private Matrix4 view, proj;
     private boolean needsUpdateView = true, needsUpdateProj = true;
     private double mouseSensibility, movementMultiplier;
     
@@ -34,11 +34,11 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * 1 and far 10.
      */
     public Camera() {
-        pos = new vec3();
-        dir = new vec3(1, 0, 0);
-        up = new vec3(0, 0, 1);
-        rot = new vec3();
-        speed = new vec3();
+        pos = new Vector3();
+        dir = new Vector3(1, 0, 0);
+        up = new Vector3(0, 0, 1);
+        rot = new Vector3();
+        speed = new Vector3();
         fov = 45;
         near = 1;
         far = 10;
@@ -55,11 +55,11 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param pos Initial position
      * @param rot Initial rotation of pitch (x), yaw (y) and roll (z)
      */
-    public Camera(vec3 pos, vec3 rot) {
+    public Camera(Vector3 pos, Vector3 rot) {
         this.pos = pos;
         this.rot = rot;
-        up = new vec3(0, 0, 1);
-        speed = new vec3();
+        up = new Vector3(0, 0, 1);
+        speed = new Vector3();
         //Init direction
         dir.x = (float) (Math.cos(Math.toRadians(rot.x)) * Math.cos(Math.toRadians(rot.y)));
         dir.z = (float) (Math.sin(Math.toRadians(rot.y)));
@@ -82,14 +82,14 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param dir Direction to look at
      * @param up Where the head points at
      */
-    public Camera(vec3 pos, vec3 dir, vec3 up) {
+    public Camera(Vector3 pos, Vector3 dir, Vector3 up) {
         this.pos = pos;
         this.dir = dir;
-        this.up = up == null ? new vec3(0, 0, 1) : up;
-        speed = new vec3();
+        this.up = up == null ? new Vector3(0, 0, 1) : up;
+        speed = new Vector3();
         //Init rotation
         this.dir.normalize();
-        this.rot = new vec3();
+        this.rot = new Vector3();
         rot.y = (float) Math.toDegrees(Math.asin(this.dir.z));
         rot.x = (float) Math.toDegrees(Math.acos(this.dir.x / Math.cos(Math.toRadians(rot.y))));
         fov = 45;
@@ -124,7 +124,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     /**
      * @return the View Matrix with position, direction &amp; up vectors
      */
-    public mat4 getViewMatrix() {
+    public Matrix4 getViewMatrix() {
         if(needsUpdateView) {
             view = GLM.lookAt(pos, GLM.sum(pos, dir), up);
             needsUpdateView = false;
@@ -135,7 +135,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     /**
      * @return the Projection Matrix of the "lens camera"
      */
-    public mat4 getProjectionMatrix() {
+    public Matrix4 getProjectionMatrix() {
         if(needsUpdateProj) {
             proj = GLM.perspective(fov, aspect, near, far);
             needsUpdateProj = false;
@@ -204,14 +204,14 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * Sets the position of the camera
      * @param pos New position as vector
      */
-    public final void setPosition(vec3 pos) {
+    public final void setPosition(Vector3 pos) {
         setPosition(pos.x, pos.y, pos.z);
     }
 
     /**
      * @return the position of the camera
      */
-    public final vec3 getPosition() {
+    public final Vector3 getPosition() {
         return pos;
     }
 
@@ -220,7 +220,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * rotated over (X, Y, Z) axis.
      * @return the rotation of the camera
      */
-    public final vec3 getRotation() {
+    public final Vector3 getRotation() {
         return rot;
     }
 
@@ -242,7 +242,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * specifies the rotation on every axis
      * @param rot Rotation of the camera as vector
      */
-    public final void setRotation(vec3 rot) {
+    public final void setRotation(Vector3 rot) {
         setRotation(rot.x, rot.y, rot.z);
     }
 
@@ -250,7 +250,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * Gets the direction where the camera is looking at
      * @return direction
      */
-    public final vec3 getLookingAtDirection() {
+    public final Vector3 getLookingAtDirection() {
         return dir;
     }
 
@@ -259,8 +259,8 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * everyframe with the difference between the last frame with the current.
      * @return speed of the camera
      */
-    public final vec3 getSpeed() {
-        vec3 sp = new vec3(speed);
+    public final Vector3 getSpeed() {
+        Vector3 sp = new Vector3(speed);
         sp.product((float) (1f/Timing.getGameTiming().frameTime));
         return sp;
     }

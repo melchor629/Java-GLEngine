@@ -6,8 +6,8 @@ import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.gl.types.*;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.ModelMatrix;
-import org.melchor629.engine.utils.math.mat4;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Matrix4;
+import org.melchor629.engine.utils.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +25,9 @@ public final class TestingClass {
             + "in vec2 texcoord;\n" //Lo mismo que con color, pero con
             + "out vec2 Texcoord;\n"//Texcoords
             + "\n"
-            + "uniform mat4 model;\n"
-            + "uniform mat4 view;\n"
-            + "uniform mat4 proj;\n"
+            + "uniform Matrix4 model;\n"
+            + "uniform Matrix4 view;\n"
+            + "uniform Matrix4 proj;\n"
             + "uniform vec3 overrideColor;\n"
             + "\n"
             + "void main() {\n"
@@ -194,8 +194,8 @@ public final class TestingClass {
         shader.setUniform("kitten", 0);
         shader.setUniform("puppy", 1);
 
-        mat4 proj = perspective(45d, 1280d / 720d, 1d, 10d);
-        mat4 view = lookAt(new vec3(2.2f, 2.2f, 2.2f), new vec3(), new vec3(0, 0, 1));
+        Matrix4 proj = perspective(45d, 1280d / 720d, 1d, 10d);
+        Matrix4 view = lookAt(new Vector3(2.2f, 2.2f, 2.2f), new Vector3(), new Vector3(0, 0, 1));
         ModelMatrix model = new ModelMatrix();
         float time;
         int x = 0;

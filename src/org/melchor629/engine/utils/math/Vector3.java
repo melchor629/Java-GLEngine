@@ -6,14 +6,14 @@ import java.nio.FloatBuffer;
  * Vector 3 Class
  * @author melchor9000
  */
-public class vec3 {
+public class Vector3 {
     /** component of the vector **/
     public float x, y, z;
 
     /**
      * Create an empty vector (0, 0, 0)
      */
-    public vec3() { }
+    public Vector3() { }
 
     /**
      * Create a vector with values (a, b, c)
@@ -21,7 +21,7 @@ public class vec3 {
      * @param b Value for y
      * @param c Value for z
      */
-    public vec3(float a, float b, float c) {
+    public Vector3(float a, float b, float c) {
         x = a;
         y = b;
         z = c;
@@ -31,7 +31,7 @@ public class vec3 {
      * Create a copy of the vector
      * @param vec Vector to be copied
      */
-    public vec3(vec3 vec) {
+    public Vector3(Vector3 vec) {
         x = vec.x;
         y = vec.y;
         z = vec.z;
@@ -41,7 +41,7 @@ public class vec3 {
      * Create a copy of the vector (except w component)
      * @param obj Vector to be copied
      */
-    public vec3(vec4 obj) {
+    public Vector3(Vector4 obj) {
         x = obj.x;
         y = obj.y;
         z = obj.z;
@@ -70,7 +70,7 @@ public class vec3 {
         z += v;
     }
     
-    public void add(vec3 v) {
+    public void add(Vector3 v) {
         x += v.x;
         y += v.y;
         z += v.z;
@@ -80,7 +80,7 @@ public class vec3 {
         add(- v);
     }
 
-    public void substract(vec3 v) {
+    public void substract(Vector3 v) {
         x -= v.x;
         y -= v.y;
         z -= v.z;
@@ -98,7 +98,7 @@ public class vec3 {
         z /= v;
     }
 
-    public void cross(vec3 v) {
+    public void cross(Vector3 v) {
         x = y * v.z - v.y * z;
         y = v.x * z - x * v.z;
         z = x * v.y - y * v.x;
@@ -119,8 +119,8 @@ public class vec3 {
      * Clones this vector. Shortcut of {@code new vec3(this); }
      */
     @Override
-    public vec3 clone() {
-        return new vec3(this);
+    public Vector3 clone() {
+        return new Vector3(this);
     }
 
     /**
@@ -138,9 +138,9 @@ public class vec3 {
      */
     @Override
     public boolean equals(Object vec) {
-        if(!(vec instanceof vec3))
+        if(!(vec instanceof Vector3))
             return false;
-        vec3 v = (vec3) vec;
+        Vector3 v = (Vector3) vec;
         return this.x == v.x && this.y == v.y && this.z == v.z;
     }
 

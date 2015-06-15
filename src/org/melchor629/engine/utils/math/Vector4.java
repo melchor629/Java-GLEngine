@@ -6,26 +6,26 @@ import java.nio.FloatBuffer;
  * Vector 4 Class
  * @author melchor9000
  */
-public class vec4 {
+public class Vector4 {
     public float x, y, z, w;
 
-    public vec4() { }
+    public Vector4() { }
     
-    public vec4(float a, float b, float c, float d) {
+    public Vector4(float a, float b, float c, float d) {
         x = a;
         y = b;
         z = c;
         w = d;
     }
     
-    public vec4(vec4 vec) {
+    public Vector4(Vector4 vec) {
         x = vec.x;
         y = vec.y;
         z = vec.z;
         w = vec.w;
     }
 
-    public vec4(vec3 vec, float d) {
+    public Vector4(Vector3 vec, float d) {
         x = vec.x;
         y = vec.y;
         z = vec.z;
@@ -39,7 +39,7 @@ public class vec4 {
     /**
      * Normalizes this vector
      */
-    public vec4 normalize() {
+    public Vector4 normalize() {
         float modulo = length();
         x = x / modulo;
         y = y / modulo;
@@ -48,7 +48,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 add(float v) {
+    public Vector4 add(float v) {
         x += v;
         y += v;
         z += v;
@@ -56,7 +56,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 add(vec4 v) {
+    public Vector4 add(Vector4 v) {
         x += v.x;
         y += v.y;
         z += v.z;
@@ -64,7 +64,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 add(vec3 v, float d) {
+    public Vector4 add(Vector3 v, float d) {
         x += v.x;
         y += v.y;
         z += v.z;
@@ -72,7 +72,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 substract(float v) {
+    public Vector4 substract(float v) {
         x -= v;
         y -= v;
         z -= v;
@@ -80,7 +80,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 substract(vec4 v) {
+    public Vector4 substract(Vector4 v) {
         x -= v.x;
         y -= v.y;
         z -= v.z;
@@ -88,7 +88,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 substract(vec3 v, float d) {
+    public Vector4 substract(Vector3 v, float d) {
         x -= v.x;
         y -= v.y;
         z -= v.z;
@@ -96,7 +96,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 product(float v) {
+    public Vector4 product(float v) {
         x *= v;
         y *= v;
         z *= v;
@@ -104,7 +104,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 product(mat4 mat) {
+    public Vector4 product(Matrix4 mat) {
         x = GLM.dot(mat.getRow(0), this);
         y = GLM.dot(mat.getRow(1), this);
         z = GLM.dot(mat.getRow(2), this);
@@ -112,7 +112,7 @@ public class vec4 {
         return this;
     }
 
-    public vec4 divide(float v) {
+    public Vector4 divide(float v) {
         x /= v;
         y /= v;
         z /= v;
@@ -140,23 +140,23 @@ public class vec4 {
     }
 
     /**
-     * Clones this vector. Shortcut of {@code new vec4(this); }
+     * Clones this vector. Shortcut of {@code new Vector4(this); }
      */
     @Override
     public Object clone() {
-        return new vec4(this);
+        return new Vector4(this);
     }
 
     /**
      * Determine if this vector is equal to other. First try to see
-     * if the object is a instance of vec4, after that, try to determine
+     * if the object is a instance of Vector4, after that, try to determine
      * if all values are equal.
      */
     @Override
     public boolean equals(Object vec) {
-        if(!(vec instanceof vec4))
+        if(!(vec instanceof Vector4))
             return false;
-        vec4 v = (vec4) vec;
+        Vector4 v = (Vector4) vec;
         return this.x == v.x && this.y == v.y && this.z == v.z && this.w == v.w;
     }
 }

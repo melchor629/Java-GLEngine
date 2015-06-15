@@ -1,17 +1,17 @@
 package org.melchor629.engine.loaders.collada;
 
+import org.melchor629.engine.utils.math.Matrix4;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.melchor629.engine.utils.math.mat4;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Vector3;
 
 /**
  *
  * @author melchor9000
  */
 public class Node {
-    public vec3 location, scale;
-    public mat4 rotation;
+    public Vector3 location, scale;
+    public Matrix4 rotation;
     public String id, name, type;
     public Instance instance;
 
@@ -52,7 +52,7 @@ public class Node {
 
     private void location(Element loc) {
         String[] l = loc.getTextContent().split(" ");
-        location = new vec3();
+        location = new Vector3();
         location.x = Float.parseFloat(l[0]);
         location.y = Float.parseFloat(l[1]);
         location.z = Float.parseFloat(l[2]);
@@ -60,14 +60,14 @@ public class Node {
 
     private void scale(Element sca) {
         String[] s = sca.getTextContent().split(" ");
-        scale = new vec3();
+        scale = new Vector3();
         scale.x = Float.parseFloat(s[0]);
         scale.y = Float.parseFloat(s[1]);
         scale.z = Float.parseFloat(s[2]);
     }
 
     private void rotation(NodeList Lrot) {
-        rotation = new mat4();
+        rotation = new Matrix4();
         for(int i = 0; i < Lrot.getLength(); i++) {
             Element rot = (Element) Lrot.item(i);
             String[] r = rot.getTextContent().split(" ");

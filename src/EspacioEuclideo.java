@@ -15,7 +15,7 @@ import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.Timing;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Vector3;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -268,28 +268,28 @@ public class EspacioEuclideo {
 
     private static FloatBuffer generarEspacioEuclídeo() {
         FloatBuffer puntos = BufferUtils.createFloatBuffer(10000 * 3);
-        TreeSet<vec3> puntos_lista = new TreeSet<>((o1, o2) ->
+        TreeSet<Vector3> puntos_lista = new TreeSet<>((o1, o2) ->
                 Math.round((o2.length() - o1.length()) * 1000.f)
         );
 
         for(int i = 0; i < puntos.capacity() / 3; i++) {
-            vec3 punto = generarPunto((WIDTH + HEIGHT), WIDTH / 20.f, HEIGHT / 20.f);
+            Vector3 punto = generarPunto((WIDTH + HEIGHT), WIDTH / 20.f, HEIGHT / 20.f);
             while(!esVálido(punto) || !puntos_lista.add(punto))
                 punto = generarPunto((WIDTH + HEIGHT), WIDTH / 20.f, HEIGHT / 20.f);
         }
 
-        for(vec3 punto : puntos_lista) {
+        for(Vector3 punto : puntos_lista) {
             puntos.put(punto.x).put(punto.y).put(punto.z);
         }
 
         return (FloatBuffer) puntos.flip();
     }
 
-    private static boolean esVálido(vec3 punto) {
+    private static boolean esVálido(Vector3 punto) {
         return Math.abs(punto.x) > 10f && Math.abs(punto.y) > .5f && Math.abs(punto.z) > .5f;
     }
 
-    private static vec3 generarPunto(float max_x, float max_y, float max_z) {
-        return new vec3(rand.nextFloat() * max_x, rand.nextFloat() * max_y - max_y / 2f, rand.nextFloat() * max_z - max_z / 2f);
+    private static Vector3 generarPunto(float max_x, float max_y, float max_z) {
+        return new Vector3(rand.nextFloat() * max_x, rand.nextFloat() * max_y - max_y / 2f, rand.nextFloat() * max_z - max_z / 2f);
     }
 }

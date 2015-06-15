@@ -980,7 +980,7 @@ public interface GLContext {
     void uniformMatrix3(int loc, boolean trans, float[] matrix) throws BufferUnderflowException;
     //void uniformMatrix3(int loc, mat3 matrix); TODO
     void uniformMatrix4(int loc, boolean trans, float[] matrix) throws BufferUnderflowException;
-    //void uniformMatrix4(int loc, mat4 matrix); TODO
+    //void uniformMatrix4(int loc, Matrix4 matrix); TODO
 
     //Texturas
     void setActiveTexture(int i);

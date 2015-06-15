@@ -20,7 +20,7 @@ import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.ModelMatrix;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Vector3;
 
 import java.io.File;
 
@@ -74,7 +74,7 @@ public class AnotherTestingClass {
             sound.decode();
             sound_buffer = new Buffer(sound.getSampleData(), AL.Format.MONO16, sound.getSampleRate());
             sound_source = new Source(sound_buffer);
-            sound_source.setPosition(new vec3(7.5f, 0.f, 0.f));
+            sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
             sound.clear();
         } catch(Exception ignore) {
         }
@@ -116,7 +116,7 @@ public class AnotherTestingClass {
         sound_source.play();
 
         while(!window.windowShouldClose()) {
-            sound_source.setVelocity(new vec3(0, 0, 0));
+            sound_source.setVelocity(new Vector3(0, 0, 0));
             gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
             s.bind();
             s.setUniformMatrix("view", camera.getViewMatrix());
@@ -134,7 +134,7 @@ public class AnotherTestingClass {
             mouse.update(t.frameTime);
             camera.updateIfNeeded();
             Listener.setPosition(camera.getPosition());
-            Listener.setOrientation(camera.getLookingAtDirection(), new vec3(0, 0, 1));
+            Listener.setOrientation(camera.getLookingAtDirection(), new Vector3(0, 0, 1));
             Listener.setVelocity(camera.getSpeed());
             t.split("cpu");
             //System.out.printf("CPU: %.6f\tGPU: %.6f\n", t.getSplitTime("cpu"), t.getSplitTime("gpu"));

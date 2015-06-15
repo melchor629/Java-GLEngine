@@ -68,7 +68,7 @@ public class GLM {
      * @param v Vector
      * @return length of the vector
      */
-    public static float length(vec3 v) {
+    public static float length(Vector3 v) {
         return (float) Math.sqrt(dot(v, v));
     }
 
@@ -77,7 +77,7 @@ public class GLM {
      * @param v Vector
      * @return length of the vector
      */
-    public static float length(vec4 v) {
+    public static float length(Vector4 v) {
         return (float) Math.sqrt(dot(v, v));
     }
 
@@ -86,9 +86,9 @@ public class GLM {
      * @param vec Variable length of vectors
      * @return vector sum of all vectors
      */
-    public static vec3 sum(vec3... vec) {
-        vec3 w = new vec3();
-        for (vec3 aVec : vec) {
+    public static Vector3 sum(Vector3... vec) {
+        Vector3 w = new Vector3();
+        for (Vector3 aVec : vec) {
             w.x += aVec.x;
             w.y += aVec.y;
             w.z += aVec.z;
@@ -101,9 +101,9 @@ public class GLM {
      * @param vec Variable length of vectors
      * @return vector sum of all vectors
      */
-    public static vec4 sum(vec4... vec) {
-        vec4 w = new vec4();
-        for (vec4 aVec : vec) {
+    public static Vector4 sum(Vector4... vec) {
+        Vector4 w = new Vector4();
+        for (Vector4 aVec : vec) {
             w.x += aVec.x;
             w.y += aVec.y;
             w.z += aVec.z;
@@ -117,8 +117,8 @@ public class GLM {
      * @param v Variable length of vectors
      * @return vector substraction of all vectors
      */
-    public static vec3 sub(vec3 u, vec3 v) {
-        vec3 w = new vec3();
+    public static Vector3 sub(Vector3 u, Vector3 v) {
+        Vector3 w = new Vector3();
         w.x = u.x - v.x;
         w.y = u.y - v.y;
         w.z = u.z - v.z;
@@ -130,8 +130,8 @@ public class GLM {
      * @param v Variable length of vectors
      * @return vector substraction of all vectors
      */
-    public static vec4 sub(vec4 u, vec4 v) {
-        vec4 w = new vec4();
+    public static Vector4 sub(Vector4 u, Vector4 v) {
+        Vector4 w = new Vector4();
         w.x = u.x - v.x;
         w.y = u.y - v.y;
         w.z = u.z - v.z;
@@ -145,8 +145,8 @@ public class GLM {
      * @param vec Vector
      * @return vector multiplied by value
      */
-    public static vec3 product(float value, vec3 vec) {
-        vec3 v = vec.clone();
+    public static Vector3 product(float value, Vector3 vec) {
+        Vector3 v = vec.clone();
         v.x *= value;
         v.y *= value;
         v.z *= value;
@@ -159,8 +159,8 @@ public class GLM {
      * @param vec Vector
      * @return vector multiplied by value
      */
-    public static vec4 product(float value, vec4 vec) {
-        vec4 v = (vec4) vec.clone();
+    public static Vector4 product(float value, Vector4 vec) {
+        Vector4 v = (Vector4) vec.clone();
         v.x *= value;
         v.y *= value;
         v.z *= value;
@@ -174,7 +174,7 @@ public class GLM {
      * @param v Second vector
      * @return dot product
      */
-    public static float dot(vec3 u, vec3 v) {
+    public static float dot(Vector3 u, Vector3 v) {
         return u.x * v.x + u.y * v.y + u.z * v.z;
     }
 
@@ -184,7 +184,7 @@ public class GLM {
      * @param v Second vector
      * @return dot product
      */
-    public static float dot(vec4 u, vec4 v) {
+    public static float dot(Vector4 u, Vector4 v) {
         return u.x * v.x + u.y * v.y + u.z * v.z + u.w * v.w;
     }
 
@@ -194,8 +194,8 @@ public class GLM {
      * @param v Second vector
      * @return cross product
      */
-    public static vec3 cross(vec3 u, vec3 v) {
-        vec3 w = new vec3();
+    public static Vector3 cross(Vector3 u, Vector3 v) {
+        Vector3 w = new Vector3();
         w.x = u.y * v.z - v.y * u.z;
         w.y = v.x * u.z - u.x * v.z;
         w.z = u.x * v.y - u.y * v.x;
@@ -207,8 +207,8 @@ public class GLM {
      * @param v Vector to be normalized
      * @return normalized vector
      */
-    public static vec3 normalize(vec3 v) {
-        vec3 nrm = new vec3();
+    public static Vector3 normalize(Vector3 v) {
+        Vector3 nrm = new Vector3();
         float modulo = length(v);
         if(modulo == 0) return nrm; //No dividir entre 0
         nrm.x = v.x / modulo;
@@ -222,8 +222,8 @@ public class GLM {
      * @param v Vector to be normalized
      * @return normalized vector
      */
-    public static vec4 normalize(vec4 v) {
-        vec4 nrm = new vec4();
+    public static Vector4 normalize(Vector4 v) {
+        Vector4 nrm = new Vector4();
         float modulo = length(v);
         nrm.x = v.x / modulo;
         nrm.y = v.y / modulo;
@@ -237,8 +237,8 @@ public class GLM {
      * @param v Vector
      * @return Vector negated
      */
-    public static vec3 negate(vec3 v) {
-        vec3 vec = new vec3();
+    public static Vector3 negate(Vector3 v) {
+        Vector3 vec = new Vector3();
         vec.x = - v.x;
         vec.y = - v.y;
         vec.z = - v.z;
@@ -250,8 +250,8 @@ public class GLM {
      * @param v Vector
      * @return Vector negated
      */
-    public static vec4 negate(vec4 v) {
-        vec4 vec = new vec4();
+    public static Vector4 negate(Vector4 v) {
+        Vector4 vec = new Vector4();
         vec.x = - v.x;
         vec.y = - v.y;
         vec.z = - v.z;
@@ -265,7 +265,7 @@ public class GLM {
      * @param v Second vector
      * @return angle in degrees
      */
-    public static float angle(vec3 u, vec3 v) {
+    public static float angle(Vector3 u, Vector3 v) {
         float dot = dot(u, v);
         float uv = length(u) * length(v);
         return (float) Math.toDegrees(Math.acos(dot / uv));
@@ -277,7 +277,7 @@ public class GLM {
      * @param v Second vector
      * @return angle in degrees
      */
-    public static float angle(vec4 u, vec4 v) {
+    public static float angle(Vector4 u, Vector4 v) {
         float dot = dot(u, v);
         float uv = length(u) * length(v);
         return (float) Math.toDegrees(Math.acos(dot / uv));
@@ -292,8 +292,8 @@ public class GLM {
      * @param mat Matrix to transpose
      * @return Return a new matrix transpose of {@code mat}
      */
-    public static mat4 transpose(mat4 mat) {
-        mat4 met = new mat4(mat);
+    public static Matrix4 transpose(Matrix4 mat) {
+        Matrix4 met = new Matrix4(mat);
         met.setRow(0, mat.getColumn(0));
         met.setRow(1, mat.getColumn(1));
         met.setRow(2, mat.getColumn(2));
@@ -306,7 +306,7 @@ public class GLM {
      * @param m Matrix
      * @return Determinant of the matrix
      */
-    public static float determinant(mat4 m) {
+    public static float determinant(Matrix4 m) {
         float SubFactor00 = m.get(2, 2) * m.get(3, 3) - m.get(3, 2) * m.get(2, 3);
         float SubFactor01 = m.get(2, 1) * m.get(3, 3) - m.get(3, 1) * m.get(2, 3);
         float SubFactor02 = m.get(2, 1) * m.get(3, 2) - m.get(3, 1) * m.get(2, 2);
@@ -314,7 +314,7 @@ public class GLM {
         float SubFactor04 = m.get(2, 0) * m.get(3, 2) - m.get(3, 0) * m.get(2, 2);
         float SubFactor05 = m.get(2, 0) * m.get(3, 1) - m.get(3, 0) * m.get(2, 1);
 
-        vec4 DetCof = new vec4(
+        Vector4 DetCof = new Vector4(
             + (m.get(1, 1) * SubFactor00 - m.get(1, 2) * SubFactor01 + m.get(1, 3) * SubFactor02),
             - (m.get(1, 0) * SubFactor00 - m.get(1, 2) * SubFactor03 + m.get(1, 3) * SubFactor04),
             + (m.get(1, 0) * SubFactor01 - m.get(1, 1) * SubFactor03 + m.get(1, 3) * SubFactor05),
@@ -331,13 +331,13 @@ public class GLM {
      * @param trans Vertex indicating the translation
      * @return Translation Matrix
      */
-    public static mat4 translateMatrix(mat4 mat, vec3 trans) {
-        mat4 result = new mat4(mat);
-        vec4 a = mat.getRow(0), b = mat.getRow(1), c = mat.getRow(2), d = mat.getRow(3);
+    public static Matrix4 translateMatrix(Matrix4 mat, Vector3 trans) {
+        Matrix4 result = new Matrix4(mat);
+        Vector4 a = mat.getRow(0), b = mat.getRow(1), c = mat.getRow(2), d = mat.getRow(3);
         a.product(trans.x);
         b.product(trans.y);
         c.product(trans.z);
-        vec4 s = sum(a, b, c, d);
+        Vector4 s = sum(a, b, c, d);
         result.setRow(3, s);
         return result;
     }
@@ -348,40 +348,7 @@ public class GLM {
      * @param axis axis vector
      * @return matrix with rotation transformation
      */
-    public static mat4 rotateMatrix(mat4 matrix, float angle, vec3 axis) {
-        /*mat4 rotate = new mat4(0.f), result = new mat4();
-        final float c = (float) Math.cos(angle), s = (float) Math.sin(angle);
-        vec3 axis = normalize(rot);
-        vec3 temp = product(1.f - c, axis);
-        
-        rotate.set(0, 0, c + temp.x * axis.x);
-        rotate.set(0, 1, 0 + temp.x * axis.y + s * axis.z);
-        rotate.set(0, 2, 0 + temp.x * axis.z - s * axis.y);
-
-        rotate.set(1, 0, 0 + temp.y * axis.x - s * axis.z);
-        rotate.set(1, 1, c + temp.y * axis.y);
-        rotate.set(1, 2, 0 + temp.y * axis.z + s * axis.x);
-
-        rotate.set(2, 0, 0 + temp.z * axis.x + s * axis.y);
-        rotate.set(2, 1, 0 + temp.z * axis.y - s * axis.x);
-        rotate.set(2, 2, c + temp.z * axis.z);
-
-        vec4 v0 = new vec4(1, 0, 0, 0);
-        vec4 v1 = new vec4(0, 1, 0, 0);
-        vec4 v2 = new vec4(0, 0, 1, 0);
-        vec4 v3 = new vec4(0, 0, 0, 1);
-        result.setRow(0, 
-                sum(product(rotate.get(0, 0), v0), product(rotate.get(0, 1), v1), product(rotate.get(0, 2), v2))
-        );
-        result.setRow(1,
-                sum(product(rotate.get(1, 0), v0), product(rotate.get(1, 1), v1), product(rotate.get(1, 2), v2))
-        );
-        result.setRow(2,
-                sum(product(rotate.get(2, 0), v0), product(rotate.get(2, 1), v1), product(rotate.get(2, 2), v2))
-        );
-        result.setRow(3, v3);
-        
-        return result;*/
+    public static Matrix4 rotateMatrix(Matrix4 matrix, float angle, Vector3 axis) {
         float len = axis.length();
         float x = axis.x / len;
         float y = axis.y / len;
@@ -421,12 +388,8 @@ public class GLM {
      * @param scale vector
      * @return Scale matrix
      */
-    public static mat4 scaleMatrix(mat4 mat, vec3 scale) {
-        /*return new mat4(scale.x,    0   ,    0   , 0,
-                           0   , scale.y,    0   , 0,
-                           0   ,    0   , scale.z, 0,
-                           0   ,    0   ,    0   , 1);*/
-        mat4 result = new mat4(0);
+    public static Matrix4 scaleMatrix(Matrix4 mat, Vector3 scale) {
+        Matrix4 result = new Matrix4(0);
         result.setRow(0, mat.getRow(0).product(scale.x));
         result.setRow(1, mat.getRow(1).product(scale.y));
         result.setRow(2, mat.getRow(2).product(scale.z));
@@ -440,8 +403,8 @@ public class GLM {
      * @param vec Vector
      * @return resulting vector
      */
-    public static vec4 mul(mat4 mat, vec4 vec) {
-        vec4 ret = new vec4();
+    public static Vector4 mul(Matrix4 mat, Vector4 vec) {
+        Vector4 ret = new Vector4();
 
         ret.x = dot(mat.getRow(0), vec);
         ret.y = dot(mat.getRow(1), vec);
@@ -456,8 +419,8 @@ public class GLM {
      * @param b Matrix
      * @return = a * b
      */
-    public static mat4 mul(mat4 a, mat4 b) {
-        mat4 res = a.clone();
+    public static Matrix4 mul(Matrix4 a, Matrix4 b) {
+        Matrix4 res = a.clone();
         res.product(b);
         return res;
     }
@@ -467,8 +430,8 @@ public class GLM {
      * @param mat Matrix
      * @return new Matrix with the inverse of the first
      */
-    public static mat4 inverse(mat4 mat) {
-        mat4 r = mat.clone();
+    public static Matrix4 inverse(Matrix4 mat) {
+        Matrix4 r = mat.clone();
         r.inverse();
         return r;
     }
@@ -486,8 +449,8 @@ public class GLM {
      * @param zFar Max value of Z from Center to be represented
      * @return Matrix with the projection
      */
-    public static mat4 ortho(double left, double right, double bottom, double top, double zNear, double zFar) {
-        mat4 ortho = new mat4();
+    public static Matrix4 ortho(double left, double right, double bottom, double top, double zNear, double zFar) {
+        Matrix4 ortho = new Matrix4();
         
         ortho.set(0, 0, (float) (2f / (right - left)));
         ortho.set(1, 1, (float) (2f / (top - bottom)));
@@ -517,8 +480,8 @@ public class GLM {
      * @param zFar Max Z value for represent vertices
      * @return Matrix for the projection
      */
-    public static mat4 perspective(double fov, double aspect, double zNear, double zFar) {
-        mat4 perspective = new mat4(0);
+    public static Matrix4 perspective(double fov, double aspect, double zNear, double zFar) {
+        Matrix4 perspective = new Matrix4(0);
 
         if(aspect == 0 || zFar == zNear)
             throw new IllegalArgumentException("aspect cannot be 0 | zFar is equal zNear, both are not possible");
@@ -550,12 +513,12 @@ public class GLM {
      * @param up Vector pointing to some axis. Can be null
      * @return View matrix
      */
-    public static mat4 lookAt(vec3 eye, vec3 center, vec3 up) {
-        mat4 look = new mat4();
+    public static Matrix4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
+        Matrix4 look = new Matrix4();
 
-        vec3 f = normalize(sub(center, eye));
-        vec3 u = normalize(up != null ? up : new vec3(0, 0, 1));
-        vec3 s = normalize(cross(f, u));
+        Vector3 f = normalize(sub(center, eye));
+        Vector3 u = normalize(up != null ? up : new Vector3(0, 0, 1));
+        Vector3 s = normalize(cross(f, u));
         u = cross(s, f);
 
         look.setColumn(0, s, 0);
@@ -569,8 +532,8 @@ public class GLM {
         return look;
     }
 
-    public static mat4 frustum(double left, double right, double bottom, double top, double near, double far) {
-        mat4 mat = new mat4(0);
+    public static Matrix4 frustum(double left, double right, double bottom, double top, double near, double far) {
+        Matrix4 mat = new Matrix4(0);
         mat.set(0, 0, (float) ((2 * near) / (right - left)));
         mat.set(1, 1, (float) ((2 * near) / (top - bottom)));
         mat.set(2, 0, (float) ((right + left) / (right - left)));
@@ -589,17 +552,17 @@ public class GLM {
      * @param viewport TODO nose
      * @return unproject vector
      */
-    public static vec3 unProject(vec3 win, mat4 model, mat4 proj, vec4 viewport) {
-        mat4 Inverse = inverse(mul(proj, model));
-        vec4 tmp = new vec4(win, 1);
+    public static Vector3 unProject(Vector3 win, Matrix4 model, Matrix4 proj, Vector4 viewport) {
+        Matrix4 Inverse = inverse(mul(proj, model));
+        Vector4 tmp = new Vector4(win, 1);
 
         tmp.x = (tmp.x - viewport.x) / viewport.z;
         tmp.y = (tmp.y - viewport.y) / viewport.w;
-        tmp = sub(product(2, tmp), new vec4(1, 1, 1, 1));
+        tmp = sub(product(2, tmp), new Vector4(1, 1, 1, 1));
 
-        vec4 obj = mul(Inverse, tmp);
+        Vector4 obj = mul(Inverse, tmp);
         obj = product(1f / obj.w, obj);
-        return new vec3(obj);
+        return new Vector3(obj);
     }
 
     /**
@@ -608,13 +571,13 @@ public class GLM {
      * @param mat Matrix
      * @return a FloatBuffer filled with the matrix
      */
-    public static FloatBuffer matrixAsBuffer(mat4 mat) {
+    public static FloatBuffer matrixAsBuffer(Matrix4 mat) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         mat.fillBuffer(buffer);
         return buffer;
     }
 
-    public static float[] matrixAsArray(mat4 mat) {
+    public static float[] matrixAsArray(Matrix4 mat) {
         float[] array = new float[16];
         int i = 0;
         for(int x = 0; x < 4; x++)

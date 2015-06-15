@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFWScrollCallback;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLWindow;
 import org.melchor629.engine.utils.Timing;
-import org.melchor629.engine.utils.math.vec2;
+import org.melchor629.engine.utils.math.Vector2;
 
 import java.lang.reflect.Field;
 
@@ -43,7 +43,7 @@ public class LWJGLMouse extends Mouse {
         glfwSetCursorPosCallback(window, cpCbk = new GLFWCursorPosCallback() {
             @Override
             public void invoke(long window, double xpos, double ypos) {
-                vec2 oldPos = LWJGLMouse.this.pos;
+                Vector2 oldPos = LWJGLMouse.this.pos;
                 LWJGLMouse.this.dPos.x = (float) xpos - oldPos.x;
                 LWJGLMouse.this.dPos.y = oldPos.y - (float) ypos;
 
@@ -107,10 +107,10 @@ public class LWJGLMouse extends Mouse {
     }
 
     /* (non-Javadoc)
-     * @see org.melchor629.engine.input.Mouse#setCursorPosition(org.melchor629.engine.utils.math.vec2)
+     * @see org.melchor629.engine.input.Mouse#setCursorPosition(org.melchor629.engine.utils.math.Vector2)
      */
     @Override
-    public void setCursorPosition(vec2 position) {
+    public void setCursorPosition(Vector2 position) {
         setCursorPosition(position.x, position.y);
     }
 

@@ -61,8 +61,6 @@ bool _engine_flac_encoder(const char* file, PCMAttr* attr, ShortBuffer* buffer, 
                 for(size_t i = 0; i < need * attr->channels / 2; i++) {
                     //pcm[i] = (int)(((FLAC__int16)(FLAC__int8)buffer->data[2*i+1]<<8)|(FLAC__int16)buffer->data[2*i]);
                     //printf("%d\n", pcm[i]);
-                    //pcm[0][i] = (FLAC__int32) buffer->get(2*i);
-                    //pcm[1][i] = (FLAC__int32) buffer->get(2*i+1);
                     pcm[0][i] = (int)(((FLAC__int16)(FLAC__int8)buffer->data[4*i+1]<<8)|(FLAC__int16)buffer->data[4*i]);
                     pcm[1][i] = (int)(((FLAC__int16)(FLAC__int8)buffer->data[4*i+3]<<8)|(FLAC__int16)buffer->data[4*i+2]);
                 }

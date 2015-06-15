@@ -1,6 +1,6 @@
 package org.melchor629.engine.loaders.collada;
 
-import org.melchor629.engine.utils.math.vec4;
+import org.melchor629.engine.utils.math.Vector4;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList;
  * Describes a color or a texture for every parameter inside a Common Rendering Effect
  */
 public class CommonColorOrTextureType {
-    private vec4 color;
+    private Vector4 color;
     private Texture texture;
     private String sid;
 
@@ -27,7 +27,7 @@ public class CommonColorOrTextureType {
     /**
      * @return the color of this node
      */
-    public vec4 getColor() {
+    public Vector4 getColor() {
         return color;
     }
 
@@ -53,7 +53,7 @@ public class CommonColorOrTextureType {
                 g = Float.parseFloat(vector[1]),
                 b = Float.parseFloat(vector[2]),
                 a = Float.parseFloat(vector[3]);
-        color = new vec4(r, g, b, a);
+        color = new Vector4(r, g, b, a);
     }
 
     public class Texture {

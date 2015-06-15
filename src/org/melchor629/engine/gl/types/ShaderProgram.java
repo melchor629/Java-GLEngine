@@ -6,7 +6,7 @@ import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.math.GLM;
-import org.melchor629.engine.utils.math.mat4;
+import org.melchor629.engine.utils.math.Matrix4;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -306,7 +306,7 @@ public class ShaderProgram implements Erasable {
     }
 
     /**
-     * Sets the value for a vec4 uniform
+     * Sets the value for a Vector4 uniform
      * @param name Name of the uniform
      * @param v0 1st value to be set
      * @param v1 2nd value to be set
@@ -325,7 +325,7 @@ public class ShaderProgram implements Erasable {
      * @param name Name of the uniform
      * @param matrix Matrix with the values to be set
      */
-    public void setUniformMatrix(String name, mat4 matrix) {
+    public void setUniformMatrix(String name, Matrix4 matrix) {
         bind();
         if(uniforms.containsKey(name))
             gl.uniformMatrix4(uniforms.get(name), false, GLM.matrixAsArray(matrix));

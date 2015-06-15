@@ -4,7 +4,7 @@ import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.objects.PCMData;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Vector3;
 import org.melchor629.engine.utils.math.GLM;
 
 import static org.melchor629.engine.Game.al;
@@ -21,9 +21,9 @@ public class Source implements Erasable {
     protected boolean looping = false;
     protected float reference_distance = 1.0f, rolloff_factor = 1.0f, max_distance = Float.MAX_VALUE;
     protected float pitch = 1.0f;
-    protected vec3 direction;
+    protected Vector3 direction;
     protected float cone_inner_angle = 360.0f, cone_outer_angle = 360.0f, cone_outer_gain = 0.0f;
-    protected vec3 position, velocity;
+    protected Vector3 position, velocity;
     protected float gain;
     
     public float min_gain, max_gain;
@@ -32,8 +32,8 @@ public class Source implements Erasable {
         if(buffer0 == null || !buffer0.isComplete())
             throw new IllegalArgumentException("Cannot pass a null or incomplete buffer");
         buffer = buffer0;
-        position = new vec3();
-        velocity = new vec3();
+        position = new Vector3();
+        velocity = new Vector3();
         source = al.genSource();
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
 
@@ -45,21 +45,21 @@ public class Source implements Erasable {
         Game.erasableList.add(this);
     }
     
-    public void setPosition(vec3 pos) {
+    public void setPosition(Vector3 pos) {
         position = pos;
         al.source3f(source, AL.Source.POSITION, pos.x, pos.y, pos.z);
     }
     
-    public vec3 getPosition() {
+    public Vector3 getPosition() {
         return position;
     }
     
-    public void setVelocity(vec3 vel) {
+    public void setVelocity(Vector3 vel) {
         velocity = vel;
         al.source3f(source, AL.Source.VELOCITY, vel.x, vel.y, vel.z);
     }
     
-    public vec3 getVelocity() {
+    public Vector3 getVelocity() {
         return velocity;
     }
     
@@ -136,12 +136,12 @@ public class Source implements Erasable {
         return pitch;
     }
     
-    public void setDirection(vec3 dir) {
+    public void setDirection(Vector3 dir) {
         direction = dir;
         al.source3f(source, AL.Source.DIRECTION, dir.x, dir.y, dir.z);
     }
     
-    public vec3 getDirection() {
+    public Vector3 getDirection() {
         return direction;
     }
     

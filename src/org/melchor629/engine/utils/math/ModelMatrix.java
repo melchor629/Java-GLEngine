@@ -9,17 +9,17 @@ package org.melchor629.engine.utils.math;
  * @author melchor9000
  */
 public class ModelMatrix {
-    protected vec3 loc, rot, scale;
-    protected mat4 matrix;
+    protected Vector3 loc, rot, scale;
+    protected Matrix4 matrix;
     
     /**
      * Creates a model matrix
      */
     public ModelMatrix() {
-        loc = new vec3(0, 0, 0);
-        rot = new vec3(0, 0, 0);
-        scale = new vec3(1, 1, 1);
-        matrix = new mat4();
+        loc = new Vector3(0, 0, 0);
+        rot = new Vector3(0, 0, 0);
+        scale = new Vector3(1, 1, 1);
+        matrix = new Matrix4();
     }
     
     /**
@@ -44,7 +44,7 @@ public class ModelMatrix {
      * @param loc new location
      * @return Itself, for chaining methods
      */
-    public ModelMatrix setLocation(vec3 loc) {
+    public ModelMatrix setLocation(Vector3 loc) {
         this.loc = loc;
         calculateMatrix();
         return this;
@@ -72,7 +72,7 @@ public class ModelMatrix {
      * @param v Amount of units to translate
      * @return Itself, for chaining methods
      */
-    public ModelMatrix translate(vec3 v) {
+    public ModelMatrix translate(Vector3 v) {
         return this.translate(v.x, v.y, v.z);
     }
     
@@ -130,7 +130,7 @@ public class ModelMatrix {
      * @param angle Amount of degrees to rotate
      * @return Itself, for chaining methods
      */
-    public ModelMatrix rotate(vec3 v, float angle) {
+    public ModelMatrix rotate(Vector3 v, float angle) {
         return this.rotate(angle, v.x, v.y, v.z);
     }
 
@@ -142,7 +142,7 @@ public class ModelMatrix {
      * @param v Axis and angle for the rotation
      * @return Itself, for chaining methods
      */
-    public ModelMatrix rotate(vec4 v) {
+    public ModelMatrix rotate(Vector4 v) {
         return this.rotate(v.w, v.x, v.y, v.z);
     }
     
@@ -170,7 +170,7 @@ public class ModelMatrix {
      * @param scale Amount of scale factor as a vector
      * @return Itself, for chaining methods
      */
-    public ModelMatrix setScale(vec3 scale) {
+    public ModelMatrix setScale(Vector3 scale) {
         this.scale = scale;
         calculateMatrix();
         return this;
@@ -203,7 +203,7 @@ public class ModelMatrix {
      * @param v Amount of units to scale
      * @return Itself, for chaining methods
      */
-    public ModelMatrix scale(vec3 v) {
+    public ModelMatrix scale(Vector3 v) {
         return this.scale(v.x, v.y, v.z);
     }
     
@@ -228,7 +228,7 @@ public class ModelMatrix {
      * Rotation and Scale set
      * @return Model Matrix
      */
-    public mat4 getModelMatrix() {
+    public Matrix4 getModelMatrix() {
         return matrix;
     }
     
@@ -239,22 +239,22 @@ public class ModelMatrix {
         matrix.product(scaleMatrix());
     }
     
-    private mat4 translationMatrix() {
-        mat4 trans = new mat4();
+    private Matrix4 translationMatrix() {
+        Matrix4 trans = new Matrix4();
         trans = GLM.translateMatrix(trans, loc);
         return trans;
     }
     
-    private mat4 rotationMatrix() {
-        mat4 rot = new mat4();
-        GLM.rotateMatrix(rot, this.rot.x, new vec3(1, 0, 0));
-        GLM.rotateMatrix(rot, this.rot.y, new vec3(0, 1, 0));
-        GLM.rotateMatrix(rot, this.rot.z, new vec3(0, 0, 1));
+    private Matrix4 rotationMatrix() {
+        Matrix4 rot = new Matrix4();
+        GLM.rotateMatrix(rot, this.rot.x, new Vector3(1, 0, 0));
+        GLM.rotateMatrix(rot, this.rot.y, new Vector3(0, 1, 0));
+        GLM.rotateMatrix(rot, this.rot.z, new Vector3(0, 0, 1));
         return rot;
     }
     
-    private mat4 scaleMatrix() {
-        mat4 scale = new mat4();
+    private Matrix4 scaleMatrix() {
+        Matrix4 scale = new Matrix4();
         scale = GLM.scaleMatrix(scale, this.scale);
         return scale;
     }

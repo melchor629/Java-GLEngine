@@ -7,7 +7,7 @@ import org.melchor629.engine.loaders.collada.Effect;
 import org.melchor629.engine.loaders.collada.Phong;
 import org.melchor629.engine.utils.ShaderManager;
 import org.melchor629.engine.utils.math.ModelMatrix;
-import org.melchor629.engine.utils.math.vec4;
+import org.melchor629.engine.utils.math.Vector4;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
  */
 public class Material {
     private String id, name;
-    private vec4 emission, ambient, diffuse, specular, reflective;
+    private Vector4 emission, ambient, diffuse, specular, reflective;
     private Texture emissionTex, ambientTex, diffuseTex, specularTex, reflectiveTex;
     private static ShaderProgram phongShader;
     private final static List<Material> materialList;
@@ -63,7 +63,7 @@ public class Material {
     private Material() {
         id = "";
         name = "Default Material";
-        diffuse = new vec4(1, 1, 1, 1);
+        diffuse = new Vector4(1, 1, 1, 1);
     }
 
     public void enableShaderAttributes(Model model) {

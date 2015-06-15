@@ -2,7 +2,7 @@ package org.melchor629.engine.al.types;
 
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.utils.math.GLM;
-import org.melchor629.engine.utils.math.vec3;
+import org.melchor629.engine.utils.math.Vector3;
 
 import static org.melchor629.engine.Game.al;
 
@@ -45,7 +45,7 @@ public class Listener {
      * Sets the position of the listener as a vec3
      * @param vec vector indicating the position
      */
-    public static void setPosition(vec3 vec) {
+    public static void setPosition(Vector3 vec) {
         setPosition(vec.x, vec.y, vec.z);
     }
     
@@ -75,10 +75,10 @@ public class Listener {
 
     /**
      * Sets the velocity of the listener (perfect for Doppler effect)
-     * with a {@link org.melchor629.engine.utils.math.vec3 vec3}.
+     * with a {@link Vector3 vec3}.
      * @param vec Velocity as vector
      */
-    public static void setVelocity(vec3 vec) {
+    public static void setVelocity(Vector3 vec) {
         setVelocity(vec.x, vec.y, vec.z);
     }
 
@@ -104,7 +104,7 @@ public class Listener {
         al.listener(AL.Listener.ORIENTATION, new int[] {atx, aty, atz, upx, upy, upz});
     }
 
-    public static void setOrientation(vec3 at, vec3 up) {
+    public static void setOrientation(Vector3 at, Vector3 up) {
         setOrientation(at.x, at.y, at.z, up.x, up.y, up.z);
     }
 
@@ -116,7 +116,7 @@ public class Listener {
      * @param rot Vector with the rotation of the camera/listener
      * @param up Up vector
      */
-    public static void calculateAndSetOrientation(vec3 rot, vec3 up) {
+    public static void calculateAndSetOrientation(Vector3 rot, Vector3 up) {
         //TODO Comrpobar si está mal (?)
         float x = (float) GLM.sin(-rot.x - 90.d);
         float y = (float) GLM.sin(-rot.y - 90.d);

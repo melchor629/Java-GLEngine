@@ -4,12 +4,12 @@ package org.melchor629.engine.utils.math;
  * Vector 2 Class
  * @author melchor9000
  */
-public class vec2 {
+public class Vector2 {
     public float x, y;
 
-    public vec2() {}
+    public Vector2() {}
     
-    public vec2(float x, float y) {
+    public Vector2(float x, float y) {
         this.x = x;
         this.y = y;
     }

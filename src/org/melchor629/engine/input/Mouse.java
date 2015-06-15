@@ -1,7 +1,7 @@
 package org.melchor629.engine.input;
 
 import org.melchor629.engine.Game;
-import org.melchor629.engine.utils.math.vec2;
+import org.melchor629.engine.utils.math.Vector2;
 
 import java.util.ArrayList;
 
@@ -26,20 +26,20 @@ public abstract class Mouse {
     /**
      * Position of the mouse
      */
-    protected vec2 pos;
+    protected Vector2 pos;
     
     /**
      * Derivative of the position with respect to time, 
      * in other words, the difference between the last position
      * and the current.
      */
-    protected vec2 dPos;
+    protected Vector2 dPos;
     
     /**
      * The speed of the wheel. Some mouses has Y wheel, an example,
      * Apple Magic Mouse.
      */
-    protected vec2 wheel;
+    protected Vector2 wheel;
 
     /**
      * An array with listeners
@@ -63,9 +63,9 @@ public abstract class Mouse {
         listeners2 = new ArrayList<>();
         listeners3 = new ArrayList<>();
         sensibility = 1.f;
-        pos = new vec2();
-        dPos = new vec2();
-        wheel = new vec2();
+        pos = new Vector2();
+        dPos = new Vector2();
+        wheel = new Vector2();
     }
     
     /**
@@ -145,7 +145,7 @@ public abstract class Mouse {
     /**
      * @return the mouse position
      */
-    public final vec2 getMousePosition() {
+    public final Vector2 getMousePosition() {
         return pos;
     }
     
@@ -155,7 +155,7 @@ public abstract class Mouse {
      * the last position and the new between frames
      * @return the mouse speed
      */
-    public final vec2 getMouseSpeed() {
+    public final Vector2 getMouseSpeed() {
         return dPos;
     }
     
@@ -164,7 +164,7 @@ public abstract class Mouse {
      * that have two axis wheels. One example is Apple Magic Mouse.
      * @return the wheel offset or speed
      */
-    public final vec2 getWheelSpeed() {
+    public final Vector2 getWheelSpeed() {
         return wheel;
     }
     
@@ -221,7 +221,7 @@ public abstract class Mouse {
      * this method may not be effective.
      * @param position Position relative to the window
      */
-    public abstract void setCursorPosition(vec2 position);
+    public abstract void setCursorPosition(Vector2 position);
     
     /**
      * Use this method when you will not use anymore the mouse
