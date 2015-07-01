@@ -15,7 +15,6 @@ void stb_load_image(const char* file_path, image_data_t* info) {
 
 void stb_clear_image(image_data_t* info) {
     stbi_image_free(info->data);
-    free(info);
 }
 
 void stb_write_image(const char* file_path, const char* fmt, image_data_t* info) {

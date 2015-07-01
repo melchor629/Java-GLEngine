@@ -77,10 +77,11 @@ public class EspacioEuclideo {
 
         VAO puntos_vao = new VAO();
         BufferObject plano_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        BufferObject puntos_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        BufferObject puntos_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STREAM_DRAW);
 
-        FloatBuffer puntos = generarEspacioEuclídeo();
-        int cantidad = puntos.capacity() / 3;
+        TreeSet<Vector3> puntos = generarEspacioEuclídeo();
+        FloatBuffer puntos_buff = BufferUtils.createFloatBuffer(puntos.size() * 3);
+        listaABuffer(puntos, (FloatBuffer) puntos_buff.flip());
         plano_vbo.fillBuffer(new float[] {
                 0,  1, -1, 0, 0,
                 0, -1, -1, 1, 0,
@@ -90,8 +91,8 @@ public class EspacioEuclideo {
                 0,  1, -1, 0, 0,
                 0, -1,  1, 1, 1,
         });
-        puntos_vbo.fillBuffer(puntos);
-        puntos.clear();
+        puntos_vbo.fillBuffer(puntos_buff);
+        //puntos.clear();
 
         ShaderProgram puntos_shader = new ShaderProgram(
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
@@ -216,6 +217,9 @@ public class EspacioEuclideo {
             puntos_shader.bind();
             puntos_shader.setUniform("opacity", opacity);
 
+            int cantidad = obtenerVisibles(puntos_buff, camera, puntos);
+            puntos_vbo.fillBuffer(puntos_buff);
+
             if(phosphorEffectEnabler)
             sceneFB.bind();
                 gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
@@ -266,7 +270,7 @@ public class EspacioEuclideo {
         Game.erasableList.forEach(Erasable::delete);
     }
 
-    private static FloatBuffer generarEspacioEuclídeo() {
+    private static TreeSet<Vector3> generarEspacioEuclídeo() {
         FloatBuffer puntos = BufferUtils.createFloatBuffer(10000 * 3);
         TreeSet<Vector3> puntos_lista = new TreeSet<>((o1, o2) ->
                 Math.round((o2.length() - o1.length()) * 1000.f)
@@ -278,11 +282,7 @@ public class EspacioEuclideo {
                 punto = generarPunto((WIDTH + HEIGHT), WIDTH / 20.f, HEIGHT / 20.f);
         }
 
-        for(Vector3 punto : puntos_lista) {
-            puntos.put(punto.x).put(punto.y).put(punto.z);
-        }
-
-        return (FloatBuffer) puntos.flip();
+        return puntos_lista;
     }
 
     private static boolean esVálido(Vector3 punto) {
@@ -291,5 +291,24 @@ public class EspacioEuclideo {
 
     private static Vector3 generarPunto(float max_x, float max_y, float max_z) {
         return new Vector3(rand.nextFloat() * max_x, rand.nextFloat() * max_y - max_y / 2f, rand.nextFloat() * max_z - max_z / 2f);
+    }
+
+    private static int obtenerVisibles(FloatBuffer puntos_buff, Camera cam, TreeSet<Vector3> puntos) {
+        int cantidad = 0;
+        puntos_buff.flip().clear();
+        puntos.stream().filter((vec) -> {
+            float x = vec.x - cam.getPosition().x, y = vec.y - cam.getPosition().y, z = vec.z - cam.getPosition().z;
+            return Math.sqrt(x*x + y*y + z*z) <= 100.0 && z > 0;
+        }).forEach((vec) -> puntos_buff.put(vec.x).put(vec.y).put(vec.z));
+        puntos_buff.flip();
+        return cantidad;
+    }
+
+    private static void listaABuffer(TreeSet<Vector3> puntos, FloatBuffer buff) {
+        buff.flip().clear();
+        for(Vector3 punto : puntos) {
+            buff.put(punto.x).put(punto.y).put(punto.z);
+        }
+        buff.flip();
     }
 }

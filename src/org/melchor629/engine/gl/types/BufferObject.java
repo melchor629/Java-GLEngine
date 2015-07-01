@@ -159,6 +159,9 @@ public class BufferObject implements Erasable {
         Game.gl.bufferSubData(target, offset, buff);
     }
 
+    // http://onrendering.blogspot.com.es/2011/10/buffer-object-streaming-in-opengl.html
+    public void clearData()
+
     /**
      * Ask GPU to tell the size of this buffer object
      * @return the size of the buffer object, measured in bytes
