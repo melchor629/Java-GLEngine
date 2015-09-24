@@ -9,7 +9,6 @@ import java.io.InputStream;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.clib.STBLoader;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.GLContext.TextureExternalFormat;
@@ -18,6 +17,7 @@ import org.melchor629.engine.gl.GLContext.TextureFormat;
 import org.melchor629.engine.gl.GLContext.TextureParameter;
 import org.melchor629.engine.gl.GLContext.TextureWrap;
 import org.melchor629.engine.utils.IOUtils;
+import org.melchor629.engine.utils.ImageIO;
 
 /**
  * Class for manage textures. Create textures from files, or from
@@ -67,7 +67,7 @@ public class Texture implements Erasable {
         gl.texParameteri(target, TextureParameter.WRAP_T, wrap_t);
         
         java.nio.ByteBuffer buffer = null;
-        STBLoader.ImageData data = null;
+        ImageIO.ImageData data = null;
         //byte[] buffer = null;
         if(file != null) {
             //IOUtils.Image image = IOUtils.readImage(file);
@@ -75,18 +75,17 @@ public class Texture implements Erasable {
             //height = image.height;
             //efmt = image.alpha ? TextureExternalFormat.RGBA : TextureExternalFormat.RGB;
             //buffer = image.buffer;
-            data = new STBLoader.ImageData();
-            STBLoader.instance.stb_load_image(file.getAbsolutePath(), data);
+            data = ImageIO.loadImage(file);
             width = data.width;
             height = data.height;
             efmt = data.components == 3 ? TextureExternalFormat.RGB : TextureExternalFormat.RGBA;
-            buffer = data.data.getByteBuffer(0, width * height * data.components);
+            buffer = data.data;
         }
         gl.texImage2D(target, 0, ifmt, width, height, 0, efmt, GLContext.type.UNSIGNED_BYTE, buffer); //TODO Determinar 1D, 2D, 3D
 
         if(mipmap)
             gl.generateMipmap(target);
-        STBLoader.instance.stb_clear_image(data);
+        data.clear.apply(data);
         buffer.clear();
         gl.bindTexture(target, 0);
 

@@ -1,5 +1,6 @@
 package org.melchor629.engine.gl;
 
+import org.lwjgl.LWJGLUtil;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.BufferUtils;
 
@@ -25,23 +26,21 @@ import static org.lwjgl.opengl.GL33.*;
  * @author melchor9000
  */
 public class LWJGLGLContext implements GLContext {
-    private org.lwjgl.opengl.GLContext context;
+    //private org.lwjgl.opengl.GLContext context;
+    private org.lwjgl.opengl.GLCapabilities context;
 
-    public LWJGLGLContext() {
-        context = org.lwjgl.opengl.GLContext.createFromCurrent();
-        context.setupDebugMessageCallback();
+    LWJGLGLContext(boolean core) {
+        context = org.lwjgl.opengl.GL.createCapabilities(core && LWJGLUtil.getPlatform() == LWJGLUtil.Platform.MACOSX);
     }
 
     @Override
-    public void destroyContext() {
-        context.destroy();
-    }
+    public void destroyContext() { }
 
     @Override
     public boolean hasCapability(String name) {
         boolean ret = false;
         try {
-            ret = context.getCapabilities().getClass().getField(name).getBoolean(context.getCapabilities());
+            ret = context.getClass().getField(name).getBoolean(context);
         } catch(NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }

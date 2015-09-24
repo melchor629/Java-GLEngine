@@ -137,15 +137,4 @@ public class IOUtils {
         try{return new java.io.FileInputStream(new File(path));}catch(Exception ignore){}
         return IOUtils.class.getClassLoader().getResourceAsStream(path);
     }
-
-    /**
-     * Class containing information about images for reading and writting
-     * @author melchor9000
-     */
-    public static final class Image {
-        public byte[] buffer;
-        public int width, height;
-        public int channels;
-        public boolean alpha;
-    }
 }

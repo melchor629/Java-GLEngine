@@ -25,6 +25,7 @@ public class LWJGLWindow implements Window {
     private GLFWWindowSizeCallback sizeCallback;
     private GLFWWindowFocusCallback focusCallback;
     private GLFWErrorCallback errorCallback;
+    private boolean core;
 
     public LWJGLWindow() {
         if(glfwInit() == 0)
@@ -78,6 +79,8 @@ public class LWJGLWindow implements Window {
                 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
         }
 
+        core = version.type == OpenGLContext.OPENGL_CORE;
+
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
     }
@@ -88,7 +91,7 @@ public class LWJGLWindow implements Window {
             throw new GLError("Context cannot be created");
         setListenerCallbacks();
         glfwMakeContextCurrent(window);
-        return context = new LWJGLGLContext();
+        return context = new LWJGLGLContext(core);
     }
 
     @Override
@@ -97,7 +100,7 @@ public class LWJGLWindow implements Window {
             throw new GLError("Context cannot be created");
         setListenerCallbacks();
         glfwMakeContextCurrent(window);
-        return context = new LWJGLGLContext();
+        return context = new LWJGLGLContext(core);
     }
 
     @Override
@@ -107,7 +110,7 @@ public class LWJGLWindow implements Window {
             throw new GLError("Context cannot be created");
         setListenerCallbacks();
         glfwMakeContextCurrent(window);
-        return context = new LWJGLGLContext();
+        return context = new LWJGLGLContext(core);
     }
 
     @Override

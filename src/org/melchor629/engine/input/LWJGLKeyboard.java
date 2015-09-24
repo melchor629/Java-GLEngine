@@ -3,6 +3,7 @@ package org.melchor629.engine.input;
 import static org.lwjgl.glfw.GLFW.*;
 
 import java.lang.reflect.Field;
+import java.util.IllegalFormatException;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -66,9 +67,11 @@ public class LWJGLKeyboard extends Keyboard {
 
         try {
             for(Field f : GLFW.class.getFields()) {
-                int code = f.getInt(null);
-                if(code == keycode)
-                    key = f.getName().substring(9);
+                try {
+                    int code = f.getInt(null);
+                    if (code == keycode)
+                        key = f.getName().substring(9);
+                } catch(IllegalArgumentException ignore) {}
             }
         } catch(SecurityException | IllegalAccessException e) {
             e.printStackTrace();

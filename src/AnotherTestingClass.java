@@ -59,6 +59,7 @@ public class AnotherTestingClass {
         AL al = Game.al = new LWJGLAudio();
         Timing t = Timing.getGameTiming();
         window.setResizable(true);
+        window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
         GLContext gl = Game.gl = window.createWindow(1280, 720, "Eso...");
         window.setVsync(true);
         al.createContext();

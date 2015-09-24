@@ -1,8 +1,5 @@
-import com.sun.jna.Pointer;
-import org.lwjgl.system.MemoryUtil;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.clib.STBLoader;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.LWJGLWindow;
 import org.melchor629.engine.gl.Window;
@@ -14,11 +11,13 @@ import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.IOUtils;
+import org.melchor629.engine.utils.ImageIO;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.Vector3;
 
+import java.io.File;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeSet;
@@ -28,7 +27,7 @@ import java.util.TreeSet;
  */
 public class EspacioEuclideo {
     static {
-        System.setProperty("jna.library.path", System.getProperty("engine.natives", "build/binaries/engineSharedLibrary/release"));
+        System.setProperty("jna.library.path", System.getProperty("engine.natives", "build/binaries/engineSharedLibrary/x64Release"));
     }
 
     private static final Random rand = new Random();
@@ -93,6 +92,7 @@ public class EspacioEuclideo {
         });
         puntos_vbo.fillBuffer(puntos_buff);
         //puntos.clear();
+        System.out.printf("Cantidad de euclides en total: %d\n", puntos.size());
 
         ShaderProgram puntos_shader = new ShaderProgram(
                 IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
@@ -108,6 +108,8 @@ public class EspacioEuclideo {
         Texture pato_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/pato.png"))
                 .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
         Texture doge_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/doge.png"))
+                .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+        Texture andres_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/andres.png"))
                 .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
 
         puntos_vao.bind();
@@ -179,16 +181,12 @@ public class EspacioEuclideo {
             if(self.getStringRepresentation(key).equals("F"))
                 phosphorEffectEnabler = !phosphorEffectEnabler;
             if(self.getStringRepresentation(key).equals("P")) {
-                IntBuffer data = BufferUtils.createIntBuffer(glWIDTH * glHEIGHT);
+                ByteBuffer data = BufferUtils.createByteBuffer(glWIDTH * glHEIGHT * 4);
                 gl.readBuffer(GLContext.CullFaceMode.FRONT);
-                gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data);
+                gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data.asIntBuffer());
                 new Thread(() -> {
-                    STBLoader.ImageData d = new STBLoader.ImageData();
-                    d.components = 3;
-                    d.width = glWIDTH;
-                    d.height = glHEIGHT;
-                    d.data = new Pointer(MemoryUtil.memAddress(data));
-                    STBLoader.instance.stb_write_image("/Users/melchor9000/Desktop/mae.png", "png", d);
+                    ImageIO.ImageData d = new ImageIO.ImageData(glWIDTH, glHEIGHT, 3, data);
+                    ImageIO.writeImage(new File("/Users/melchor9000/Desktop/mae.png"), d);
                 }, "Screenshot saver").start();
             }
 
@@ -204,6 +202,8 @@ public class EspacioEuclideo {
                 current = aleks_tex;
             if(self.getStringRepresentation(key).equals("6"))
                 current = doge_tex;
+            if(self.getStringRepresentation(key).equals("7"))
+                current = andres_tex;
         });
 
         window.showWindow();
@@ -219,6 +219,7 @@ public class EspacioEuclideo {
 
             int cantidad = obtenerVisibles(puntos_buff, camera, puntos);
             puntos_vbo.fillBuffer(puntos_buff);
+            System.out.printf("Cantidad de euclides: %d     \r", cantidad);
 
             if(phosphorEffectEnabler)
             sceneFB.bind();
@@ -294,14 +295,17 @@ public class EspacioEuclideo {
     }
 
     private static int obtenerVisibles(FloatBuffer puntos_buff, Camera cam, TreeSet<Vector3> puntos) {
-        int cantidad = 0;
+        final int cantidad[] = {0};
         puntos_buff.flip().clear();
         puntos.stream().filter((vec) -> {
             float x = vec.x - cam.getPosition().x, y = vec.y - cam.getPosition().y, z = vec.z - cam.getPosition().z;
-            return Math.sqrt(x*x + y*y + z*z) <= 100.0 && z > 0;
-        }).forEach((vec) -> puntos_buff.put(vec.x).put(vec.y).put(vec.z));
+            return Math.sqrt(x*x + y*y + z*z) <= 100.0 && x > 0;
+        }).forEach((vec) -> {
+            puntos_buff.put(vec.x).put(vec.y).put(vec.z);
+            cantidad[0]++;
+        });
         puntos_buff.flip();
-        return cantidad;
+        return cantidad[0];
     }
 
     private static void listaABuffer(TreeSet<Vector3> puntos, FloatBuffer buff) {

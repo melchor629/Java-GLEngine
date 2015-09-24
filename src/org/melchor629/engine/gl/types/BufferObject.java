@@ -160,7 +160,7 @@ public class BufferObject implements Erasable {
     }
 
     // http://onrendering.blogspot.com.es/2011/10/buffer-object-streaming-in-opengl.html
-    public void clearData()
+    public void clearData() {}
 
     /**
      * Ask GPU to tell the size of this buffer object
