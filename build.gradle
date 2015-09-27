@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     compile 'net.java.dev.jna:jna:4.+'
+    compile 'org.reflections:reflections:0.9.+'
     compile files('../Library/lwjgl/jar/lwjgl.jar');
 }
 

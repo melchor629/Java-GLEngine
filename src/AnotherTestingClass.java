@@ -14,7 +14,7 @@ import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
-import org.melchor629.engine.loaders.Flac;
+import org.melchor629.engine.loaders.audio.flac.FlacDecoder;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
@@ -70,15 +70,15 @@ public class AnotherTestingClass {
 
         Buffer sound_buffer;
         Source sound_source = null;
-        try {
-            Flac sound = new Flac(FLACDecoder.archivo, true);
+        /*try {
+            FlacDecoder sound = new FlacDecoder(AudioTests.archivo, true);
             sound.decode();
             sound_buffer = new Buffer(sound.getSampleData(), AL.Format.MONO16, sound.getSampleRate());
             sound_source = new Source(sound_buffer);
             sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
             sound.clear();
         } catch(Exception ignore) {
-        }
+        }*/
 
         Collada c = null;
         try {

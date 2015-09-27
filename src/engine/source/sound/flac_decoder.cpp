@@ -86,7 +86,7 @@ void EngineFlacDecoder::error_callback(::FLAC__StreamDecoderErrorStatus status) 
 }
 
 bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e, bool fm) {
-    EngineFlacDecoder decoder;
+    EngineFlacDecoder decoder(fm);
     bool ret = true;
 
     if(!m || !d) {

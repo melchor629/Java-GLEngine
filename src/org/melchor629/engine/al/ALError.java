@@ -33,7 +33,6 @@ public class ALError extends RuntimeException {
         super(msg);
         this.msg = msg;
         this.alFunc = glFunc;
-        this.initCause(this);
     }
 
     @Override

@@ -3,23 +3,33 @@ import org.melchor629.engine.al.AL;
 import org.melchor629.engine.al.LWJGLAudio;
 import org.melchor629.engine.al.types.Buffer;
 import org.melchor629.engine.al.types.Source;
-import org.melchor629.engine.loaders.Flac;
+import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioDecoder;
+import org.melchor629.engine.loaders.audio.flac.FlacDecoder;
 import org.melchor629.engine.utils.Timing;
+
+import java.io.File;
+import java.nio.ShortBuffer;
+import java.util.ArrayList;
 
 /**
  * Probando el FlacDecoder y el FlacEncoder
  */
-public class FLACDecoder {
+public class AudioTests {
+    static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/x64release"); }
+
     public static String archivo =
-            "/Users/melchor9000/Downloads/Deadmau5 - 2009 - For Lack of a Better Name/10 Deadmau5 - Strobe.flac";
-            //"/Users/melchor9000/Downloads/Telegram/(09) [Rammstein] Te Quiero Puta!.flac";
-            //"/Users/melchor9000/Desktop/sideral_driving.flac";
+            //"/Volumes/OSX/Música/13. Aria Math.wav";
+            "/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
 
     public static void main(String[] args) throws Exception {
         AL al = Game.al = new LWJGLAudio();
+        Game.erasableList = new ArrayList<>();
         al.createContext();
-        Flac decoder = new Flac(archivo, true);
+        AudioDecoder decoder = AudioDecoder.createDecoderForFile(new File(archivo));
+        AudioContainer data;
         long timeDecode = System.currentTimeMillis(), timeWrite;
+        decoder.readHeader();
         decoder.decode();
         timeDecode = System.currentTimeMillis() - timeDecode;
 
@@ -30,13 +40,15 @@ public class FLACDecoder {
 
         System.out.printf("Time spent decoding flac %d, and time spent to write WAV file %d\n", timeDecode, timeWrite);
 
-        Buffer sd_buffer = new Buffer(decoder.getSampleData(), AL.Format.MONO16, decoder.getSampleRate());
+        data = decoder.getAudioContainer();
+        Buffer sd_buffer = new Buffer(data.getDataAsShort(), AL.Format.STEREO16, data.getSampleRate());
         Source sd_source = new Source(sd_buffer);
-        decoder.clear();
+        data.cleanUpNativeResources();
         sd_source.setGain(1.00f);
         sd_source.play();
         Timing.sleep(5000);
-        while(System.in.read() != '\n');
+        int c;
+        do{ c = System.in.read(); } while(c != '\n');
 
         /*boolean ok = FlacLibraryNative.instance.engine_flac_encoder("/Users/melchor9000/Desktop/wav.flac", decoder.attributes, decoder.data,
                 (int errCode, String msg) -> System.err.printf("[FLACENCODER] (%d) %s\n", errCode, msg));
@@ -44,7 +56,6 @@ public class FLACDecoder {
 
         sd_source.stop();
         sd_source.delete();
-        decoder.clear();
         al.deleteContext();
     }
 }
