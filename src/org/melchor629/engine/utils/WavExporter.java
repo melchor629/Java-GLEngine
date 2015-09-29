@@ -27,7 +27,7 @@ public class WavExporter {
     }
 
     public static void export(String file, ShortBuffer data, long total_samples, int sample_rate, int channels) throws IOException {
-        FileOutputStream fos = new FileOutputStream(new File("/Users/melchor9000/Desktop/flac.wav"));
+        FileOutputStream fos = new FileOutputStream(new File(file));
         DataOutputStream dos = new DataOutputStream(fos);
         long total_size = total_samples * channels * 16 / 8;
         write_string(fos, "RIFF");
@@ -45,7 +45,7 @@ public class WavExporter {
 
         byte[] littleBuff = new byte[8196];
         short[] bigBuff = new short[4098];
-        int left = data.capacity(), toWrite = 8196;
+        int left = data.capacity(), toWrite = 4098;
         while(left > 8196) {
             data.get(bigBuff, 0, bigBuff.length);
             shortToByte(bigBuff, littleBuff);

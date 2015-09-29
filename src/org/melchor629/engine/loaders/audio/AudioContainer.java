@@ -13,7 +13,7 @@ public final class AudioContainer {
     private int samplerate, channels;
     private long samples;
     private BitDepth bitDepth;
-    //private ByteBuffer pcm;
+    private Buffer pcm;
     private long pcmAddress, pcmSize;
     CleanUpFunction cleanUpFunction;
 
@@ -144,12 +144,15 @@ public final class AudioContainer {
      * @param buffer pcm buffer
      */
     public void setBuffer(Buffer buffer) {
-        //TODO Comprobar que este hack tira (NO TIRA :( )
-        //pcm = (ByteBuffer) ((sun.nio.ch.DirectBuffer) buffer).attachment();
-        //if(pcm == null) pcm = (ByteBuffer) buffer;
         if(!buffer.isDirect()) throw new RuntimeException("Buffer is not direct allocated");
         pcmAddress = ((DirectBuffer) buffer).address();
         pcmSize = buffer.capacity();
+        pcm = buffer;
+
+        if(buffer instanceof ShortBuffer)
+            pcmSize *= 2;
+        else if(buffer instanceof IntBuffer || buffer instanceof FloatBuffer)
+            pcmSize *= 4;
     }
 
     /**
@@ -157,6 +160,7 @@ public final class AudioContainer {
      */
     public void cleanUpNativeResources() {
         if(cleanUpFunction != null) cleanUpFunction.clean(this);
+        pcm = null;
     }
 
     /**

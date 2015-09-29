@@ -68,6 +68,8 @@ public abstract class AudioDecoder {
     }
 
     static public AudioDecoder createDecoderForFile(File file) throws FileNotFoundException {
+        if(!file.exists()) throw new FileNotFoundException("File must exist to be decoded");
+        if(!file.canRead()) throw new FileNotFoundException("File cannot be read");
         String path = file.getAbsolutePath();
         AudioDecoder d = createDecoderForFormat(path.substring(path.lastIndexOf(".") + 1));
         if(d != null)
