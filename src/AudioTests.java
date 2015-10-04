@@ -1,3 +1,4 @@
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.al.LWJGLAudio;
@@ -10,7 +11,6 @@ import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.WavExporter;
 
 import java.io.File;
-import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +22,8 @@ public class AudioTests {
     public static String archivo =
             //"/Volumes/OSX/Música/13. Aria Math.wav";
             //"/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
-            "/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
+            //"/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
+            "/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
 
     public static void main(String[] args) throws Exception {
         AL al = Game.al = new LWJGLAudio();
@@ -55,7 +56,7 @@ public class AudioTests {
         do{ c = System.in.read(); } while(c != '\n');
 
         sd_source.stop();
-        sd_source.delete();
+        Game.erasableList.forEach(Erasable::delete);
         al.deleteContext();
     }
 }

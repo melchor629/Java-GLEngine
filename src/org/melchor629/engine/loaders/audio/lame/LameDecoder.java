@@ -24,10 +24,6 @@ public class LameDecoder extends AudioDecoder {
     FileInputStream input;
     int delay, padding;
 
-    public LameDecoder() {
-        decoder = LibLame.INSTANCE.hip_decode_init();
-    }
-
     @Override
     public void readHeader() throws IOException {
         if(!configureDecoder()) throw new AudioDecoderException("Cannot parse mp3 header (may be invalid)");
@@ -101,6 +97,7 @@ public class LameDecoder extends AudioDecoder {
     @Override
     protected void setFile(File file) throws FileNotFoundException {
         input = new FileInputStream(file);
+        decoder = LibLame.INSTANCE.hip_decode_init();
     }
 
     @Override

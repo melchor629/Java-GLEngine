@@ -3,7 +3,7 @@ package org.melchor629.engine.al.types;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
-import org.melchor629.engine.objects.PCMData;
+import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.math.Vector3;
 import org.melchor629.engine.utils.math.GLM;
 
@@ -40,7 +40,7 @@ public class Source implements Erasable {
         Game.erasableList.add(this);
     }
     
-    public Source(PCMData data) {
+    public Source(AudioContainer data) {
     	this(new Buffer(data));
         Game.erasableList.add(this);
     }
