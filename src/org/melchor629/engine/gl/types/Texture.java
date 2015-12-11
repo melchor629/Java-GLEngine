@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
@@ -16,6 +17,7 @@ import org.melchor629.engine.gl.GLContext.TextureFilter;
 import org.melchor629.engine.gl.GLContext.TextureFormat;
 import org.melchor629.engine.gl.GLContext.TextureParameter;
 import org.melchor629.engine.gl.GLContext.TextureWrap;
+import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.ImageIO;
 
@@ -28,6 +30,7 @@ public class Texture implements Erasable {
     protected int texture = -1;
     protected GLContext.TextureTarget target;
     protected int dimensions;
+    protected int width, height, comp;
 
     /**
      * Create a simple empty 2D texture, with minifier and magnifier filter
@@ -42,6 +45,9 @@ public class Texture implements Erasable {
         texture = gl.genTexture();
         target = GLContext.TextureTarget.TEXTURE_2D;
         dimensions = 2;
+        this.width = width;
+        this.height = height;
+        this.comp = eformat == TextureExternalFormat.RGB ? 3 : 4; //TODO Más general
 
         gl.bindTexture(target, texture);
         gl.texParameteri(target, GLContext.TextureParameter.MIN_FILTER, GLContext.TextureFilter.LINEAR);
@@ -80,6 +86,9 @@ public class Texture implements Erasable {
             height = data.height;
             efmt = data.components == 3 ? TextureExternalFormat.RGB : TextureExternalFormat.RGBA;
             buffer = data.data;
+            this.comp = data.components;
+        } else {
+            this.comp = efmt == TextureExternalFormat.RGB ? 3 : 4; //TODO Más general
         }
         gl.texImage2D(target, 0, ifmt, width, height, 0, efmt, GLContext.type.UNSIGNED_BYTE, buffer); //TODO Determinar 1D, 2D, 3D
 
@@ -88,6 +97,9 @@ public class Texture implements Erasable {
         data.clear.apply(data);
         buffer.clear();
         gl.bindTexture(target, 0);
+
+        this.width = width;
+        this.height = height;
 
         Game.erasableList.add(this);
     }
@@ -99,6 +111,14 @@ public class Texture implements Erasable {
 
     public void unbind() {
         gl.bindTexture(target, 0);
+    }
+
+    public void clearTexture() {
+        ByteBuffer ff = BufferUtils.createByteBuffer(width * height * comp);
+        bind();
+        gl.texSubImage2D(target, 0, 0, 0, width, height,
+                comp == 3 ? TextureExternalFormat.RGB : TextureExternalFormat.RGBA, GLContext.type.UNSIGNED_BYTE, ff);
+        unbind();
     }
 
     public void delete() {
@@ -136,7 +156,7 @@ public class Texture implements Erasable {
     }
 
     public int hashCode() {
-        return texture + super.hashCode();
+        return texture * 17 + dimensions;
     }
 
     /**

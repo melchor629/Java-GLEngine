@@ -60,7 +60,8 @@ public class AnotherTestingClass {
         Timing t = Timing.getGameTiming();
         window.setResizable(true);
         window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
-        GLContext gl = Game.gl = window.createWindow(1280, 720, "Eso...");
+        window.createWindow(1280, 720, "Eso...");
+        GLContext gl = Game.gl = window.createContext();
         window.setVsync(true);
         al.createContext();
         Keyboard keyboard = Game.keyboard = new LWJGLKeyboard();

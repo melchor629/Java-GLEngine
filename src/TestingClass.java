@@ -86,7 +86,8 @@ public final class TestingClass {
         Timing t = Timing.getGameTiming();
         window.setVsync(true);
         window.setResizable(true);
-        GLContext gl = Game.gl = window.createWindow(1280, 720, "G5 to engine test");
+        window.createWindow(1280, 720, "G5 to engine test");
+        GLContext gl = Game.gl = window.createContext();
 
         VAO vao = new VAO();
         vao.bind();

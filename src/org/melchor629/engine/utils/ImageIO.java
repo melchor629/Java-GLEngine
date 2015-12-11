@@ -38,7 +38,7 @@ public class ImageIO {
 
     private static boolean hasLWJGL() {
         try {
-            Class.forName("org.lwjgl.LWJGLUtil");
+            Class.forName("org.lwjgl.system.Platform");
             return true;
         } catch(ClassNotFoundException ignore) {
             return false;

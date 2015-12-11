@@ -1033,6 +1033,12 @@ public interface GLContext {
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, FloatBuffer b);
     void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, DoubleBuffer b);
 
+    //TODO con 1D y 3D
+    void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, ByteBuffer b);
+    void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, ShortBuffer b);
+    void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, IntBuffer b);
+    void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, FloatBuffer b);
+
     //Framebuffer & Renderbuffer
     int genFramebuffer();
     void genFramebuffers(int[] fbs);

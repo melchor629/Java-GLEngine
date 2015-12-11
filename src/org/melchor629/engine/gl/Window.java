@@ -164,9 +164,8 @@ public interface Window {
      * @param width width of the window
      * @param height height of the window
      * @param title title of the window
-     * @return the context created from the window
      */
-    GLContext createWindow(int width, int height, String title);
+    void createWindow(int width, int height, String title);
 
     /**
      * Creates a Fullscreen display with the given width, height and title.
@@ -174,18 +173,16 @@ public interface Window {
      * @param width width of the window
      * @param height height of the window
      * @param title title of the window
-     * @return the context created from the window
      */
-    GLContext createFullscreenWindow(int width, int height, String title);
+    void createFullscreenWindow(int width, int height, String title);
 
     /**
      * Creates a Fullscreen display with the given title. The width and
      * height will be the same as monitor's
      * Also creates OpenGL context.
      * @param title title of the window
-     * @return the context created from the window
      */
-    GLContext createFullscreenWindow(String title);
+    void createFullscreenWindow(String title);
 
     /**
      * Determines if the window should close in the future or not
@@ -237,6 +234,31 @@ public interface Window {
      * @param title new window title
      */
     void setTitle(String title);
+
+    /**
+     * Synchronices drawing. Have to be called after every frame is drawn.
+     */
+    void syncGPU();
+
+    /**
+     * Creates the OpenGL context and sets this context to this Window
+     * @return the context created from the window
+     */
+    GLContext createContext();
+
+    /**
+     * If is applicable, poll events from window event loop
+     */
+    default void pollEvents() {}
+
+    /**
+     * If is applicable, blocks thread until new events have come in window event loop
+     */
+    default void waitEvents() {
+        pollEvents();
+    }
+
+    void postEvent(Runnable r);
 
     /**
      * Adds a listener for the event {@link OnFocusEvent}.

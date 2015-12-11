@@ -1,6 +1,6 @@
 package org.melchor629.engine.gl;
 
-import org.lwjgl.LWJGLUtil;
+import org.lwjgl.system.Platform;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.BufferUtils;
 
@@ -26,11 +26,10 @@ import static org.lwjgl.opengl.GL33.*;
  * @author melchor9000
  */
 public class LWJGLGLContext implements GLContext {
-    //private org.lwjgl.opengl.GLContext context;
     private org.lwjgl.opengl.GLCapabilities context;
 
     LWJGLGLContext(boolean core) {
-        context = org.lwjgl.opengl.GL.createCapabilities(core && LWJGLUtil.getPlatform() == LWJGLUtil.Platform.MACOSX);
+        context = org.lwjgl.opengl.GL.createCapabilities(core && Platform.get() == Platform.MACOSX);
     }
 
     @Override
@@ -797,6 +796,26 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width, int height, int depth, int border, TextureExternalFormat efmt, type t, DoubleBuffer b) {
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, ByteBuffer b) {
+        glTexSubImage2D(target.e, level, xoffset, yoffset, width, height, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, ShortBuffer b) {
+        glTexSubImage2D(target.e, level, xoffset, yoffset, width, height, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, IntBuffer b) {
+        glTexSubImage2D(target.e, level, xoffset, yoffset, width, height, efmt.e, t.e, b);
+    }
+
+    @Override
+    public void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, FloatBuffer b) {
+        glTexSubImage2D(target.e, level, xoffset, yoffset, width, height, efmt.e, t.e, b);
     }
 
     /* (non-Javadoc)

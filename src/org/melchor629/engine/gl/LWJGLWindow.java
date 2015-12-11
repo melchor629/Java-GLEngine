@@ -1,14 +1,16 @@
 package org.melchor629.engine.gl;
 
-import org.lwjgl.LWJGLUtil;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.system.Platform;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -26,6 +28,7 @@ public class LWJGLWindow implements Window {
     private GLFWWindowFocusCallback focusCallback;
     private GLFWErrorCallback errorCallback;
     private boolean core;
+    private ConcurrentLinkedQueue<Runnable> events;
 
     public LWJGLWindow() {
         if(glfwInit() == 0)
@@ -35,6 +38,7 @@ public class LWJGLWindow implements Window {
         resizeListeners = new ArrayList<>();
         focusListeners = new ArrayList<>();
         blurListeners = new ArrayList<>();
+        events = new ConcurrentLinkedQueue<>();
     }
 
     @Override
@@ -75,7 +79,7 @@ public class LWJGLWindow implements Window {
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
         } else if(version.type == OpenGLContext.OPENGL_CORE) {
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-            if(org.lwjgl.LWJGLUtil.getPlatform() == LWJGLUtil.Platform.MACOSX)
+            if(Platform.get() == Platform.MACOSX)
                 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
         }
 
@@ -86,31 +90,25 @@ public class LWJGLWindow implements Window {
     }
 
     @Override
-    public GLContext createWindow(int width, int height, String title) {
-        if((window = glfwCreateWindow(width, height, title, 0l, 0l)) == 0l)
+    public void createWindow(int width, int height, String title) {
+        if((window = glfwCreateWindow(width, height, title, 0L, 0L)) == 0L)
             throw new GLError("Context cannot be created");
         setListenerCallbacks();
-        glfwMakeContextCurrent(window);
-        return context = new LWJGLGLContext(core);
     }
 
     @Override
-    public GLContext createFullscreenWindow(int width, int height, String title) {
-        if((window = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), 0l)) == 0l)
+    public void createFullscreenWindow(int width, int height, String title) {
+        if((window = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), 0L)) == 0L)
             throw new GLError("Context cannot be created");
         setListenerCallbacks();
-        glfwMakeContextCurrent(window);
-        return context = new LWJGLGLContext(core);
     }
 
     @Override
-    public GLContext createFullscreenWindow(String title) {
-        IntBuffer mode = glfwGetVideoMode(glfwGetPrimaryMonitor()).asIntBuffer();
-        if((window = glfwCreateWindow(mode.get(0), mode.get(1), title, glfwGetPrimaryMonitor(), 0l)) == 0)
+    public void createFullscreenWindow(String title) {
+        GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        if((window = glfwCreateWindow(mode.width(), mode.height(), title, glfwGetPrimaryMonitor(), 0L)) == 0)
             throw new GLError("Context cannot be created");
         setListenerCallbacks();
-        glfwMakeContextCurrent(window);
-        return context = new LWJGLGLContext(core);
     }
 
     @Override
@@ -121,6 +119,7 @@ public class LWJGLWindow implements Window {
     @Override
     public void setWindowShouldClose(boolean close) {
         glfwSetWindowShouldClose(window, close ? 1 : 0);
+        glfwPostEmptyEvent();
     }
 
     @Override
@@ -154,6 +153,35 @@ public class LWJGLWindow implements Window {
     }
 
     @Override
+    public void syncGPU() {
+        glfwSwapBuffers(window);
+    }
+
+    @Override
+    public GLContext createContext() {
+        glfwMakeContextCurrent(window);
+        return context = new LWJGLGLContext(core);
+    }
+
+    @Override
+    public void pollEvents() {
+        glfwPollEvents();
+        while(!events.isEmpty()) events.poll().run();
+    }
+
+    @Override
+    public void waitEvents() {
+        glfwWaitEvents();
+        while(!events.isEmpty()) events.poll().run();
+    }
+
+    @Override
+    public void postEvent(Runnable r) {
+        events.add(r);
+        glfwPostEmptyEvent();
+    }
+
+    @Override
     public void setOnFocusEventListener(OnFocusEvent e) {
         focusListeners.add(e);
     }
@@ -167,8 +195,8 @@ public class LWJGLWindow implements Window {
     public double getDPI() {
         IntBuffer width = BufferUtils.createIntBuffer(1), height = BufferUtils.createIntBuffer(1);
         glfwGetMonitorPhysicalSize(glfwGetPrimaryMonitor(), width, height);
-        IntBuffer mode = glfwGetVideoMode(glfwGetPrimaryMonitor()).asIntBuffer();
-        return mode.get(0) / (width.get(0) / 25.4);
+        GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        return mode.width() / (width.get(0) / 25.4);
     }
 
     @Override
