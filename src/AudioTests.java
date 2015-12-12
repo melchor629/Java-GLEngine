@@ -1,3 +1,4 @@
+import com.sun.jna.Native;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
@@ -26,6 +27,8 @@ public class AudioTests {
             "/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
 
     public static void main(String[] args) throws Exception {
+        Native.setProtected(true);
+
         AL al = Game.al = new LWJGLAudio();
         Game.erasableList = new ArrayList<>();
         al.createContext();
