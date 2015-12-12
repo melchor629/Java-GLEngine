@@ -1,4 +1,4 @@
-package org.melchor629.engine.clib;
+package org.melchor629.engine.native_bridge;
 
 import com.sun.jna.*;
 

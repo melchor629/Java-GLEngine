@@ -1,6 +1,6 @@
 package org.melchor629.engine.loaders.audio.flac;
 
-import org.melchor629.engine.clib.FlacLibraryNative;
+import org.melchor629.engine.native_bridge.FlacLibraryNative;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 

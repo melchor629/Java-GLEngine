@@ -1,4 +1,4 @@
-package org.melchor629.engine.clib;
+package org.melchor629.engine.native_bridge;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -10,7 +10,6 @@ import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
-import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;

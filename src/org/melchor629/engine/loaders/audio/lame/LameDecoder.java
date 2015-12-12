@@ -2,7 +2,7 @@ package org.melchor629.engine.loaders.audio.lame;
 
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import org.melchor629.engine.clib.LibLame;
+import org.melchor629.engine.native_bridge.LibLame;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;

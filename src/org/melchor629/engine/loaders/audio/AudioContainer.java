@@ -10,8 +10,8 @@ import java.nio.*;
  * decoded from other codecs.
  */
 public final class AudioContainer {
-    private int samplerate, channels;
-    private long samples;
+    private int samplerate = -1, channels = -1;
+    private long samples = -1;
     private BitDepth bitDepth;
     private Buffer pcm;
     private long pcmAddress, pcmSize;
@@ -161,6 +161,14 @@ public final class AudioContainer {
     public void cleanUpNativeResources() {
         if(cleanUpFunction != null) cleanUpFunction.clean(this);
         pcm = null;
+    }
+
+    /**
+     * Indicates when this object can be used by the external code or not
+     * @return true if can be used or not
+     */
+    boolean isReadyToBeUsed() {
+        return pcm != null && samplerate != -1 && channels != -1 && samples != -1L;
     }
 
     /**
