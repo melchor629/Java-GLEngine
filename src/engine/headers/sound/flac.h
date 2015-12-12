@@ -5,7 +5,7 @@
 
 class EngineFlacDecoder : public FLAC::Decoder::File {
 public:
-    EngineFlacDecoder(bool fm) : FLAC::Decoder::File(), _forceMono(fm) {}
+    EngineFlacDecoder() : FLAC::Decoder::File() {}
     OnErrorEventCallback err;
     OnMetadataEventCallback met;
     OnDataEventCallback data;
@@ -16,11 +16,9 @@ protected:
         const int * const buffer[]);
     virtual void metadata_callback(const ::FLAC__StreamMetadata *metadata);
     virtual void error_callback(::FLAC__StreamDecoderErrorStatus status);
-    void forceMono(bool fm) { _forceMono = fm; }
 
 private:
     PCMAttr* attr;
-    bool _forceMono;
 
     EngineFlacDecoder(const EngineFlacDecoder&);
     EngineFlacDecoder& operator=(const EngineFlacDecoder&);
@@ -41,10 +39,8 @@ extern "C" {
      * @param m Callback called when basic metadata is read
      * @param d Callback called when the sound data is read
      * @param e Callback called when an error occurrs
-     * @param forceMono Forces the audio to be mono
      **/
-    bool engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e,
-                             bool forceMono);
+    bool engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e);
 
     /**
      * Encodes a PCM sound to FLAC. Only supported 16 bit stereo or mono.

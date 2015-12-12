@@ -27,7 +27,7 @@ public class Material {
 
     static {
         try {
-            phongShader = ShaderManager.getInstance().loadShader("Phong", "res/phong.vs", "res/phong.fs");
+            phongShader = ShaderManager.getInstance().loadShader("Phong", "phong.vs", "phong.fs");
         } catch(IOException ignore) {}
         materialList = new ArrayList<>();
         defaultMaterial = new Material();

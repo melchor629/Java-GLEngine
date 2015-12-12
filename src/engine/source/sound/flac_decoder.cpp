@@ -6,15 +6,19 @@ void ShortBufferClearFunc(void* ptr) {
     delete buff;
 }
 
-static bool write_little_endian_uint16(ShortBuffer* f, FLAC__uint16 x) {
+static inline bool write_little_endian_uint16(ShortBuffer* f, FLAC__uint16 x) {
     return f->put((uint8_t) x) && f->put((uint8_t) (x >> 8));
 }
 
-static bool write_little_endian_int16(ShortBuffer* f, FLAC__int16 x) {
+static inline bool write_little_endian_int16(ShortBuffer* f, FLAC__int16 x) {
     return write_little_endian_uint16(f, (FLAC__uint16) x);
 }
 
-static bool write_little_endian_uint32(ShortBuffer* f, FLAC__uint32 x) {
+static inline bool write_little_endian_int24(ShortBuffer* f, FLAC__uint32 x) {
+    return f->put((uint8_t) x) && f->put((uint8_t) (x >> 8)) && f->put((uint8_t) (x >> 16));
+}
+
+static inline bool write_little_endian_uint32(ShortBuffer* f, FLAC__uint32 x) {
     return f->put((uint8_t) x) && f->put((uint8_t) (x >> 8)) && f->put((uint8_t) (x >> 16))
         && f->put((uint8_t) (x >> 24));
 }
@@ -29,35 +33,42 @@ static bool write_little_endian_uint32(ShortBuffer* f, FLAC__uint32 x) {
         fprintf(stderr, "ERROR: Solo soporta FLAC con el total de muestas en STREAMINFO\n");
         return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
     }
-    if(attr->channels > 2 or attr->bps != 16) {
-        fprintf(stderr, "ERROR: Solo soporta FLAC con 16 bit stereo/mono");
+    if(attr->channels > 2 or (attr->bps != 16 and attr->bps != 24)) {
+        fprintf(stderr, "ERROR: Solo soporta FLAC con 16 bit stereo/mono\n");
         return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
     }
 
+    //Sabemos que OpenAL no soporta 24 Bits, por tanto se deberia hacer una conversión más adelante
+    bool int16 = attr->bps == 16;
+    bool int24 = attr->bps == 24;
     if(attr->channels == 2) {
-        if(_forceMono) {
-            for(i = 0; i < frame->header.blocksize; i++) {
-                //Interesante y funcional truco para convertir a mono
-                int32_t sample = (buffer[0][i] + buffer[1][i]) / 2;
-                if(!write_little_endian_int16(f, (int16_t) sample)) {
-                    fprintf(stderr, "ERROR: error al escribir en el buffer");
-                    return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
-                }
-            }
-        } else {
-            for(i = 0; i < frame->header.blocksize; i++) {
+        for(i = 0; i < frame->header.blocksize; i++) {
+            if(int16) {
                 if(!write_little_endian_int16(f, (int16_t) buffer[0][i]) ||
                     !write_little_endian_int16(f, (int16_t) buffer[1][i])) {
-                    fprintf(stderr, "ERROR: error al escribir en el buffer");
+                    fprintf(stderr, "ERROR: error al escribir en el buffer\n");
+                    return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+                }
+            } else if(int24) {
+                if(!write_little_endian_int24(f, (int32_t) buffer[0][i]) ||
+                    !write_little_endian_int24(f, (int32_t) buffer[1][i])) {
+                    fprintf(stderr, "ERROR: error al escribir en el buffer\n");
                     return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
                 }
             }
         }
     } else if(attr->channels == 1) {
         for(i = 0; i < frame->header.blocksize; i++) {
-            if(!write_little_endian_int16(f, (int16_t) buffer[0][i])) {
-                fprintf(stderr, "ERROR: error al escribir en el buffer");
-                return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+            if(int16) {
+                if(!write_little_endian_int16(f, (int16_t) buffer[0][i])) {
+                    fprintf(stderr, "ERROR: error al escribir en el buffer\n");
+                    return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+                }
+            } else if(int24) {
+                if(!write_little_endian_int24(f, (int32_t) buffer[0][i])) {
+                    fprintf(stderr, "ERROR: error al escribir en el buffer\n");
+                    return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+                }
             }
         }
     }
@@ -85,8 +96,8 @@ void EngineFlacDecoder::error_callback(::FLAC__StreamDecoderErrorStatus status) 
         err(status, FLAC__StreamDecoderErrorStatusString[status]);
 }
 
-bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e, bool fm) {
-    EngineFlacDecoder decoder(fm);
+bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e) {
+    EngineFlacDecoder decoder;
     bool ret = true;
 
     if(!m || !d) {
@@ -120,7 +131,7 @@ bool _engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEve
 }
 
 extern "C" {
-bool engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e, bool fm) {
-    return _engine_flac_decoder(file, m, d, e, fm);
+bool engine_flac_decoder(const char* file, OnMetadataEventCallback m, OnDataEventCallback d, OnErrorEventCallback e) {
+    return _engine_flac_decoder(file, m, d, e);
 }
 };

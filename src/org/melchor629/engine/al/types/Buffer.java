@@ -68,9 +68,6 @@ public class Buffer implements Erasable {
 	}
 	
 	public boolean isComplete() {
-		/*int[] ret = new int[1];
-		al.buffer(buffer, AL.Buffer.SIZE, ret);
-		return ret[0] != 0;*/
 		return al.getBufferi(buffer, AL.Buffer.SIZE) != 0;
 	}
 	

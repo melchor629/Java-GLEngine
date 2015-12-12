@@ -14,7 +14,8 @@ import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.loaders.Collada;
-import org.melchor629.engine.loaders.audio.flac.FlacDecoder;
+import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
@@ -23,6 +24,7 @@ import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.Vector3;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class AnotherTestingClass {
     static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/release"); }
@@ -54,7 +56,11 @@ public class AnotherTestingClass {
             + "    outColor = vec4(Color, 1.0);"
             + "}";
 
-    public static void colladaxd(String[] args) {
+    private static final Object lock = new Object();
+    private static Source sound_source;
+
+    public static void colladaxd() {
+        Game.erasableList = new ArrayList<>();
         Window window = Game.window = new LWJGLWindow();
         AL al = Game.al = new LWJGLAudio();
         Timing t = Timing.getGameTiming();
@@ -69,17 +75,24 @@ public class AnotherTestingClass {
         Camera camera = new Camera();
         camera.setClipPanes(0.1, 100);
 
-        Buffer sound_buffer;
-        Source sound_source = null;
-        /*try {
-            FlacDecoder sound = new FlacDecoder(AudioTests.archivo, true);
-            sound.decode();
-            sound_buffer = new Buffer(sound.getSampleData(), AL.Format.MONO16, sound.getSampleRate());
-            sound_source = new Source(sound_buffer);
-            sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
-            sound.clear();
-        } catch(Exception ignore) {
-        }*/
+        new Thread(() -> {
+            try {
+                Buffer sound_buffer;
+                AudioContainer sound;
+
+                synchronized (lock) {
+                    AudioDecoder decoder = AudioDecoder.createDecoderForFile(new File(AudioTests.archivo));
+                    decoder.readHeader();
+                    decoder.decode();
+                    sound = decoder.getAudioContainer();
+                    sound_buffer = new Buffer(sound.getDataAsShort(), AL.Format.STEREO16, sound.getSampleRate());
+                    sound_source = new Source(sound_buffer);
+                }
+
+                sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
+                sound.cleanUpNativeResources();
+            } catch(Exception ignore) {ignore.printStackTrace();}
+        }, "Canción de fondo").start();
 
         Collada c = null;
         try {
@@ -115,7 +128,9 @@ public class AnotherTestingClass {
         gl.enable(GLEnable.DEPTH_TEST);
         gl.clearColor(1, 1, 1, 1);
         t.split("GL & data");
-        sound_source.play();
+        synchronized (lock) {
+            sound_source.play();
+        }
 
         while(!window.windowShouldClose()) {
             sound_source.setVelocity(new Vector3(0, 0, 0));
@@ -153,7 +168,7 @@ public class AnotherTestingClass {
     }
     
     public static void main(String[] args) {
-        colladaxd(args);
+        colladaxd();
         System.exit(0);
     }
 

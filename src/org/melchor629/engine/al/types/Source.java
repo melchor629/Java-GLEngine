@@ -42,7 +42,6 @@ public class Source implements Erasable {
     
     public Source(AudioContainer data) {
     	this(new Buffer(data));
-        Game.erasableList.add(this);
     }
     
     public void setPosition(Vector3 pos) {

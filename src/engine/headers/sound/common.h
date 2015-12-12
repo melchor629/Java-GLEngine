@@ -1,14 +1,14 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
-#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 /**
  * Struct with some basic info about a sound
  **/
 struct PCMAttr {
-    FLAC__uint64 total_samples;
+    uint64_t total_samples;
     unsigned sample_rate, channels, bps;
 };
 

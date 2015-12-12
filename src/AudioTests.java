@@ -7,15 +7,13 @@ import org.melchor629.engine.al.types.Buffer;
 import org.melchor629.engine.al.types.Source;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
-import org.melchor629.engine.loaders.audio.flac.FlacDecoder;
 import org.melchor629.engine.utils.Timing;
-import org.melchor629.engine.utils.WavExporter;
 
 import java.io.File;
 import java.util.ArrayList;
 
 /**
- * Probando el FlacDecoder y el FlacEncoder
+ * Probando descodificadores de audio
  */
 public class AudioTests {
     static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/x64release"); }
@@ -23,8 +21,8 @@ public class AudioTests {
     public static String archivo =
             //"/Volumes/OSX/Música/13. Aria Math.wav";
             //"/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
-            //"/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
-            "/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
+            "/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
+            //"/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
 
     public static void main(String[] args) throws Exception {
         Native.setProtected(true);
@@ -34,19 +32,14 @@ public class AudioTests {
         al.createContext();
         AudioDecoder decoder = AudioDecoder.createDecoderForFile(new File(archivo));
         AudioContainer data;
-        long timeDecode = System.currentTimeMillis(), timeWrite;
+        long timeDecode = System.currentTimeMillis();
         decoder.readHeader();
         decoder.decode();
         timeDecode = System.currentTimeMillis() - timeDecode;
         data = decoder.getAudioContainer();
 
-        timeWrite = System.currentTimeMillis();
-        /*WavExporter.export("/Users/melchor9000/Desktop/flac.wav", data.getDataAsShort(), data.getNumberOfSamples(),
-                data.getSampleRate(), data.getChannels());*/
-        timeWrite = System.currentTimeMillis() - timeWrite;
-
         String ext = archivo.substring(archivo.lastIndexOf(".") + 1);
-        System.out.printf("Time spent decoding %s %dms, and time spent to write WAV file %dms\n", ext, timeDecode, timeWrite);
+        System.out.printf("Time spent decoding %s %dms\n", ext, timeDecode);
 
         data.getDataAsShort().clear();
         Buffer sd_buffer = new Buffer(data.getDataAsShort(), AL.Format.STEREO16, data.getSampleRate());

@@ -11,18 +11,8 @@ import java.io.File;
  */
 public class FlacDecoder extends AudioDecoder {
     private String file;
-    private boolean forceMono = false;
     private FlacLibraryNative.PCMAttr attributes;
     private FlacLibraryNative.ShortBuffer data;
-
-    /**
-     * Uses internal engine force mono to force the sound data
-     * to be mono, or not.
-     * @param forceMono1 Value for force mono
-     */
-    public void setForceMono(boolean forceMono1) {
-        forceMono = forceMono1;
-    }
 
     /**
      * Decodes FLAC file
@@ -31,7 +21,7 @@ public class FlacDecoder extends AudioDecoder {
         FlacLibraryNative.instance.engine_flac_decoder(file,
                 (FlacLibraryNative.PCMAttr attr) -> attributes = attr,
                 (FlacLibraryNative.ShortBuffer buff) -> data = buff,
-                (int errCode, String msg) -> System.err.printf("[FlacDecoder] (%d) %s\n", errCode, msg), forceMono);
+                (int errCode, String msg) -> System.err.printf("[FlacDecoder] (%d) %s\n", errCode, msg));
         container.setSamples(attributes.total_samples.longValue());
         container.setChannels(attributes.channels);
         container.setSampleRate(attributes.sample_rate);
