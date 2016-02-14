@@ -8,12 +8,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.melchor629.engine.loaders.collada.Controller;
-import org.melchor629.engine.loaders.collada.Effect;
-import org.melchor629.engine.loaders.collada.Geometry;
-import org.melchor629.engine.loaders.collada.Image;
-import org.melchor629.engine.loaders.collada.Material;
-import org.melchor629.engine.loaders.collada.VisualScene;
+import org.melchor629.engine.loaders.collada.*;
 import org.melchor629.engine.utils.Timing;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,19 +28,21 @@ public class Collada {
     public ArrayList<Effect> effects;
     public ArrayList<VisualScene> visual_scenes;
     public ArrayList<Controller> controllers;
+    public ArrayList<Light> lights;
     /** $('scene instance_visual_scene').attr('url') **/
     public String The_Scene;
 
     public Collada(File file) throws IOException, SAXException {
         cFile = file;
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = null;
+        DocumentBuilder dBuilder;
         
         try {
             dBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             System.out.printf("Error que nunca deberia haber salido...\n"); //TODO Logger
             e.printStackTrace();
+            return;
         }
         
         Document doc = dBuilder.parse(file);
@@ -58,6 +55,7 @@ public class Collada {
         effects(collada);
         visual_scenes(collada);
         controllers(collada);
+        lights(collada);
     }
 
     public Geometry searchForGeometryWithId(String id) {
@@ -87,6 +85,15 @@ public class Collada {
 
         while(i < effects.size() && !effects.get(i).getId().equals(id)) i++;
         return i < effects.size() ? effects.get(i) : null;
+    }
+
+    public Light searchForLightWithId(String id) {
+        int i = 0;
+        if(id.startsWith("#"))
+            id = id.substring(1);
+
+        while(i < lights.size() && !lights.get(i).getId().equals(id)) i++;
+        return i < lights.size() ? lights.get(i) : null;
     }
     
     public void disposeData() {
@@ -164,6 +171,16 @@ public class Collada {
         for(int i = 0; i < nl.getLength(); i++) {
             Element cntrl = (Element) nl.item(i);
             controllers.add(new Controller(cntrl));
+        }
+    }
+
+    protected void lights(Element collada) {
+        lights = new ArrayList<>();
+        NodeList nl = ((Element) collada.getElementsByTagName("library_lights").item(0))
+                .getElementsByTagName("light");
+        for(int i = 0; i < nl.getLength(); i++) {
+            Element light = (Element) nl.item(i);
+            lights.add(new Light(light));
         }
     }
 }

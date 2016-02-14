@@ -139,6 +139,7 @@ public class AnotherTestingClass {
             s.setUniformMatrix("view", camera.getViewMatrix());
             s.setUniformMatrix("project", camera.getProjectionMatrix());
 
+            cubeModel.translate(0.0001f, 0, 0);
             s.setUniformMatrix("model", cubeModel.getModelMatrix());
             cube.draw();
 
@@ -154,7 +155,7 @@ public class AnotherTestingClass {
             Listener.setOrientation(camera.getLookingAtDirection(), new Vector3(0, 0, 1));
             Listener.setVelocity(camera.getSpeed());
             t.split("cpu");
-            //System.out.printf("CPU: %.6f\tGPU: %.6f\n", t.getSplitTime("cpu"), t.getSplitTime("gpu"));
+            System.out.printf("CPU: %.6f\tGPU: %.6f    \r", t.getSplitTime("cpu"), t.getSplitTime("gpu"));
         }
 
         s.delete();

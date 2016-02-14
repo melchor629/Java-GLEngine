@@ -51,7 +51,7 @@ public class ColladaScene {
                 modelMatrices.add(model);
 
                 if(((Instance_Geometry) n.instance).instance_material_target != null) {
-                    String name = ((Instance_Geometry) n.instance).name;
+                    String name = ((Instance_Geometry) n.instance).instance_material_target;
                     materials.add(Material.getMaterial(name));
                 } else {
                     materials.add(Material.getMaterial("")); //Default Material

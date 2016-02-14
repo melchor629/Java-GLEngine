@@ -57,12 +57,12 @@ public class WavExporter {
 
     private static void shortToByte(short[] a, byte[] b) {
         for(int i = 0; i < a.length; i++) {
-            b[2 * i] = (byte) (a[i]);
-            b[2*i+1] = (byte) (a[i] >> 8);
+            b[2 * i] = (byte) (a[i] >> 8);
+            b[2*i+1] = (byte) (a[i]);
         }
 
         if(a.length % 2 == 1) {
-            b[b.length-2] = (byte) a[a.length];
+            b[b.length-2] = (byte) (a[a.length]);
             b[b.length-1] = (byte) (a[a.length] >> 8);
         }
     }

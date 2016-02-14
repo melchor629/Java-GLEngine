@@ -19,9 +19,9 @@ public class AudioTests {
     static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/x64release"); }
 
     public static String archivo =
-            //"/Volumes/OSX/Música/13. Aria Math.wav";
+            "/Volumes/OSX/Música/13. Aria Math.wav";
             //"/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
-            "/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
+            //"/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
             //"/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
 
     public static void main(String[] args) throws Exception {

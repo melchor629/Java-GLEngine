@@ -6,7 +6,6 @@ import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
 
-import static org.lwjgl.openal.AL.destroy;
 import static org.lwjgl.openal.AL10.*;
 
 /**
@@ -20,9 +19,14 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void createContext() throws ALError {
-		context = ALContext.create();
-		if(context == null)
-			throw new ALError("Error creating context");
+		try {
+			context = ALContext.create();
+            context.makeCurrent();
+		} catch(Exception e) {
+			ALError err = new ALError("Error creating context");
+			err.initCause(e);
+			throw err;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -30,8 +34,11 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void deleteContext() {
-		if(context != null)
-			destroy(context);
+		if(context != null) {
+            context.destroy();
+            context.getDevice().close();
+            context = null;
+        }
 	}
 
 	/* (non-Javadoc)
@@ -373,8 +380,9 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getSource(int source, Source pname, float[] floats) {
-		// TODO Auto-generated method stub
-
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
+        alGetSourcefv(source, pname.e, buffer);
+        buffer.get(floats);
 	}
 
 	/* (non-Javadoc)
@@ -382,8 +390,9 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getSource(int source, Source pname, int[] integers) {
-		// TODO Auto-generated method stub
-
+        IntBuffer buffer = BufferUtils.createIntBuffer(3);
+        alGetSourceiv(source, pname.e, buffer);
+        buffer.get(integers);
 	}
 
 	/* (non-Javadoc)
@@ -391,8 +400,7 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public float getSourcef(int source, Source pname) {
-		// TODO Auto-generated method stub
-		return 0;
+		return alGetSourcef(source, pname.e);
 	}
 
 	/* (non-Javadoc)
@@ -733,7 +741,7 @@ public class LWJGLAudio implements AL {
 	public void getBuffer(int buffer, Buffer pname, float[] floats) {
 		if(!isBuffer(buffer))
 			throw new ALError("alBuffer", "Buffer is not a buffer");
-		
+
 		//TODO AL11.
 	}
 

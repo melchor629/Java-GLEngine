@@ -48,7 +48,7 @@ public class WavDecoder extends AudioDecoder {
         if(!new String(buff, Charset.defaultCharset()).equals("data")) throw new AudioDecoderException("No data section");
 
         sizeOfWavData = toNativeOrder(fis.readInt());
-        container.setSamples(sizeOfWavData / container.getChannels() / bitDepth);
+        container.setSamples(sizeOfWavData / container.getChannels() / bitDepth * 8);
     }
 
     @Override
