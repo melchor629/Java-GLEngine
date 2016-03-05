@@ -97,7 +97,6 @@ public class IOUtils {
      */
     public static String readUrl(URL url) throws IOException {
         StringBuilder sb = new StringBuilder();
-        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         URLConnection con = url.openConnection();
         con.setConnectTimeout(1000);

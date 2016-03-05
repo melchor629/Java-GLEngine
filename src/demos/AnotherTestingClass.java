@@ -1,3 +1,5 @@
+package demos;
+
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.al.LWJGLAudio;
@@ -17,7 +19,6 @@ import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.objects.Camera;
-import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.math.ModelMatrix;
@@ -27,7 +28,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class AnotherTestingClass {
-    static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/release"); }
     
     private final static String vertex_shader = "#version 150 core\n"
             + "in vec3 position;\n"
@@ -96,15 +96,15 @@ public class AnotherTestingClass {
 
         Collada c = null;
         try {
-            c = new Collada(new File("mierda.dae"));
+            //c = new Collada(new File("mierda.dae"));
+            c = new Collada(new File("src/main/resources/scenes/mierdolo.dae"));
+            c.loadElements();
         } catch(Exception e) {
             e.printStackTrace();
             window.destroyWindow();
             System.exit(1);
         }
 
-        Model.loadModels(c);
-        Material.loadMaterials(c);
         ColladaScene cs = new ColladaScene(c.visual_scenes.get(0));
 
         ShaderProgram s = new ShaderProgram(vertex_shader, fragment_shader);
@@ -126,6 +126,7 @@ public class AnotherTestingClass {
         s.setUniformMatrix("model", model.getModelMatrix());
 
         gl.enable(GLEnable.DEPTH_TEST);
+        gl.enable(GLEnable.CULL_FACE);
         gl.clearColor(1, 1, 1, 1);
         t.split("GL & data");
         synchronized (lock) {

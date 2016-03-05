@@ -1,7 +1,6 @@
-package org.melchor629.engine.native_bridge;
+package org.melchor629.engine.nativeBridge;
 
 import com.sun.jna.*;
-import com.sun.jna.Native;
 import com.sun.jna.ptr.IntByReference;
 
 import java.util.Arrays;

@@ -9,6 +9,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.melchor629.engine.loaders.collada.*;
+import org.melchor629.engine.objects.Model;
+import org.melchor629.engine.utils.IOUtils;
+import org.melchor629.engine.utils.TextureManager;
 import org.melchor629.engine.utils.Timing;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,6 +59,12 @@ public class Collada {
         visual_scenes(collada);
         controllers(collada);
         lights(collada);
+    }
+
+    public void loadElements() throws IOException {
+        Model.loadModels(this);
+        for(Image i : images) TextureManager.getInstance().loadTexture(i.name, IOUtils.getResourceAsStream("img/" + i.init_from));
+        org.melchor629.engine.objects.Material.loadMaterials(this);
     }
 
     public Geometry searchForGeometryWithId(String id) {

@@ -343,7 +343,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
 
         float sensibility = (float) delta * 4 * (float) mouseSensibility;
         
-        rot.x += self.getMouseSpeed().x * sensibility;
+        rot.x -= self.getMouseSpeed().x * sensibility;
         rot.y += self.getMouseSpeed().y * sensibility;
         
         if(rot.y > 89.f)

@@ -4,7 +4,7 @@ import com.sun.jna.ptr.IntByReference;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
-import org.melchor629.engine.native_bridge.LibOpusFile;
+import org.melchor629.engine.nativeBridge.LibOpusFile;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.io.File;

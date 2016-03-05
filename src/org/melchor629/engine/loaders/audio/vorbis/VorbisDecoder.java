@@ -1,7 +1,7 @@
 package org.melchor629.engine.loaders.audio.vorbis;
 
 import com.sun.jna.ptr.IntByReference;
-import org.melchor629.engine.native_bridge.LibVorbisFile;
+import org.melchor629.engine.nativeBridge.LibVorbisFile;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;

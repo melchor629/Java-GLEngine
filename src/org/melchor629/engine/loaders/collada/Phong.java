@@ -3,6 +3,8 @@ package org.melchor629.engine.loaders.collada;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.util.List;
+
 /**
  * Is a type of Common Rendering Effects
  */
@@ -10,26 +12,26 @@ public class Phong {
     private CommonColorOrTextureType emission, ambient, diffuse, specular, reflective;
     private float shininess, reflectivity, transparency, index_of_refraction;
 
-    public Phong(Element phong) {
+    public Phong(Element phong, List<Effect.newparam> newparams) {
         NodeList node = phong.getElementsByTagName("emission");
         if(node.getLength() == 1)
-            emission = new CommonColorOrTextureType((Element) node.item(0));
+            emission = new CommonColorOrTextureType((Element) node.item(0), newparams);
 
         node = phong.getElementsByTagName("ambient");
         if(node.getLength() == 1)
-            ambient = new CommonColorOrTextureType((Element) node.item(0));
+            ambient = new CommonColorOrTextureType((Element) node.item(0), newparams);
 
         node = phong.getElementsByTagName("diffuse");
         if(node.getLength() == 1)
-            diffuse = new CommonColorOrTextureType((Element) node.item(0));
+            diffuse = new CommonColorOrTextureType((Element) node.item(0), newparams);
 
         node = phong.getElementsByTagName("specular");
         if(node.getLength() == 1)
-            specular = new CommonColorOrTextureType((Element) node.item(0));
+            specular = new CommonColorOrTextureType((Element) node.item(0), newparams);
 
         node = phong.getElementsByTagName("reflective");
         if(node.getLength() == 1)
-            reflective = new CommonColorOrTextureType((Element) node.item(0));
+            reflective = new CommonColorOrTextureType((Element) node.item(0), newparams);
 
         node = phong.getElementsByTagName("shininess");
         if(node.getLength() == 1)

@@ -1,6 +1,8 @@
+plugins {
+    id "org.sonarqube" version "1.2"
+}
+
 apply plugin: 'java'
-apply plugin: 'cpp'
-apply plugin: 'c'
 
 repositories {
     mavenCentral()
@@ -9,108 +11,8 @@ repositories {
 dependencies {
     compile 'net.java.dev.jna:jna:4.+'
     compile 'org.reflections:reflections:0.9.+'
+    compile 'org.luaj:luaj-jse:3.0.+'
     compile files('../Library/lwjgl/jar/lwjgl.jar');
-}
-
-model {
-    buildTypes {
-        debug
-        release
-    }
-
-    toolChains {
-        gcc(Gcc) {
-            target("x86") {
-                cCompiler.withArguments { args ->
-                    args << "-m32"
-                }
-                cppCompiler.withArguments { args ->
-                    args << "-m32"
-                }
-                linker.withArguments { args ->
-                    args << "-m32" << "-L/usr/lib/i386-linux-gnu/"
-                }
-            }
-            target("x64")
-        }
-
-        clang(Clang) {
-            target("x86") {
-                cCompiler.withArguments { args ->
-                    args << "-m32"
-                }
-                cppCompiler.withArguments { args ->
-                    args << "-m32"
-                }
-                linker.withArguments { args ->
-                    args << "-m32"
-                }
-            }
-            target("x64")
-        }
-
-        mingw_x64(Gcc) {
-            path "/usr/bin"
-            eachPlatform() {
-                cCompiler.executable "x86_64-w64-mingw32-gcc"
-                cppCompiler.executable "x86_64-w64-mingw32-g++"
-                linker.executable "x86_64-w64-mingw32-g++"
-                assembler.executable "x86_64-w64-mingw32-as"
-                staticLibArchiver.executable "x86_64-w64-mingw32-ar"
-            }
-            target("win64")
-        }
-    }
-
-    platforms {
-        x86 {
-            architecture "x86"
-        }
-        x64 {
-            architecture "x64"
-        }
-
-        win64 {
-            architecture "x64"
-            operatingSystem "windows"
-        }
-    }
-
-    components {
-        engine(NativeLibrarySpec) {
-            targetPlatform "x86"
-            targetPlatform "x64"
-            targetPlatform "win64"
-            sources {
-                cpp {
-                    source {
-                        srcDir 'src/engine/source'
-                        include '**/*.cpp'
-                    }
-                }
-
-                c {
-                    source {
-                        srcDir 'src/engine/source'
-                        include '**/*.c'
-                    }
-                }
-            }
-
-            binaries.all {
-                if(toolChain in Gcc || toolChain in Clang) {
-                    cppCompiler.args '-I/usr/local/include/'
-                    cCompiler.args '-I/usr/local/include/'
-                    linker.args '-L/usr/local/lib/', '-lFLAC++', '-lFLAC'
-
-                    if(buildType == buildTypes.debug)
-                        cppCompiler.args "-g"
-                    else
-                        cppCompiler.args "-O3"
-                }
-            }
-        }
-    }
 }
 
 sourceSets {
@@ -118,5 +20,11 @@ sourceSets {
         java {
             srcDir 'src'
         }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "*/demos/*"
     }
 }

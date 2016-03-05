@@ -1,3 +1,5 @@
+package demos;
+
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLContext.*;

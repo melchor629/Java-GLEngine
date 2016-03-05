@@ -354,9 +354,8 @@ public class ShaderProgram implements Erasable {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        delete();
+    public int hashCode() {
+        return shaderProgram;
     }
 
     /**

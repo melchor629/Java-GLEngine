@@ -4,7 +4,9 @@ import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.types.Texture;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -31,14 +33,30 @@ public class TextureManager {
         else if(searchTexture(url) != null)
             texture = searchTexture(url);
         else {
+            if(!new File(url).exists()) throw new FileNotFoundException("File " + url + " not found");
             TextureWrapper textureWrapper = new TextureWrapper();
             textureWrapper.name = name;
             textureWrapper.url = url;
             textureWrapper.texture = texture = new Texture.builder().setFile(new File(url)).setMipmap(true).
                     setWrap(GLContext.TextureWrap.CLAMP_TO_BORDER).setMin(GLContext.TextureFilter.NEAREST_MIPMAP_LINEAR)
                     .setMag(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).build();
+            textures.add(textureWrapper);
         }
 
+        return texture;
+    }
+
+    public Texture loadTexture(String name, InputStream io) throws IOException {
+        Texture texture = searchTexture(name);
+        if(texture == null) {
+            TextureWrapper textureWrapper = new TextureWrapper();
+            textureWrapper.name = name;
+            textureWrapper.url = "";
+            textureWrapper.texture = texture = new Texture.builder().setStreamToFile(io).setMipmap(true).
+                    setWrap(GLContext.TextureWrap.CLAMP_TO_BORDER).setMin(GLContext.TextureFilter.NEAREST_MIPMAP_LINEAR)
+                    .setMag(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).build();
+            textures.add(textureWrapper);
+        }
         return texture;
     }
 

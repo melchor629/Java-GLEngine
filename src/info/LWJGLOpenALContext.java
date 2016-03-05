@@ -2,6 +2,7 @@ package info;
 
 import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.ALContext;
+import org.melchor629.engine.utils.logger.Logger;
 
 import java.lang.reflect.Field;
 
@@ -10,24 +11,26 @@ import java.lang.reflect.Field;
  * from OpenAL
  */
 public class LWJGLOpenALContext {
+    private static final Logger LOG = Logger.getLogger(LWJGLOpenALContext.class);
+
     public static void main(String[] args) {
         ALContext context = ALContext.create();
         context.makeCurrent();
         ALCapabilities cap = context.getCapabilities();
 
-        System.out.println("Extensions supported by the context:");
+        LOG.info("Extensions supported by the context:");
         for(Field f : cap.getClass().getFields()) {
             try {
                 if(f.getBoolean(cap))
-                    System.out.printf(" - %s:\n", f.getName());
+                    LOG.info(" - %s:", f.getName());
             } catch(Exception ignore) {}
         }
 
-        System.out.println("\nExtensions supported by the device:");
+        LOG.info("Extensions supported by the device:");
         for(Field f : context.getDevice().getCapabilities().getClass().getFields()) {
             try {
                 if(f.getBoolean(context.getDevice().getCapabilities()))
-                    System.out.printf(" - %s\n", f.getName());
+                    LOG.info(" - %s", f.getName());
             } catch(Exception ignore) {}
         }
 
@@ -36,4 +39,6 @@ public class LWJGLOpenALContext {
         context.destroy();
         context.getDevice().close();
     }
+
+    private LWJGLOpenALContext() {}
 }

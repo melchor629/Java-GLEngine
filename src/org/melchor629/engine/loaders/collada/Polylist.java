@@ -13,7 +13,6 @@ public class Polylist {
     public int count;
     public java.nio.IntBuffer vcount, p;
     public ArrayList<Input> inputs;
-    private short offset = 0;
 
     public Polylist(Element pl) {
         material = pl.getAttribute("material");
@@ -25,13 +24,11 @@ public class Polylist {
             Element input = (Element) nl.item(i);
             Input in = new Input(input);
             inputs.add(in);
-            if(offset < in.offset)
-                offset = (short) in.offset;
         }
 
         vcount = org.melchor629.engine.utils.BufferUtils.createIntBuffer(count);
         String t = pl.getElementsByTagName("vcount").item(0).getTextContent();
-        int pos = 0, newPos = 0, pCount = 0;
+        int pos = 0, newPos, pCount = 0;
         for(int i = 0; i < count; i++) {
             newPos = t.indexOf(' ', pos + 1);
             int val;

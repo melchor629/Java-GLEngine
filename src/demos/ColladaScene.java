@@ -1,3 +1,5 @@
+package demos;
+
 import org.melchor629.engine.loaders.collada.Instance_Geometry;
 import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.loaders.collada.VisualScene;

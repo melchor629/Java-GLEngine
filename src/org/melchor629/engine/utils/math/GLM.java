@@ -1,9 +1,5 @@
 package org.melchor629.engine.utils.math;
 
-import java.nio.FloatBuffer;
-
-import org.lwjgl.BufferUtils;
-
 /**
  * Utils for Math stuff. See javadoc for every method.
  * This class also contains some shortcuts for some
@@ -11,8 +7,6 @@ import org.lwjgl.BufferUtils;
  * @author melchor9000
  */
 public class GLM {
-    public static final double PI = Math.PI;
-    public static final double E = Math.E;
 
     /**
      * Sinus of the angle
@@ -492,10 +486,9 @@ public class GLM {
         double left = -range * aspect;
         double right = range * aspect;
         double bottom = -range;
-        double top = range;
         
         perspective.set(0, 0, (float) ((2f * zNear) / (right - left)));
-        perspective.set(1, 1, (float) ((2f * zNear) / (top - bottom)));
+        perspective.set(1, 1, (float) ((2f * zNear) / (range - bottom)));
         perspective.set(2, 2, (float) -((zFar + zNear) / (zFar - zNear)));
         perspective.set(2, 3, - 1F);
         perspective.set(3, 2, (float) -((2D * zFar * zNear) / (zFar - zNear)));
@@ -563,18 +556,6 @@ public class GLM {
         Vector4 obj = mul(Inverse, tmp);
         obj = product(1f / obj.w, obj);
         return new Vector3(obj);
-    }
-
-    /**
-     * Fills a {@link java.nio.FloatBuffer} with the values of the Matrix, ready for use in
-     * OpenGL functions.
-     * @param mat Matrix
-     * @return a FloatBuffer filled with the matrix
-     */
-    public static FloatBuffer matrixAsBuffer(Matrix4 mat) {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        mat.fillBuffer(buffer);
-        return buffer;
     }
 
     public static float[] matrixAsArray(Matrix4 mat) {

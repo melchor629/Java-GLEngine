@@ -4,6 +4,8 @@ import org.melchor629.engine.utils.math.Vector4;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.util.List;
+
 /**
  * Describes a color or a texture for every parameter inside a Common Rendering Effect
  */
@@ -12,13 +14,13 @@ public class CommonColorOrTextureType {
     private Texture texture;
     private String sid;
 
-    public CommonColorOrTextureType(Element element) {
+    public CommonColorOrTextureType(Element element, List<Effect.newparam> newparams) {
         NodeList list = element.getChildNodes();
         for(int i = 0; i < list.getLength(); i++) {
             if(list.item(i) instanceof Element) {
                 Element element1 = (Element) list.item(i);
                 if(element1.getTagName().equals("color")) parseColor(element1.getTextContent());
-                else if(element1.getTagName().equals("texture")) texture = new Texture(element1);
+                else if(element1.getTagName().equals("texture")) texture = new Texture(element1, newparams);
                 sid = element1.getAttribute("sid");
             }
         }
@@ -32,7 +34,7 @@ public class CommonColorOrTextureType {
     }
 
     /**
-     * The String ID is a string identifier of the node. It's util
+     * The String ID is a string identifier of the node. It's useful
      * for identify which node is
      * @return node's SID
      */
@@ -59,8 +61,25 @@ public class CommonColorOrTextureType {
     public class Texture {
         private String texture, texturecoord;
 
-        Texture(Element element) {
+        Texture(Element element, List<Effect.newparam> newparams) {
+            texture = element.getAttribute("texture");
+            texturecoord = element.getAttribute("texcoord");
 
+            for(Effect.newparam np : newparams) {
+                if(np.sid.equals(texture)) {
+                    if(np.type.equals("sampler2D")) {
+                        for(Effect.newparam n : newparams) {
+                            if(n.sid.equals(np.value)) {
+                                texture = n.value;
+                                break;
+                            }
+                        }
+                    } else {
+                        texture = np.value;
+                    }
+                    break;
+                }
+            }
         }
 
         /**

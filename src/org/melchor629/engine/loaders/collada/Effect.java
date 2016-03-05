@@ -16,18 +16,18 @@ public class Effect {
     public Effect(Element effects) {
         Element profile_COMMON = (Element) effects.getElementsByTagName("profile_COMMON").item(0);
         id = effects.getAttribute("id");
-        Element technique = (Element) profile_COMMON.getElementsByTagName("technique").item(0);
-        if(technique.getElementsByTagName("phong").item(0) != null)
-            phong = new Phong((Element) technique.getElementsByTagName("phong").item(0));
-        else if(technique.getElementsByTagName("blinn").getLength() == 1)
-            phong = new Phong((Element) technique.getElementsByTagName("blinn").item(0));
-        //else ... TODO
         params = new ArrayList<>();
         org.w3c.dom.NodeList nl = profile_COMMON.getElementsByTagName("newparam");
         for(int i = 0; i < nl.getLength(); i++) {
             Element newparam = (Element) nl.item(i);
             params.add(new newparam(newparam));
         }
+        Element technique = (Element) profile_COMMON.getElementsByTagName("technique").item(0);
+        if(technique.getElementsByTagName("phong").item(0) != null)
+            phong = new Phong((Element) technique.getElementsByTagName("phong").item(0), params);
+        else if(technique.getElementsByTagName("blinn").getLength() == 1)
+            phong = new Phong((Element) technique.getElementsByTagName("blinn").item(0), params);
+        //else ... TODO
     }
 
     public Phong getPhong() {

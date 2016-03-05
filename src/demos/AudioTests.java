@@ -1,3 +1,5 @@
+package demos;
+
 import com.sun.jna.Native;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
@@ -8,6 +10,7 @@ import org.melchor629.engine.al.types.Source;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.utils.Timing;
+import org.melchor629.engine.utils.logger.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,11 +19,11 @@ import java.util.ArrayList;
  * Probando descodificadores de audio
  */
 public class AudioTests {
-    static { System.setProperty("jna.library.path", "build/binaries/engineSharedLibrary/x64release"); }
+    private static final Logger log = Logger.getLogger(AudioTests.class);
 
-    public static String archivo =
-            "/Volumes/OSX/Música/13. Aria Math.wav";
-            //"/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
+    public static final String archivo =
+            //"/Volumes/OSX/Música/13. Aria Math.wav";
+            "/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
             //"/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
             //"/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
 
@@ -39,7 +42,7 @@ public class AudioTests {
         data = decoder.getAudioContainer();
 
         String ext = archivo.substring(archivo.lastIndexOf(".") + 1);
-        System.out.printf("Time spent decoding %s %dms\n", ext, timeDecode);
+        log.info("Time spent decoding %s %dms", ext, timeDecode);
 
         data.getDataAsShort().clear();
         Buffer sd_buffer = new Buffer(data.getDataAsShort(), AL.Format.STEREO16, data.getSampleRate());

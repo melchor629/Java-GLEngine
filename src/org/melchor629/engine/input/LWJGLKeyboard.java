@@ -3,7 +3,6 @@ package org.melchor629.engine.input;
 import static org.lwjgl.glfw.GLFW.*;
 
 import java.lang.reflect.Field;
-import java.util.IllegalFormatException;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;

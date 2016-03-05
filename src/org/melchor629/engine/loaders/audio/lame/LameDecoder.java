@@ -2,7 +2,7 @@ package org.melchor629.engine.loaders.audio.lame;
 
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import org.melchor629.engine.native_bridge.LibLame;
+import org.melchor629.engine.nativeBridge.LibLame;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
@@ -141,9 +141,7 @@ public class LameDecoder extends AudioDecoder {
         }
         while (!isMp123SyncWord(buf)) {
             // search for MP3 syncword one byte at a time
-            for (int i = 0; i < 3; i++) {
-                buf[i] = buf[i + 1];
-            }
+            System.arraycopy(buf, 1, buf, 0, 3);
             int val = input.read();
             if (val == -1) {
                 return false;

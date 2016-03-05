@@ -108,11 +108,11 @@ public class Framebuffer implements Erasable {
     public void attachStencilTexture(Texture texture) {
         gl.bindFramebuffer(fb);
         if(texture.is1D()) {
-            gl.framebufferTexture1D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
+            gl.framebufferTexture1D(GLContext.FramebufferAttachment.STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
         } else if(texture.is2D()) {
-            gl.framebufferTexture2D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
+            gl.framebufferTexture2D(GLContext.FramebufferAttachment.STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
         } else if(texture.is3D()) {
-            gl.framebufferTexture3D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
+            gl.framebufferTexture3D(GLContext.FramebufferAttachment.STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
         }
     }
 
@@ -138,11 +138,11 @@ public class Framebuffer implements Erasable {
     public void attachDepthStencilTexture(Texture texture) {
         gl.bindFramebuffer(fb);
         if(texture.is1D()) {
-            gl.framebufferTexture1D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
+            gl.framebufferTexture1D(GLContext.FramebufferAttachment.DEPTH_STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
         } else if(texture.is2D()) {
-            gl.framebufferTexture2D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
+            gl.framebufferTexture2D(GLContext.FramebufferAttachment.DEPTH_STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0);
         } else if(texture.is3D()) {
-            gl.framebufferTexture3D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
+            gl.framebufferTexture3D(GLContext.FramebufferAttachment.DEPTH_STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
         }
     }
 

@@ -1,10 +1,10 @@
-package org.melchor629.engine.native_bridge;
+package org.melchor629.engine.nativeBridge;
 
 import com.sun.jna.*;
 import com.sun.jna.ptr.IntByReference;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ public class LibOpusFile implements Library {
     public static class OggOpusFile extends Structure implements Structure.ByReference {
         @Override
         protected List getFieldOrder() {
-            return Arrays.asList("");
+            return Collections.singletonList("");
         }
     }
 
