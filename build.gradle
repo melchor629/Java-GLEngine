@@ -4,6 +4,9 @@ plugins {
 
 apply plugin: 'java'
 
+sourceCompatibility = 1.8
+version '0.1-SNAPSHOT'
+
 repositories {
     mavenCentral()
 }
@@ -13,13 +16,14 @@ dependencies {
     compile 'org.reflections:reflections:0.9.+'
     compile 'org.luaj:luaj-jse:3.0.+'
     compile files('../Library/lwjgl/jar/lwjgl.jar');
+
+    testCompile 'junit:junit:4.12'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'GLEngine',
+                'Implementation-Version': version
     }
 }
 

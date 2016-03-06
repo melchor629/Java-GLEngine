@@ -16,7 +16,7 @@ public class Matrix3 {
         setMatrix(a11, a21, a31, a12, a22, a32, a13, a23, a33);
     }
 
-    public Matrix3(Matrix2 other) {
+    public Matrix3(Matrix3 other) {
         this();
         setMatrix(other.getValue(1, 1), other.getValue(2, 1), other.getValue(3, 1),
                   other.getValue(1, 2), other.getValue(2, 2), other.getValue(3, 2),

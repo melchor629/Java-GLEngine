@@ -7,6 +7,7 @@ import org.melchor629.engine.loaders.collada.CommonColorOrTextureType;
 import org.melchor629.engine.loaders.collada.Effect;
 import org.melchor629.engine.loaders.collada.Phong;
 import org.melchor629.engine.utils.ShaderManager;
+import org.melchor629.engine.utils.TextureManager;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.Vector4;
 
@@ -65,6 +66,11 @@ public class Material {
         ambient = colorOrDefault(p.getAmbient(), .1f, .1f, .1f);
         emission = colorOrDefault(p.getEmission(), 0, 0, 0);
         reflective = colorOrDefault(p.getReflective(), 1, 1, 1);
+        diffuseTex = textureOrNull(p.getDiffuse());
+        specularTex = textureOrNull(p.getSpecular());
+        ambientTex = textureOrNull(p.getAmbient());
+        emissionTex = textureOrNull(p.getEmission());
+        reflectiveTex = textureOrNull(p.getReflective());
         shininess = p.getShininess();
     }
 
@@ -84,8 +90,14 @@ public class Material {
         return new Vector4(r, g, b, 1);
     }
 
+    private Texture textureOrNull(CommonColorOrTextureType o) {
+        if(o != null && o.getTexture() != null)
+             return TextureManager.getInstance().searchTexture(o.getTexture().getTexture());
+        return null;
+    }
+
     public void enableShaderAttributes(Model model) {
-        model.enableAttribs(phongShader, "position", "normal", "texcoord", "color");
+        model.enableAttribs(phongShader, "position", "normal", "texCoord", "color");
     }
 
     public void prepareMaterialToDraw(Camera camera, ModelMatrix modelMatrix) {

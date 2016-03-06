@@ -281,6 +281,48 @@ public class GLM {
     //////////////////////////////////////////////////
     ///    Matrix Utils                            ///
     //////////////////////////////////////////////////
+    @SafeVarargs
+    public static <T extends Number> Matrix<T> sum(Matrix<T>... mats) {
+        if(mats.length > 0) {
+            Matrix<T> matrix = mats[0].clone();
+
+            for(int i = 1; i < mats.length; i++) {
+                matrix.add(mats[i]);
+            }
+
+            return matrix;
+        }
+        return null;
+    }
+
+    @SafeVarargs
+    public static <T extends Number> Matrix<T> substract(Matrix<T>... mats) {
+        if(mats.length > 0) {
+            Matrix<T> matrix = mats[0].clone();
+
+            for(int i = 1; i < mats.length; i++) {
+                matrix.substract(mats[i]);
+            }
+
+            return matrix;
+        }
+        return null;
+    }
+
+    @SafeVarargs
+    public static <T extends Number> Matrix<T> product(Matrix<T>... mats) {
+        if(mats.length > 0) {
+            Matrix<T> matrix = mats[0].clone();
+
+            for(int i = 1; i < mats.length; i++) {
+                matrix.multiply(mats[i]);
+            }
+
+            return matrix;
+        }
+        return null;
+    }
+
     /**
      * Transposes the matrix
      * @param mat Matrix to transpose

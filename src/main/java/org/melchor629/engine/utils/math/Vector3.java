@@ -6,7 +6,7 @@ import java.nio.FloatBuffer;
  * Vector 3 Class
  * @author melchor9000
  */
-public class Vector3 {
+public class Vector3 implements Cloneable {
     /** component of the vector **/
     public float x, y, z;
 
@@ -120,7 +120,13 @@ public class Vector3 {
      */
     @Override
     public Vector3 clone() {
-        return new Vector3(this);
+        try {
+            return (Vector3) super.clone();
+        } catch(Exception e) {
+            RuntimeException r = new RuntimeException();
+            r.initCause(e);
+            throw r;
+        }
     }
 
     /**
@@ -144,4 +150,8 @@ public class Vector3 {
         return this.x == v.x && this.y == v.y && this.z == v.z;
     }
 
+    @Override
+    public int hashCode() {
+        return (int) Math.floor(this.x * 29 * 29 + this.y * 29 + this.z);
+    }
 }

@@ -6,7 +6,7 @@ import java.nio.FloatBuffer;
  * Matrix 4x4 Class
  * @author melchor9000
  */
-public class Matrix4 {
+public class Matrix4 implements Cloneable {
     /** Matrix as array of floats **/
     public float[][] matrix = new float[4][4];
     
@@ -394,7 +394,13 @@ public class Matrix4 {
      */
     @Override
     public Matrix4 clone() {
-        return new Matrix4(this);
+        try {
+            return (Matrix4) super.clone();
+        } catch(Exception e) {
+            RuntimeException r = new RuntimeException();
+            r.initCause(e);
+            throw r;
+        }
     }
 
     /**

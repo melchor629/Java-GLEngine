@@ -28,7 +28,7 @@ out vec4 outColor;
 
 vec4 diffuseColor() {
     if(material.useDiffuseTex)
-        return texture(material.diffuseTex, f_texCoord);
+        return vec4(f_texCoord, 0.0, 1.0);//texture(material.diffuseTex, f_texCoord);
     else
         return vec4(material.diffuse, material.transparency);
 }

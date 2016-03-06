@@ -1,5 +1,6 @@
 package org.melchor629.engine.objects;
 
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.types.BufferObject;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * From Dart experiment
  */
-public class Model {
+public class Model implements Erasable {
     private VAO vao;
     private BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, colorBuffer;
     private final Geometry geometry;
@@ -160,7 +161,7 @@ public class Model {
         vao.unbind();
     }
 
-    private void delete() {
+    public void delete() {
         vao.delete();
         indexBuffer.delete();
         vertexBuffer.delete();
