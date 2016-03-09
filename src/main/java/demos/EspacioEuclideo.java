@@ -22,10 +22,6 @@ import java.util.TreeSet;
  * No hacer caso a esto
  */
 public class EspacioEuclideo extends Game {
-    static {
-        System.setProperty("jna.library.path", System.getProperty("engine.natives", "build/binaries/engineSharedLibrary/x64Release"));
-    }
-
     private static final Random rand = new Random();
     private static int WIDTH = 1280;
     private static int HEIGHT = 720;
@@ -37,7 +33,7 @@ public class EspacioEuclideo extends Game {
     private static TreeSet<Vector3> generarEspacioEuclídeo() {
         FloatBuffer puntos = BufferUtils.createFloatBuffer(10000 * 3);
         TreeSet<Vector3> puntos_lista = new TreeSet<>((o1, o2) ->
-                Math.round((o2.length() - o1.length()) * 1000.f)
+                Math.round((o2.module() - o1.module()) * 1000.f)
         );
 
         for(int i = 0; i < puntos.capacity() / 3; i++) {
@@ -50,21 +46,27 @@ public class EspacioEuclideo extends Game {
     }
 
     private static boolean esVálido(Vector3 punto) {
-        return Math.abs(punto.x) > 10f && Math.abs(punto.y) > .5f && Math.abs(punto.z) > .5f;
+        return Math.abs(punto.x()) > 10f && Math.abs(punto.y()) > .5f && Math.abs(punto.z()) > .5f;
     }
 
     private static Vector3 generarPunto(float max_x, float max_y, float max_z) {
-        return new Vector3(rand.nextFloat() * max_x, rand.nextFloat() * max_y - max_y / 2f, rand.nextFloat() * max_z - max_z / 2f);
+        return new Vector3(
+            rand.nextFloat() * max_x,
+            rand.nextFloat() * max_y - max_y / 2f,
+            rand.nextFloat() * max_z - max_z / 2f
+        );
     }
 
     private static int obtenerVisibles(FloatBuffer puntos_buff, Camera cam, TreeSet<Vector3> puntos) {
         final int cantidad[] = {0};
         puntos_buff.flip().clear();
         puntos.stream().filter((vec) -> {
-            float x = vec.x - cam.getPosition().x, y = vec.y - cam.getPosition().y, z = vec.z - cam.getPosition().z;
+            float x = vec.x() - cam.getPosition().x(),
+                y = vec.y() - cam.getPosition().y(),
+                z = vec.z() - cam.getPosition().z();
             return Math.sqrt(x*x + y*y + z*z) <= 100.0 && x > 0;
         }).forEach((vec) -> {
-            puntos_buff.put(vec.x).put(vec.y).put(vec.z);
+            puntos_buff.put(vec.x()).put(vec.y()).put(vec.z());
             cantidad[0]++;
         });
         puntos_buff.flip();
@@ -74,7 +76,7 @@ public class EspacioEuclideo extends Game {
     private static void listaABuffer(TreeSet<Vector3> puntos, FloatBuffer buff) {
         buff.flip().clear();
         for(Vector3 punto : puntos) {
-            buff.put(punto.x).put(punto.y).put(punto.z);
+            buff.put(punto.x()).put(punto.y()).put(punto.z());
         }
         buff.flip();
     }
@@ -286,18 +288,19 @@ public class EspacioEuclideo extends Game {
     @Override
     public void render() {
         float opacity = 1.f;
-        if(camera.getPosition().x < 50.f)
-            opacity = camera.getPosition().x / 50.f;
-        else if(camera.getPosition().x > WIDTH + HEIGHT - 50.f)
-            opacity = (WIDTH + HEIGHT - camera.getPosition().x) / 50.f;
+        if(camera.getPosition().x() < 50.f)
+            opacity = camera.getPosition().x() / 50.f;
+        else if(camera.getPosition().x() > WIDTH + HEIGHT - 50.f)
+            opacity = (WIDTH + HEIGHT - camera.getPosition().x()) / 50.f;
         opacity = Math.max(0, opacity);
         puntos_shader.bind();
-        puntos_shader.setUniform("opacity", opacity);
+        puntos_shader.setUniform("opacity", 1.f + 0.f*opacity);
 
         if(pasos++ % 5 == 0) {
             cantidad = obtenerVisibles(puntos_buff, camera, puntos);
             puntos_vbo.fillBuffer(puntos_buff);
             System.out.printf("Cantidad de puntos visibles: %d     \r", cantidad);
+            System.out.flush();
             pasos %= 5;
         }
 
@@ -336,10 +339,9 @@ public class EspacioEuclideo extends Game {
         else
             gl.disable(GLContext.GLEnable.FRAMEBUFFER_SRGB);
 
-        if(camera.getPosition().x > WIDTH + HEIGHT + 50f)
-            camera.setPosition(0, camera.getPosition().y, camera.getPosition().z);
-        if(t.frameTime < 1)
-            camera.setPosition(camera.getPosition().x + 25 * (float) t.frameTime, camera.getPosition().y, camera.getPosition().z);
+        if(camera.getPosition().x() > WIDTH + HEIGHT + 50f)
+            camera.setPosition(0, camera.getPosition().y(), camera.getPosition().z());
+            camera.setPosition(camera.getPosition().x() + 25 * (float) t.frameTime, camera.getPosition().y(), camera.getPosition().z());
         camera.updateIfNeeded();
     }
 

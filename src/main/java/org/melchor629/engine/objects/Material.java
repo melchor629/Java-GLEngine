@@ -109,32 +109,32 @@ public class Material {
         phongShader.setUniform("material.useSpecularTex", specularTex != null ? 1 : 0);
         phongShader.setUniform("material.useReflectiveTex", reflectiveTex != null ? 1 : 0);
 
-        phongShader.setUniform("material.diffuse", diffuse.x, diffuse.y, diffuse.z);
+        phongShader.setUniform("material.diffuse", diffuse.x(), diffuse.y(), diffuse.z());
         if (specular != null)
-            phongShader.setUniform("material.specular", specular.x, specular.y, specular.z);
+            phongShader.setUniform("material.specular", specular.x(), specular.y(), specular.z());
         else
             phongShader.setUniform("material.specular", 1, 1, 1);
         if (ambient != null)
-            phongShader.setUniform("material.ambient", ambient.x, ambient.y, ambient.z);
+            phongShader.setUniform("material.ambient", ambient.x(), ambient.y(), ambient.z());
         if (emission != null)
-            phongShader.setUniform("material.emission", emission.x, emission.y, emission.z);
+            phongShader.setUniform("material.emission", emission.x(), emission.y(), emission.z());
         if (reflective != null)
-            phongShader.setUniform("material.reflective", reflective.x, reflective.y, reflective.z);
+            phongShader.setUniform("material.reflective", reflective.x(), reflective.y(), reflective.z());
 
         phongShader.setUniform("material.shininess", shininess);
 
         phongShader.setUniformMatrix("model", modelMatrix.getModelMatrix());
         phongShader.setUniformMatrix("view", camera.getViewMatrix());
         phongShader.setUniformMatrix("projection", camera.getProjectionMatrix());
-        phongShader.setUniform("cameraPos", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
-        phongShader.setUniform("cameraDir", camera.getLookingAtDirection().x, camera.getLookingAtDirection().y,
-                camera.getLookingAtDirection().z);
+        phongShader.setUniform("cameraPos", camera.getPosition().x(), camera.getPosition().y(), camera.getPosition().z());
+        phongShader.setUniform("cameraDir", camera.getLookingAtDirection().x(), camera.getLookingAtDirection().y(),
+                camera.getLookingAtDirection().z());
 
         //TODO Eliminar
         //phongShader.setUniform("light.pos", 4.076245f, 1.005454f, 5.903862f);
-        phongShader.setUniform("light.pos", camera.pos.x, camera.pos.y, camera.pos.z);
-        phongShader.setUniform("light.dir", camera.getLookingAtDirection().x, camera.getLookingAtDirection().y,
-                camera.getLookingAtDirection().z);
+        phongShader.setUniform("light.pos", camera.pos.x(), camera.pos.y(), camera.pos.z());
+        phongShader.setUniform("light.dir", camera.getLookingAtDirection().x(), camera.getLookingAtDirection().y(),
+                camera.getLookingAtDirection().z());
         phongShader.setUniform("light.cutOff", (float) Math.toRadians(12.5));
         phongShader.setUniform("light.outerCutOff", (float) Math.toRadians(17.5));
         phongShader.setUniform("light.emission", 1.f, 1, 1, 1.f);

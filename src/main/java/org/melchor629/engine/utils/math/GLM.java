@@ -9,33 +9,6 @@ package org.melchor629.engine.utils.math;
 public class GLM {
 
     /**
-     * Sinus of the angle
-     * @param angle in degrees
-     * @return Sinus
-     */
-    public static double sin(double angle) {
-        return Math.sin(Math.toRadians(angle));
-    }
-
-    /**
-     * Cosine of the angle
-     * @param angle in degrees
-     * @return Cosine
-     */
-    public static double cos(double angle) {
-        return Math.cos(Math.toRadians(angle));
-    }
-
-    /**
-     * Trigonometric tangent of the angle
-     * @param angle in degrees
-     * @return tangent
-     */
-    public static double tan(double angle) {
-        return Math.tan(Math.toRadians(angle));
-    }
-
-    /**
      * Transform the degree angle to radians
      * @param angle in degrees
      * @return angle in radians
@@ -56,36 +29,16 @@ public class GLM {
     //////////////////////////////////////////////////
     ///    Vertex Utils                            ///
     //////////////////////////////////////////////////
-    
-    /**
-     * Returns the length of the vector (en Español el módulo)
-     * @param v Vector
-     * @return length of the vector
-     */
-    public static float length(Vector3 v) {
-        return (float) Math.sqrt(dot(v, v));
-    }
-
-    /**
-     * Returns the length of the vector (en Español el módulo)
-     * @param v Vector
-     * @return length of the vector
-     */
-    public static float length(Vector4 v) {
-        return (float) Math.sqrt(dot(v, v));
-    }
 
     /**
      * Sums all vectors.
      * @param vec Variable length of vectors
      * @return vector sum of all vectors
      */
-    public static Vector3 sum(Vector3... vec) {
+    public static Vector3 add(Vector3... vec) {
         Vector3 w = new Vector3();
-        for (Vector3 aVec : vec) {
-            w.x += aVec.x;
-            w.y += aVec.y;
-            w.z += aVec.z;
+        for(Vector3 aVec : vec) {
+            w.add(aVec);
         }
         return w;
     }
@@ -95,13 +48,24 @@ public class GLM {
      * @param vec Variable length of vectors
      * @return vector sum of all vectors
      */
-    public static Vector4 sum(Vector4... vec) {
+    public static Vector4 add(Vector4... vec) {
         Vector4 w = new Vector4();
-        for (Vector4 aVec : vec) {
-            w.x += aVec.x;
-            w.y += aVec.y;
-            w.z += aVec.z;
-            w.w += aVec.w;
+        for(Vector4 aVec : vec) {
+            w.add(aVec);
+        }
+        return w;
+    }
+
+    /**
+     * Sums all vectors.
+     * @param vec Variable length of vectors
+     * @return vector sum of all vectors
+     */
+    @SafeVarargs
+    public static <T extends Number> Vector<T> add(Vector<T>... vec) {
+        Vector<T> w = vec[0].clone();
+        for(int i = 1; i < vec.length; i++) {
+            w.add(vec[i]);
         }
         return w;
     }
@@ -112,11 +76,7 @@ public class GLM {
      * @return vector substraction of all vectors
      */
     public static Vector3 sub(Vector3 u, Vector3 v) {
-        Vector3 w = new Vector3();
-        w.x = u.x - v.x;
-        w.y = u.y - v.y;
-        w.z = u.z - v.z;
-        return w;
+        return (Vector3) u.clone().substract(v);
     }
 
     /**
@@ -125,11 +85,20 @@ public class GLM {
      * @return vector substraction of all vectors
      */
     public static Vector4 sub(Vector4 u, Vector4 v) {
-        Vector4 w = new Vector4();
-        w.x = u.x - v.x;
-        w.y = u.y - v.y;
-        w.z = u.z - v.z;
-        w.w = u.w - v.w;
+        return (Vector4) u.clone().substract(v);
+    }
+
+    /**
+     * Substract all vectors.
+     * @param vec Variable length of vectors
+     * @return vector substraction of all vectors
+     */
+    @SafeVarargs
+    public static <T extends Number> Vector<T> sub(Vector<T>... vec) {
+        Vector<T> w = vec[0].clone();
+        for(int i = 1; i < vec.length; i++) {
+            w.substract(vec[i]);
+        }
         return w;
     }
 
@@ -140,11 +109,7 @@ public class GLM {
      * @return vector multiplied by value
      */
     public static Vector3 product(float value, Vector3 vec) {
-        Vector3 v = vec.clone();
-        v.x *= value;
-        v.y *= value;
-        v.z *= value;
-        return v;
+        return (Vector3) vec.clone().product(value);
     }
 
     /**
@@ -154,88 +119,48 @@ public class GLM {
      * @return vector multiplied by value
      */
     public static Vector4 product(float value, Vector4 vec) {
-        Vector4 v = (Vector4) vec.clone();
-        v.x *= value;
-        v.y *= value;
-        v.z *= value;
-        v.w *= value;
-        return v;
+        return (Vector4) vec.clone().product(value);
     }
 
     /**
-     * Make dot product of vectors
-     * @param u First vector
-     * @param v Second vector
-     * @return dot product
+     * Multiplies the vector with the value
+     * @param value Value to multiply
+     * @param vec Vector
+     * @param <T> Type of the numbers
+     * @return vector multiplied by the value
      */
-    public static float dot(Vector3 u, Vector3 v) {
-        return u.x * v.x + u.y * v.y + u.z * v.z;
+    public static <T extends Number> Vector<T> product(T value, Vector<T> vec) {
+        return vec.clone().product(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Number> Vector<T> cross(Vector<T> a, Vector<T> b) {
+        if(b.getNumCoords() != 3)
+            throw new ArithmeticException("Vector is not of 3 coordinates");
+        T ux = a.getCoord(1), uy = a.getCoord(2), uz = a.getCoord(3);
+        T vx = b.getCoord(1), vy = b.getCoord(2), vz = b.getCoord(3);
+        return a.fillWithValues(
+            a.ops.sub(a.ops.mul(uy, vz), a.ops.mul(vy, uz)),
+            a.ops.sub(a.ops.mul(uz, vx), a.ops.mul(vz, ux)),
+            a.ops.sub(a.ops.mul(ux, vy), a.ops.mul(vx, uy))
+        );
     }
 
     /**
-     * Make dot product of vectors
-     * @param u First vector
-     * @param v Second vector
-     * @return dot product
+     * Computes the cross product in all vectors.
+     * @param vecs Vectors to make cross products
+     * @param <T> type of the numbers
+     * @return result of all cross products
+     * @throws ArithmeticException if any vector has not 3 coordinates
      */
-    public static float dot(Vector4 u, Vector4 v) {
-        return u.x * v.x + u.y * v.y + u.z * v.z + u.w * v.w;
-    }
-
-    /**
-     * Make cross product of vectors
-     * @param u First vector
-     * @param v Second vector
-     * @return cross product
-     */
-    public static Vector3 cross(Vector3 u, Vector3 v) {
-        Vector3 w = new Vector3();
-        w.x = u.y * v.z - v.y * u.z;
-        w.y = v.x * u.z - u.x * v.z;
-        w.z = u.x * v.y - u.y * v.x;
-        return w;
-    }
-
-    /**
-     * Turn the vector given into a normalized one
-     * @param v Vector to be normalized
-     * @return normalized vector
-     */
-    public static Vector3 normalize(Vector3 v) {
-        Vector3 nrm = new Vector3();
-        float modulo = length(v);
-        if(modulo == 0) return nrm; //No dividir entre 0
-        nrm.x = v.x / modulo;
-        nrm.y = v.y / modulo;
-        nrm.z = v.z / modulo;
-        return nrm;
-    }
-
-    /**
-     * Turn the vector given into a normalized one
-     * @param v Vector to be normalized
-     * @return normalized vector
-     */
-    public static Vector4 normalize(Vector4 v) {
-        Vector4 nrm = new Vector4();
-        float modulo = length(v);
-        nrm.x = v.x / modulo;
-        nrm.y = v.y / modulo;
-        nrm.z = v.z / modulo;
-        nrm.w = v.w / modulo;
-        return nrm;
-    }
-
-    /**
-     * Negates the vector (is like: (-1) * v)
-     * @param v Vector
-     * @return Vector negated
-     */
-    public static Vector3 negate(Vector3 v) {
-        Vector3 vec = new Vector3();
-        vec.x = - v.x;
-        vec.y = - v.y;
-        vec.z = - v.z;
+    @SafeVarargs
+    public static <T extends Number> Vector<T> cross(Vector<T>... vecs) {
+        Vector<T> vec = vecs[0].clone();
+        if(vec.getNumCoords() == 3) {
+            for(int i = 1; i < vecs.length; i++) {
+                cross(vec, vecs[i]);
+            }
+        }
         return vec;
     }
 
@@ -244,13 +169,9 @@ public class GLM {
      * @param v Vector
      * @return Vector negated
      */
-    public static Vector4 negate(Vector4 v) {
-        Vector4 vec = new Vector4();
-        vec.x = - v.x;
-        vec.y = - v.y;
-        vec.z = - v.z;
-        vec.w = - v.w;
-        return vec;
+    @SuppressWarnings("unchecked")
+    public static <T extends Vector<? extends Number>> T negate(T v) {
+        return (T) v.clone().negate();
     }
 
     /**
@@ -260,9 +181,7 @@ public class GLM {
      * @return angle in degrees
      */
     public static float angle(Vector3 u, Vector3 v) {
-        float dot = dot(u, v);
-        float uv = length(u) * length(v);
-        return (float) Math.toDegrees(Math.acos(dot / uv));
+        return (float) Math.toDegrees(u.angle(v));
     }
 
     /**
@@ -272,9 +191,18 @@ public class GLM {
      * @return angle in degrees
      */
     public static float angle(Vector4 u, Vector4 v) {
-        float dot = dot(u, v);
-        float uv = length(u) * length(v);
-        return (float) Math.toDegrees(Math.acos(dot / uv));
+        return (float) Math.toDegrees(u.angle(v));
+    }
+
+    /**
+     * Calculate the angle between two vectors
+     * @param u First vector
+     * @param v Second vector
+     * @param <T> type of the numbers
+     * @return angle in degrees
+     */
+    public static <T extends Number> float angle(Vector<T> u, Vector<T> v) {
+        return (float) Math.toDegrees(u.angle(v));
     }
 
 
@@ -282,7 +210,7 @@ public class GLM {
     ///    Matrix Utils                            ///
     //////////////////////////////////////////////////
     @SafeVarargs
-    public static <T extends Number> Matrix<T> sum(Matrix<T>... mats) {
+    public static <T extends Number> Matrix<T> add(Matrix<T>... mats) {
         if(mats.length > 0) {
             Matrix<T> matrix = mats[0].clone();
 
@@ -329,94 +257,139 @@ public class GLM {
      * @return Return a new matrix transpose of {@code mat}
      */
     public static Matrix4 transpose(Matrix4 mat) {
-        Matrix4 met = new Matrix4(mat);
-        met.setRow(0, mat.getColumn(0));
-        met.setRow(1, mat.getColumn(1));
-        met.setRow(2, mat.getColumn(2));
-        met.setRow(3, mat.getColumn(2));
-        return met;
-    }
-
-    /**
-     * Computes the determinant of the matrix
-     * @param m Matrix
-     * @return Determinant of the matrix
-     */
-    public static float determinant(Matrix4 m) {
-        float SubFactor00 = m.get(2, 2) * m.get(3, 3) - m.get(3, 2) * m.get(2, 3);
-        float SubFactor01 = m.get(2, 1) * m.get(3, 3) - m.get(3, 1) * m.get(2, 3);
-        float SubFactor02 = m.get(2, 1) * m.get(3, 2) - m.get(3, 1) * m.get(2, 2);
-        float SubFactor03 = m.get(2, 0) * m.get(3, 3) - m.get(3, 0) * m.get(2, 3);
-        float SubFactor04 = m.get(2, 0) * m.get(3, 2) - m.get(3, 0) * m.get(2, 2);
-        float SubFactor05 = m.get(2, 0) * m.get(3, 1) - m.get(3, 0) * m.get(2, 1);
-
-        Vector4 DetCof = new Vector4(
-            + (m.get(1, 1) * SubFactor00 - m.get(1, 2) * SubFactor01 + m.get(1, 3) * SubFactor02),
-            - (m.get(1, 0) * SubFactor00 - m.get(1, 2) * SubFactor03 + m.get(1, 3) * SubFactor04),
-            + (m.get(1, 0) * SubFactor01 - m.get(1, 1) * SubFactor03 + m.get(1, 3) * SubFactor05),
-            - (m.get(1, 0) * SubFactor02 - m.get(1, 1) * SubFactor04 + m.get(1, 2) * SubFactor05));
-
-        return
-            m.get(0, 0) * DetCof.x + m.get(0, 1) * DetCof.y +
-            m.get(0, 2) * DetCof.z + m.get(0, 3) * DetCof.w;
+        return (Matrix4) mat.clone().transpose();
     }
     
     /**
-     * Create a translation matrix with the translation vertex
+     * Create a translation matrix with the translation vector
      * @param mat Model Matrix
-     * @param trans Vertex indicating the translation
+     * @param trans Vector indicating the translation
      * @return Translation Matrix
      */
     public static Matrix4 translateMatrix(Matrix4 mat, Vector3 trans) {
-        Matrix4 result = new Matrix4(mat);
-        Vector4 a = mat.getRow(0), b = mat.getRow(1), c = mat.getRow(2), d = mat.getRow(3);
-        a.product(trans.x);
-        b.product(trans.y);
-        c.product(trans.z);
-        Vector4 s = sum(a, b, c, d);
-        result.setRow(3, s);
+        Matrix4 result = (Matrix4) mat.clone();
+        Vector<Float> a = mat.getRow(1), b = mat.getRow(2), c = mat.getRow(3), d = mat.getRow(4);
+        a.product(trans.x());
+        b.product(trans.y());
+        c.product(trans.z());
+        result.setRow(4, add(a, b, c, d));
+        return result;
+    }
+
+    /**
+     * Builds a translation matrix with the translation vector
+     * @param mat input matrix
+     * @param trans translation
+     * @param <T> type of the numbers
+     * @return input matrix translated
+     */
+    public static <T extends Number> Matrix<T> translateMatrix(Matrix<T> mat, Vector<T> trans) {
+        if(mat.getColumns() != 4 || mat.getRows() != 4)
+            throw new IllegalArgumentException("Matrix is not 4x4");
+        if(trans.getNumCoords() != 3)
+            throw new IllegalArgumentException("Vector has not 3 coordinates");
+
+        Matrix<T> result = mat.clone();
+        Vector<T> a = mat.getRow(1), b = mat.getRow(2), c = mat.getRow(3), d = mat.getRow(4);
+        a.product(trans.getCoord(1));
+        b.product(trans.getCoord(2));
+        c.product(trans.getCoord(3));
+        result.setRow(4, add(a, b, c, d));
         return result;
     }
 
     /**
      * Create a rotation matrix with the angle and the axis on which rotate
      * @param angle rotate angle (in radians)
-     * @param axis axis vector
+     * @param v axis vector
      * @return matrix with rotation transformation
      */
-    public static Matrix4 rotateMatrix(Matrix4 matrix, float angle, Vector3 axis) {
-        float len = axis.length();
-        float x = axis.x / len;
-        float y = axis.y / len;
-        float z = axis.z / len;
-        float c = (float) cos(angle);
-        float s = (float) sin(angle);
-        float C = 1.f - c;
-        float m11 = x * x * C + c;
-        float m12 = x * y * C - z * s;
-        float m13 = x * z * C + y * s;
-        float m21 = y * x * C + z * s;
-        float m22 = y * y * C + c;
-        float m23 = y * z * C - x * s;
-        float m31 = z * x * C - y * s;
-        float m32 = z * y * C + x * s;
-        float m33 = z * z * C + c;
-        float t1 = matrix.get(0, 0) * m11 + matrix.get(1, 0) * m21 + matrix.get(2, 0) * m31;
-        float t2 = matrix.get(0, 1) * m11 + matrix.get(1, 1) * m21 + matrix.get(2, 1) * m31;
-        float t3 = matrix.get(0, 2) * m11 + matrix.get(1, 2) * m21 + matrix.get(2, 2) * m31;
-        float t4 = matrix.get(0, 3) * m11 + matrix.get(1, 3) * m21 + matrix.get(2, 3) * m31;
-        float t5 = matrix.get(0, 0) * m12 + matrix.get(1, 0) * m22 + matrix.get(2, 0) * m32;
-        float t6 = matrix.get(0, 1) * m12 + matrix.get(1, 1) * m22 + matrix.get(2, 1) * m32;
-        float t7 = matrix.get(0, 2) * m12 + matrix.get(1, 2) * m22 + matrix.get(2, 2) * m32;
-        float t8 = matrix.get(0, 3) * m12 + matrix.get(1, 3) * m22 + matrix.get(2, 3) * m32;
-        float t9 = matrix.get(0, 0) * m13 + matrix.get(1, 0) * m23 + matrix.get(2, 0) * m33;
-        float t10 = matrix.get(0, 1) * m13 + matrix.get(1, 1) * m23 + matrix.get(2, 1) * m33;
-        float t11 = matrix.get(0, 2) * m13 + matrix.get(1, 2) * m23 + matrix.get(2, 2) * m33;
-        float t12 = matrix.get(0, 3) * m13 + matrix.get(1, 3) * m23 + matrix.get(2, 3) * m33;
-        matrix.setRow(0, t1, t2, t3, t4);
-        matrix.setRow(1, t5, t6, t7, t8);
-        matrix.setRow(2, t9, t10, t11, t12);
-        return matrix;
+    public static Matrix4 rotateMatrix(Matrix4 m, float angle, Vector3 v) {
+        Matrix4 rot = new Matrix4();
+        rot.fillWithValue(0f);
+        float c = (float) Math.cos(angle);
+        float s = (float) Math.sin(angle);
+        Vector3 axis = (Vector3) v.clone().normalize();
+        Vector3 temp = (Vector3) axis.clone().product(1 - c);
+
+        rot.setValueAt(1,1, c + temp.x() * axis.x());
+        rot.setValueAt(1,2, 0 + temp.x() * axis.y() + s * axis.z());
+        rot.setValueAt(1,3, 0 + temp.x() * axis.z() - s * axis.y());
+
+        rot.setValueAt(2,1, 0 + temp.y() * axis.x() - s * axis.z());
+        rot.setValueAt(2,2, c + temp.y() * axis.y());
+        rot.setValueAt(2,3, 0 + temp.y() * axis.z() + s * axis.x());
+
+        rot.setValueAt(3,1, 0 + temp.z() * axis.x() + s * axis.y());
+        rot.setValueAt(3,2, 0 + temp.z() * axis.y() - s * axis.x());
+        rot.setValueAt(3,3, c + temp.z() * axis.z());
+
+        Matrix4 result = new Matrix4();
+        result.fillWithValue(0f);
+        result.setRow(1,
+            m.getRow(1).product(rot.getValueAt(1,1))
+                .add(m.getRow(2).product(rot.getValueAt(1,2)))
+                .add(m.getRow(3).product(rot.getValueAt(1,3))));
+        result.setRow(2,
+            m.getRow(1).product(rot.getValueAt(2,1))
+                .add(m.getRow(2).product(rot.getValueAt(2,2)))
+                .add(m.getRow(3).product(rot.getValueAt(2,3))));
+        result.setRow(3,
+            m.getRow(1).product(rot.getValueAt(3,1))
+                .add(m.getRow(2).product(rot.getValueAt(3,2)))
+                .add(m.getRow(3).product(rot.getValueAt(3,3))));
+        result.setRow(4, m.getRow(4));
+        return result;
+    }
+
+    /**
+     * Builds a rotation matrix with a rotation angle and rotation axis
+     * @param m initial matrix
+     * @param angle rotation angle
+     * @param v rotation axis
+     * @param <T> type of the numbers
+     * @return initial matrix rotated
+     */
+    public static <T extends Number> Matrix<T> rotateMatrix(Matrix<T> m, T angle, Vector<T> v) {
+        if(m.getColumns() != 4 || m.getRows() != 4)
+            throw new IllegalArgumentException("Matrix is not 4x4");
+        if(v.getNumCoords() != 3)
+            throw new IllegalArgumentException("Vector has not 3 coordinates");
+
+        ArithmeticOperations<T> o = m.ops;
+        Matrix<T> rot = m.clone().fillWithValue(o.convert(0));
+        T c = o.convert(Math.cos(angle.doubleValue()));
+        T s = o.convert(Math.sin(angle.doubleValue()));
+        Vector<T> axis = v.clone().normalize();
+        Vector<T> temp = axis.clone().product(o.sub(o.convert(1), c));
+
+        rot.setValueAt(1,1, o.add(c, o.mul(temp.getCoord(1), axis.getCoord(1))));
+        rot.setValueAt(1,2, o.add(o.mul(temp.getCoord(1), axis.getCoord(2)), o.mul(s, axis.getCoord(3))));
+        rot.setValueAt(1,3, o.sub(o.mul(temp.getCoord(1), axis.getCoord(3)), o.mul(s, axis.getCoord(2))));
+
+        rot.setValueAt(2,1, o.sub(o.mul(temp.getCoord(2), axis.getCoord(1)), o.mul(s, axis.getCoord(3))));
+        rot.setValueAt(2,2, o.add(c, o.mul(temp.getCoord(2), axis.getCoord(2))));
+        rot.setValueAt(2,3, o.add(o.mul(temp.getCoord(2), axis.getCoord(3)), o.mul(s, axis.getCoord(1))));
+
+        rot.setValueAt(3,1, o.add(o.mul(temp.getCoord(3), axis.getCoord(1)), o.mul(s, axis.getCoord(2))));
+        rot.setValueAt(3,2, o.sub(o.mul(temp.getCoord(3), axis.getCoord(2)), o.mul(s, axis.getCoord(1))));
+        rot.setValueAt(3,3, o.add(c, o.mul(temp.getCoord(3), axis.getCoord(3))));
+
+        Matrix<T> result = m.clone().fillWithValue(m.ops.convert(0));
+        result.setRow(1,
+            m.getRow(1).product(rot.getValueAt(1,1))
+                .add(m.getRow(2).product(rot.getValueAt(1,2)))
+                .add(m.getRow(3).product(rot.getValueAt(1,3))));
+        result.setRow(2,
+            m.getRow(1).product(rot.getValueAt(2,1))
+                .add(m.getRow(2).product(rot.getValueAt(2,2)))
+                .add(m.getRow(3).product(rot.getValueAt(2,3))));
+        result.setRow(3,
+            m.getRow(1).product(rot.getValueAt(3,1))
+                .add(m.getRow(2).product(rot.getValueAt(3,2)))
+                .add(m.getRow(3).product(rot.getValueAt(3,3))));
+        result.setRow(4, m.getRow(4));
+        return result;
     }
 
     /**
@@ -425,11 +398,33 @@ public class GLM {
      * @return Scale matrix
      */
     public static Matrix4 scaleMatrix(Matrix4 mat, Vector3 scale) {
-        Matrix4 result = new Matrix4(0);
-        result.setRow(0, mat.getRow(0).product(scale.x));
-        result.setRow(1, mat.getRow(1).product(scale.y));
-        result.setRow(2, mat.getRow(2).product(scale.z));
-        result.setRow(3, mat.getRow(3));
+        Matrix4 result = new Matrix4();
+        result.fillWithValue(0f);
+        result.setRow(1, mat.getRow(1).product(scale.x()));
+        result.setRow(2, mat.getRow(2).product(scale.y()));
+        result.setRow(3, mat.getRow(3).product(scale.z()));
+        result.setRow(4, mat.getRow(4));
+        return result;
+    }
+
+    /**
+     * Builds a scale matrix with the scale vector
+     * @param mat initial matrix
+     * @param scale scale vector
+     * @param <T> type of numbers
+     * @return initial matrix scaled
+     */
+    public static <T extends Number> Matrix<T> scaleMatrix(Matrix<T> mat, Vector<T> scale) {
+        if(mat.getColumns() != 4 || mat.getRows() != 4)
+            throw new IllegalArgumentException("Matrix is not 4x4");
+        if(scale.getNumCoords() != 3)
+            throw new IllegalArgumentException("Vector has not 3 coordinates");
+
+        Matrix<T> result = mat.clone().fillWithValue(mat.ops.convert(0));
+        result.setRow(1, mat.getRow(1).product(scale.getCoord(1)));
+        result.setRow(2, mat.getRow(2).product(scale.getCoord(2)));
+        result.setRow(3, mat.getRow(3).product(scale.getCoord(3)));
+        result.setRow(4, mat.getRow(4));
         return result;
     }
     
@@ -442,10 +437,10 @@ public class GLM {
     public static Vector4 mul(Matrix4 mat, Vector4 vec) {
         Vector4 ret = new Vector4();
 
-        ret.x = dot(mat.getRow(0), vec);
-        ret.y = dot(mat.getRow(1), vec);
-        ret.z = dot(mat.getRow(2), vec);
-        ret.w = dot(mat.getRow(3), vec);
+        ret.x(mat.getRow(1).dot(vec));
+        ret.y(mat.getRow(2).dot(vec));
+        ret.z(mat.getRow(3).dot(vec));
+        ret.w(mat.getRow(4).dot(vec));
         return ret;
     }
 
@@ -456,20 +451,7 @@ public class GLM {
      * @return = a * b
      */
     public static Matrix4 mul(Matrix4 a, Matrix4 b) {
-        Matrix4 res = a.clone();
-        res.product(b);
-        return res;
-    }
-
-    /**
-     * Compute the inverse of the matrix into a new one
-     * @param mat Matrix
-     * @return new Matrix with the inverse of the first
-     */
-    public static Matrix4 inverse(Matrix4 mat) {
-        Matrix4 r = mat.clone();
-        r.inverse();
-        return r;
+        return (Matrix4) a.clone().multiply(b);
     }
 
     /**
@@ -488,12 +470,12 @@ public class GLM {
     public static Matrix4 ortho(double left, double right, double bottom, double top, double zNear, double zFar) {
         Matrix4 ortho = new Matrix4();
         
-        ortho.set(0, 0, (float) (2f / (right - left)));
-        ortho.set(1, 1, (float) (2f / (top - bottom)));
-        ortho.set(2, 2, (float) -(2f / (zFar - zNear)));
-        ortho.set(3, 0, (float) -((right + left) / (right - left)));
-        ortho.set(3, 1, (float) -((top + bottom) / (top - bottom)));
-        ortho.set(3, 2, (float) -((zFar + zNear) / (zFar - zNear)));
+        ortho.setValueAt(1, 1, (float) (2f / (right - left)));
+        ortho.setValueAt(2, 2, (float) (2f / (top - bottom)));
+        ortho.setValueAt(3, 3, (float) -(2f / (zFar - zNear)));
+        ortho.setValueAt(4, 1, (float) -((right + left) / (right - left)));
+        ortho.setValueAt(4, 2, (float) -((top + bottom) / (top - bottom)));
+        ortho.setValueAt(4, 3, (float) -((zFar + zNear) / (zFar - zNear)));
         
         return ortho;
     }
@@ -517,23 +499,24 @@ public class GLM {
      * @return Matrix for the projection
      */
     public static Matrix4 perspective(double fov, double aspect, double zNear, double zFar) {
-        Matrix4 perspective = new Matrix4(0);
+        Matrix4 perspective = new Matrix4();
+        perspective.fillWithValue(0f);
 
-        if(aspect == 0 || zFar == zNear)
+        if(floatEquals(aspect, 0, 0.00001) || floatEquals(zFar, zNear, 0.0001))
             throw new IllegalArgumentException("aspect cannot be 0 | zFar is equal zNear, both are not possible");
         if(Math.abs(fov) >= 180)
             throw new IllegalArgumentException("FOV cannot be greater than 180º");
 
-        double range = tan(fov / 2D) * zNear;
+        double range = Math.tan(fov / 2D) * zNear;
         double left = -range * aspect;
         double right = range * aspect;
         double bottom = -range;
         
-        perspective.set(0, 0, (float) ((2f * zNear) / (right - left)));
-        perspective.set(1, 1, (float) ((2f * zNear) / (range - bottom)));
-        perspective.set(2, 2, (float) -((zFar + zNear) / (zFar - zNear)));
-        perspective.set(2, 3, - 1F);
-        perspective.set(3, 2, (float) -((2D * zFar * zNear) / (zFar - zNear)));
+        perspective.setValueAt(1, 1, (float) ((2f * zNear) / (right - left)));
+        perspective.setValueAt(2, 2, (float) ((2f * zNear) / (range - bottom)));
+        perspective.setValueAt(3, 3, (float) -((zFar + zNear) / (zFar - zNear)));
+        perspective.setValueAt(3, 4, - 1F);
+        perspective.setValueAt(4, 3, (float) -((2D * zFar * zNear) / (zFar - zNear)));
         
         return perspective;
     }
@@ -551,31 +534,31 @@ public class GLM {
     public static Matrix4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
         Matrix4 look = new Matrix4();
 
-        Vector3 f = normalize(sub(center, eye));
-        Vector3 u = normalize(up != null ? up : new Vector3(0, 0, 1));
-        Vector3 s = normalize(cross(f, u));
-        u = cross(s, f);
+        Vector3 f = (Vector3) sub(center, eye).normalize();
+        Vector3 s = (Vector3) f.cross(up).normalize();
+        Vector3 u = s.cross(f);
 
-        look.setColumn(0, s, 0);
-        look.setColumn(1, u, 0);
-        look.setColumn(2, negate(f), 0);
+        look.setColumn(1, new Vector4(s, 0));
+        look.setColumn(2, new Vector4(u, 0));
+        look.setColumn(3, new Vector4(negate(f), 0));
 
-        look.set(3, 0, -dot(s, eye));
-        look.set(3, 1, -dot(u, eye));
-        look.set(3, 2,  dot(f, eye));
+        look.setValueAt(4, 1, -s.dot(eye));
+        look.setValueAt(4, 2, -u.dot(eye));
+        look.setValueAt(4, 3,  f.dot(eye));
         
         return look;
     }
 
     public static Matrix4 frustum(double left, double right, double bottom, double top, double near, double far) {
-        Matrix4 mat = new Matrix4(0);
-        mat.set(0, 0, (float) ((2 * near) / (right - left)));
-        mat.set(1, 1, (float) ((2 * near) / (top - bottom)));
-        mat.set(2, 0, (float) ((right + left) / (right - left)));
-        mat.set(2, 1, (float) ((top + bottom) / (top - bottom)));
-        mat.set(2, 2, (float) - ((far + near) / (far - near)));
-        mat.set(2, 3, -1);
-        mat.set(3, 2, (float) - ((2f * far * near) / (far - near)));
+        Matrix4 mat = new Matrix4();
+        mat.fillWithValue(0.f);
+        mat.setValueAt(1, 1, (float) ((2 * near) / (right - left)));
+        mat.setValueAt(2, 2, (float) ((2 * near) / (top - bottom)));
+        mat.setValueAt(3, 1, (float) ((right + left) / (right - left)));
+        mat.setValueAt(3, 2, (float) ((top + bottom) / (top - bottom)));
+        mat.setValueAt(3, 3, (float) - ((far + near) / (far - near)));
+        mat.setValueAt(3, 4, -1.f);
+        mat.setValueAt(4, 3, (float) - ((2f * far * near) / (far - near)));
         return mat;
     }
 
@@ -588,24 +571,24 @@ public class GLM {
      * @return unproject vector
      */
     public static Vector3 unProject(Vector3 win, Matrix4 model, Matrix4 proj, Vector4 viewport) {
-        Matrix4 Inverse = inverse(mul(proj, model));
+        Matrix4 Inverse = (Matrix4) mul(proj, model).invert();
         Vector4 tmp = new Vector4(win, 1);
 
-        tmp.x = (tmp.x - viewport.x) / viewport.z;
-        tmp.y = (tmp.y - viewport.y) / viewport.w;
+        tmp.x((tmp.x() - viewport.x()) / viewport.z());
+        tmp.y((tmp.y() - viewport.y()) / viewport.w());
         tmp = sub(product(2, tmp), new Vector4(1, 1, 1, 1));
 
         Vector4 obj = mul(Inverse, tmp);
-        obj = product(1f / obj.w, obj);
-        return new Vector3(obj);
+        obj = product(1f / obj.w(), obj);
+        return new Vector3(obj.x(), obj.y(), obj.z());
     }
 
     public static float[] matrixAsArray(Matrix4 mat) {
         float[] array = new float[16];
         int i = 0;
-        for(int x = 0; x < 4; x++)
-            for(int y = 0; y < 4; y++)
-                array[i++] = mat.matrix[x][y];
+        for(int x = 1; x <= 4; x++)
+            for(int y = 1; y <= 4; y++)
+                array[i++] = mat.getValueAt(x, y);
         return array;
     }
     
@@ -634,24 +617,26 @@ public class GLM {
     /**
      * Because calculing float numbers are really imprecise, this function
      * checks for a little difference between them:<br>
-     * <code> |a-b| &lt; 0.00001 </code><br>
+     * <code> |a-b| &lt; eps </code><br>
      * @param a first float
      * @param b second float
+     * @param eps epsilon, acceptable error value
      **/
-    public static boolean floatEqualsFloat(float a, float b) {
-        float err = Math.abs((a - b) / b);
-        return err <= 0.00001;
+    public static boolean floatEquals(float a, float b, float eps) {
+        float err = Math.abs(a - b);
+        return err < eps;
     }
     
     /**
      * Because calculing float numbers are really imprecise, this function
      * checks for a little difference between them:<br>
-     * <code> |a-b| &lt; 0.00001 </code><br>
+     * <code> |a-b| &lt; eps </code><br>
      * @param a first float
      * @param b second float
+     * @param eps epsilon, acceptable error value
      **/
-    public static boolean doubleEqualsDouble(double a, double b) {
-        double err = Math.abs((a - b) / b);
-        return err <= 0.00001;
+    public static boolean floatEquals(double a, double b, double eps) {
+        double err = Math.abs(a - b);
+        return err < eps;
     }
 }

@@ -61,9 +61,9 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         up = new Vector3(0, 0, 1);
         speed = new Vector3();
         //Init direction
-        dir.x = (float) (Math.cos(Math.toRadians(rot.x)) * Math.cos(Math.toRadians(rot.y)));
-        dir.z = (float) (Math.sin(Math.toRadians(rot.y)));
-        dir.y = (float) (Math.sin(Math.toRadians(rot.x)) * Math.cos(Math.toRadians(rot.y)));
+        dir.x((float) (Math.cos(Math.toRadians(rot.x())) * Math.cos(Math.toRadians(rot.y()))));
+        dir.z((float) (Math.sin(Math.toRadians(rot.y()))));
+        dir.y((float) (Math.sin(Math.toRadians(rot.x())) * Math.cos(Math.toRadians(rot.y()))));
         fov = 45;
         near = 1;
         far = 10;
@@ -90,8 +90,8 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         //Init rotation
         this.dir.normalize();
         this.rot = new Vector3();
-        rot.y = (float) Math.toDegrees(Math.asin(this.dir.z));
-        rot.x = (float) Math.toDegrees(Math.acos(this.dir.x / Math.cos(Math.toRadians(rot.y))));
+        rot.y((float) Math.toDegrees(Math.asin(this.dir.z())));
+        rot.x((float) Math.toDegrees(Math.acos(this.dir.x() / Math.cos(Math.toRadians(rot.y())))));
         fov = 45;
         near = 1;
         far = 10;
@@ -99,8 +99,8 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         mouseSensibility = movementMultiplier = 1;
         
         //Seleccionando el cuadrante correcto según donde apunta
-        if(rot.x >= 90.f && dir.z < 0f)
-            rot.x = -90.f;
+        if(rot.x() >= 90.f && dir.z() < 0f)
+            rot.x(-90.f);
         
         initListeners();
     }
@@ -111,13 +111,11 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      */
     public void updateIfNeeded() {
         if(needsUpdateView) {
-            view = GLM.lookAt(pos, GLM.sum(pos, dir), up);
-            needsUpdateView = false;
+            getViewMatrix();
         }
 
         if(needsUpdateProj) {
-            proj = GLM.perspective(fov, aspect, near, far);
-            needsUpdateProj = false;
+            getProjectionMatrix();
         }
     }
     
@@ -126,7 +124,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      */
     public Matrix4 getViewMatrix() {
         if(needsUpdateView) {
-            view = GLM.lookAt(pos, GLM.sum(pos, dir), up);
+            view = GLM.lookAt(pos, GLM.add(pos, dir), up);
             needsUpdateView = false;
         }
         return view;
@@ -137,7 +135,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      */
     public Matrix4 getProjectionMatrix() {
         if(needsUpdateProj) {
-            proj = GLM.perspective(fov, aspect, near, far);
+            proj = GLM.perspective(GLM.rad(fov), aspect, near, far);
             needsUpdateProj = false;
         }
         return proj;
@@ -194,9 +192,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param z Z Coordinate
      */
     public final void setPosition(float x, float y, float z) {
-        this.pos.x = x;
-        this.pos.y = y;
-        this.pos.z = z;
+        this.pos.x(x).y(y).z(z);
         needsUpdateView = true;
     }
 
@@ -205,7 +201,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param pos New position as vector
      */
     public final void setPosition(Vector3 pos) {
-        setPosition(pos.x, pos.y, pos.z);
+        setPosition(pos.x(), pos.y(), pos.z());
     }
 
     /**
@@ -231,9 +227,11 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param z Rotation over Z axis
      */
     public final void setRotation(float x, float y, float z) {
-        this.rot.x = x;
-        this.rot.y = y;
-        this.rot.z = z;
+        this.rot.x(x).y(y).z(z);
+        dir.x((float) (Math.cos(Math.toRadians(rot.x())) * Math.cos(Math.toRadians(rot.y()))));
+        dir.z((float) (Math.sin(Math.toRadians(rot.y()))));
+        dir.y((float) (Math.sin(Math.toRadians(rot.x())) * Math.cos(Math.toRadians(rot.y()))));
+        dir.normalize();
         needsUpdateView = true;
     }
 
@@ -243,7 +241,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param rot Rotation of the camera as vector
      */
     public final void setRotation(Vector3 rot) {
-        setRotation(rot.x, rot.y, rot.z);
+        setRotation(rot.x(), rot.y(), rot.z());
     }
 
     /**
@@ -260,7 +258,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @return speed of the camera
      */
     public final Vector3 getSpeed() {
-        Vector3 sp = new Vector3(speed);
+        Vector3 sp = (Vector3) speed.clone();
         sp.product((float) (1f/Timing.getGameTiming().frameTime));
         return sp;
     }
@@ -308,33 +306,35 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
 
 
     private void initListeners() {
-        Game.keyboard.addListener(this);
-        Game.mouse.addListener((OnMouseMoveEvent) this);
-        //Arreglar esto
-        Game.mouse.addListener((OnMouseClickEvent) this);
+        if(Game.keyboard != null && Game.mouse != null) {
+            Game.keyboard.addListener(this);
+            Game.mouse.addListener((OnMouseMoveEvent) this);
+            //Arreglar esto
+            Game.mouse.addListener((OnMouseClickEvent) this);
+        }
     }
 
     public void invoke(Keyboard self, double delta) {
         float cameraSpeed = 5.f * (float) delta * (float) movementMultiplier;
-        float x = pos.x, y = pos.y, z = pos.z;
+        float x = pos.x(), y = pos.y(), z = pos.z();
         
         if(self.isKeyPressed("W"))
             pos.add(GLM.product(cameraSpeed, dir));
         if(self.isKeyPressed("S"))
             pos.substract(GLM.product(cameraSpeed, dir));
         if(self.isKeyPressed("A"))
-            pos.substract(GLM.product(cameraSpeed, GLM.normalize(GLM.cross(dir, up))));
+            pos.substract(GLM.product(cameraSpeed, GLM.cross(dir, up).normalize()));
         if(self.isKeyPressed("D"))
-            pos.add(GLM.product(cameraSpeed, GLM.normalize(GLM.cross(dir, up))));
+            pos.add(GLM.product(cameraSpeed, GLM.cross(dir, up).normalize()));
         if(self.isKeyPressed("Q"))
-            pos.z += cameraSpeed;
+            pos.z(pos.z() + cameraSpeed);
         if(self.isKeyPressed("E"))
-            pos.z -= cameraSpeed;
+            pos.z(pos.z() - cameraSpeed);
         if(self.isKeyPressed("ESCAPE"))
             Game.window.setWindowShouldClose(true);
         
-        speed.x = pos.x - x; speed.y = pos.y - y; speed.z = pos.z - z;
-        if(speed.x != 0.f || speed.y != 0.f || speed.z != 0.f)
+        speed.x(pos.x() - x).y(pos.y() - y).z(pos.z() - z);
+        if(speed.x() != 0.f || speed.y() != 0.f || speed.z() != 0.f)
             needsUpdateView = true;
     }
 
@@ -343,17 +343,18 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
 
         float sensibility = (float) delta * 4 * (float) mouseSensibility;
         
-        rot.x -= self.getMouseSpeed().x * sensibility;
-        rot.y += self.getMouseSpeed().y * sensibility;
+        rot.x(rot.x() - self.getMouseSpeed().x() * sensibility);
+        rot.y(rot.y() + self.getMouseSpeed().y() * sensibility);
         
-        if(rot.y > 89.f)
-            rot.y = 89.f;
-        else if(rot.y < -89.f)
-            rot.y = -89.f;
+        if(rot.y() > 89.f)
+            rot.y(89.f);
+        else if(rot.y() < -89.f)
+            rot.y(-89.f);
         
-        dir.x = (float) (Math.cos(Math.toRadians(rot.x)) * Math.cos(Math.toRadians(rot.y)));
-        dir.z = (float) (Math.sin(Math.toRadians(rot.y)));
-        dir.y = (float) (Math.sin(Math.toRadians(rot.x)) * Math.cos(Math.toRadians(rot.y)));
+        dir.x((float) (Math.cos(Math.toRadians(rot.x())) * Math.cos(Math.toRadians(rot.y()))));
+        dir.z((float) (Math.sin(Math.toRadians(rot.y()))));
+        dir.y((float) (Math.sin(Math.toRadians(rot.x())) * Math.cos(Math.toRadians(rot.y()))));
+        dir.normalize();
         
         needsUpdateView = true;
     }
@@ -369,6 +370,6 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      */
     public String toString() {
         return String.format("Camera [\n    (%.3f, %.3f, %.3f),\n    (%.3fº, %.3fº, %.3fº),\n    (%.1f, %.1f, %.1f) px/s\n]",
-                pos.x, pos.y, pos.z, rot.x, rot.y, 0.f /*rot.z*/, speed.x, speed.y, speed.z);
+                pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), speed.x(), speed.y(), speed.z());
     }
 }

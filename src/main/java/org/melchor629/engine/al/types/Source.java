@@ -46,7 +46,7 @@ public class Source implements Erasable {
     
     public void setPosition(Vector3 pos) {
         position = pos;
-        al.source3f(source, AL.Source.POSITION, pos.x, pos.y, pos.z);
+        al.source3f(source, AL.Source.POSITION, pos.x(), pos.y(), pos.z());
     }
     
     public Vector3 getPosition() {
@@ -55,7 +55,7 @@ public class Source implements Erasable {
     
     public void setVelocity(Vector3 vel) {
         velocity = vel;
-        al.source3f(source, AL.Source.VELOCITY, vel.x, vel.y, vel.z);
+        al.source3f(source, AL.Source.VELOCITY, vel.x(), vel.y(), vel.z());
     }
     
     public Vector3 getVelocity() {
@@ -137,7 +137,7 @@ public class Source implements Erasable {
     
     public void setDirection(Vector3 dir) {
         direction = dir;
-        al.source3f(source, AL.Source.DIRECTION, dir.x, dir.y, dir.z);
+        al.source3f(source, AL.Source.DIRECTION, dir.x(), dir.y(), dir.z());
     }
     
     public Vector3 getDirection() {

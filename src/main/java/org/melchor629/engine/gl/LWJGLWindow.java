@@ -226,9 +226,9 @@ public class LWJGLWindow implements Window {
         resizeListeners.clear();
         focusListeners.clear();
         blurListeners.clear();
-        sizeCallback.release();
-        focusCallback.release();
-        errorCallback.release();
+        sizeCallback.free();
+        focusCallback.free();
+        errorCallback.free();
         glfwTerminate();
     }
 

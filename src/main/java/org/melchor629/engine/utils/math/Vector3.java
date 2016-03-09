@@ -1,19 +1,18 @@
 package org.melchor629.engine.utils.math;
 
-import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 /**
  * Vector 3 Class
  * @author melchor9000
  */
-public class Vector3 implements Cloneable {
-    /** component of the vector **/
-    public float x, y, z;
-
+public class Vector3 extends Vector<Float> {
     /**
      * Create an empty vector (0, 0, 0)
      */
-    public Vector3() { }
+    public Vector3() {
+        super(3, ArithmeticOperations.floats);
+    }
 
     /**
      * Create a vector with values (a, b, c)
@@ -22,136 +21,39 @@ public class Vector3 implements Cloneable {
      * @param c Value for z
      */
     public Vector3(float a, float b, float c) {
-        x = a;
-        y = b;
-        z = c;
+        this();
+        fillWithValues(Arrays.asList(a, b, c));
     }
 
-    /**
-     * Create a copy of the vector
-     * @param vec Vector to be copied
-     */
-    public Vector3(Vector3 vec) {
-        x = vec.x;
-        y = vec.y;
-        z = vec.z;
+    public Vector3 cross(Vector<Float> v) {
+        float vx = v.getCoord(1), vy = v.getCoord(2), vz = v.getCoord(3);
+        return new Vector3(
+            y() * vz - vy * z(),
+            z() * vx - vz * x(),
+            x() * vy - vx * y());
     }
 
-    /**
-     * Create a copy of the vector (except w component)
-     * @param obj Vector to be copied
-     */
-    public Vector3(Vector4 obj) {
-        x = obj.x;
-        y = obj.y;
-        z = obj.z;
+    public float x() {
+        return getCoord(1);
     }
 
-    /**
-     * @return Computes the length value of the vector
-     */
-    public float length() {
-        return GLM.length(this);
+    public float y() {
+        return getCoord(2);
     }
 
-    /**
-     * Normalizes this vector
-     */
-    public void normalize() {
-        float modulo = length();
-        x /= modulo;
-        y /= modulo;
-        z /= modulo;
+    public float z() {
+        return getCoord(3);
     }
 
-    public void add(float v) {
-        x += v;
-        y += v;
-        z += v;
-    }
-    
-    public void add(Vector3 v) {
-        x += v.x;
-        y += v.y;
-        z += v.z;
+    public Vector3 x(float v) {
+        return (Vector3) setCoord(1, v);
     }
 
-    public void substract(float v) {
-        add(- v);
+    public Vector3 y(float v) {
+        return (Vector3) setCoord(2, v);
     }
 
-    public void substract(Vector3 v) {
-        x -= v.x;
-        y -= v.y;
-        z -= v.z;
-    }
-
-    public void product(float v) {
-        x *= v;
-        y *= v;
-        z *= v;
-    }
-
-    public void divide(float v) {
-        x /= v;
-        y /= v;
-        z /= v;
-    }
-
-    public void cross(Vector3 v) {
-        x = y * v.z - v.y * z;
-        y = v.x * z - x * v.z;
-        z = x * v.y - y * v.x;
-    }
-
-    public float[] toFloats() {
-        return new float[] { x, y, z };
-    }
-
-    public FloatBuffer fillBuffer(FloatBuffer buffer) {
-        if(buffer.capacity() < 3)
-            throw new IllegalArgumentException("Buffer should have atleast 3 floats of capacity, this one has " + buffer.capacity());
-        buffer.position(0);
-        return buffer.put(toFloats()).compact();
-    }
-
-    /**
-     * Clones this vector. Shortcut of {@code new vec3(this); }
-     */
-    @Override
-    public Vector3 clone() {
-        try {
-            return (Vector3) super.clone();
-        } catch(Exception e) {
-            RuntimeException r = new RuntimeException();
-            r.initCause(e);
-            throw r;
-        }
-    }
-
-    /**
-     * Returns a representation of this vector
-     */
-    @Override
-    public String toString() {
-        return String.format("(%+.3f, %+.3f, %+.3f)", x, y, z);
-    }
-
-    /**
-     * Determine if this vector is equal to other. First try to see
-     * if the object is a instance of vec3, after that, try to determine
-     * if all values are equal.
-     */
-    @Override
-    public boolean equals(Object vec) {
-        if(!(vec instanceof Vector3))
-            return false;
-        Vector3 v = (Vector3) vec;
-        return this.x == v.x && this.y == v.y && this.z == v.z;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) Math.floor(this.x * 29 * 29 + this.y * 29 + this.z);
+    public Vector3 z(float v) {
+        return (Vector3) setCoord(3, v);
     }
 }

@@ -7,6 +7,7 @@ import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.objects.Material;
 import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.math.ModelMatrix;
+import org.melchor629.engine.utils.math.Vector4;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -46,9 +47,9 @@ public class ColladaScene {
                 models.add(searchModel(n));
                 ModelMatrix model = new ModelMatrix();
                 model.setLocation(n.location);
-                model.rotate(n.rotation.getRow(1));
-                model.rotate(n.rotation.getRow(2));
-                model.rotate(n.rotation.getRow(3));
+                model.rotate((Vector4) n.rotation.getRow(1));
+                model.rotate((Vector4) n.rotation.getRow(2));
+                model.rotate((Vector4) n.rotation.getRow(3));
                 model.setScale(n.scale);
                 modelMatrices.add(model);
 

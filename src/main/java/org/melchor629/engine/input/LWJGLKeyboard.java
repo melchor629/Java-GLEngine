@@ -85,7 +85,7 @@ public class LWJGLKeyboard extends Keyboard {
      */
     @Override
     public void release() {
-        kCbk.release();
+        kCbk.free();
     }
 
 }

@@ -52,9 +52,9 @@ public class Node {
 
     private void strToVector(Vector3 v, Element loc) {
         String[] l = loc.getTextContent().split(" ");
-        v.x = Float.parseFloat(l[0]);
-        v.y = Float.parseFloat(l[1]);
-        v.z = Float.parseFloat(l[2]);
+        v.x(Float.parseFloat(l[0]));
+        v.y(Float.parseFloat(l[1]));
+        v.z(Float.parseFloat(l[2]));
     }
 
     private void rotation(NodeList Lrot) {
@@ -63,20 +63,20 @@ public class Node {
             Element rot = (Element) Lrot.item(i);
             String[] r = rot.getTextContent().split(" ");
             if(rot.getAttribute("sid").equals("rotationZ")) {
-                rotation.matrix[0][0] = Float.parseFloat(r[0]);
-                rotation.matrix[0][1] = Float.parseFloat(r[1]);
-                rotation.matrix[0][2] = Float.parseFloat(r[2]);
-                rotation.matrix[0][3] = Float.parseFloat(r[3]);
+                rotation.setValueAt(1, 1, Float.parseFloat(r[0]));
+                rotation.setValueAt(1, 2, Float.parseFloat(r[1]));
+                rotation.setValueAt(1, 3, Float.parseFloat(r[2]));
+                rotation.setValueAt(1, 4, Float.parseFloat(r[3]));
             } else if(rot.getAttribute("sid").equals("rotationY")) {
-                rotation.matrix[1][0] = Float.parseFloat(r[0]);
-                rotation.matrix[1][1] = Float.parseFloat(r[1]);
-                rotation.matrix[1][2] = Float.parseFloat(r[2]);
-                rotation.matrix[1][3] = Float.parseFloat(r[3]);
+                rotation.setValueAt(2, 1, Float.parseFloat(r[0]));
+                rotation.setValueAt(2, 2, Float.parseFloat(r[1]));
+                rotation.setValueAt(2, 3, Float.parseFloat(r[2]));
+                rotation.setValueAt(2, 4, Float.parseFloat(r[3]));
             } else if(rot.getAttribute("sid").equals("rotationX")) {
-                rotation.matrix[2][0] = Float.parseFloat(r[0]);
-                rotation.matrix[2][1] = Float.parseFloat(r[1]);
-                rotation.matrix[2][2] = Float.parseFloat(r[2]);
-                rotation.matrix[2][3] = Float.parseFloat(r[3]);
+                rotation.setValueAt(3, 1, Float.parseFloat(r[0]));
+                rotation.setValueAt(3, 2, Float.parseFloat(r[1]));
+                rotation.setValueAt(3, 3, Float.parseFloat(r[2]));
+                rotation.setValueAt(3, 4, Float.parseFloat(r[3]));
             }
         }
     }

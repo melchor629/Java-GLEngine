@@ -108,11 +108,13 @@ public abstract class Mouse {
      * @param delta Delta value
      */
     protected void fireMouseMove(double delta) {
-        if(wheel.x != 0 || wheel.y != 0 || dPos.x != 0 || dPos.y != 0) {
+        if(wheel.x() != 0 || wheel.y() != 0 || dPos.x() != 0 || dPos.y() != 0) {
             for(OnMouseMoveEvent e : listeners2)
                 e.invoke(this, delta);
-            wheel.x = wheel.y = 0.f;
-            dPos.x = dPos.y = 0.f;
+            wheel.x(0.f);
+            wheel.y(0.f);
+            dPos.x(0.f);
+            dPos.y(0.f);
         }
     }
 

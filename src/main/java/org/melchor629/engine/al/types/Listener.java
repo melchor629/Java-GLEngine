@@ -46,7 +46,7 @@ public class Listener {
      * @param vec vector indicating the position
      */
     public static void setPosition(Vector3 vec) {
-        setPosition(vec.x, vec.y, vec.z);
+        setPosition(vec.x(), vec.y(), vec.z());
     }
     
     //TODO setPosition(ivec3)
@@ -79,10 +79,8 @@ public class Listener {
      * @param vec Velocity as vector
      */
     public static void setVelocity(Vector3 vec) {
-        setVelocity(vec.x, vec.y, vec.z);
+        setVelocity(vec.x(), vec.y(), vec.z());
     }
-
-    //TODO setVelocity(ivec3)
 
     /**
      * Sets the orientation of the listener with two vectors represented
@@ -105,7 +103,7 @@ public class Listener {
     }
 
     public static void setOrientation(Vector3 at, Vector3 up) {
-        setOrientation(at.x, at.y, at.z, up.x, up.y, up.z);
+        setOrientation(at.x(), at.y(), at.z(), up.x(), up.y(), up.z());
     }
 
     //TODO setOrientation(ivec3 at, ivec3 up)
@@ -118,9 +116,9 @@ public class Listener {
      */
     public static void calculateAndSetOrientation(Vector3 rot, Vector3 up) {
         //TODO Comrpobar si está mal (?)
-        float x = (float) GLM.sin(-rot.x - 90.d);
-        float y = (float) GLM.sin(-rot.y - 90.d);
-        float z = (float) GLM.cos(-rot.x - 90.d);
-        setOrientation(x, y, z, up.x, up.y, up.z);
+        float x = (float) Math.sin(GLM.rad(-rot.x() - 90.d));
+        float y = (float) Math.sin(GLM.rad(-rot.y() - 90.d));
+        float z = (float) Math.cos(GLM.rad(-rot.x() - 90.d));
+        setOrientation(x, y, z, up.x(), up.y(), up.z());
     }
 }

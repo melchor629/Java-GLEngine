@@ -44,11 +44,11 @@ public class LWJGLMouse extends Mouse {
             @Override
             public void invoke(long window, double xpos, double ypos) {
                 Vector2 oldPos = LWJGLMouse.this.pos;
-                LWJGLMouse.this.dPos.x = (float) xpos - oldPos.x;
-                LWJGLMouse.this.dPos.y = oldPos.y - (float) ypos;
+                LWJGLMouse.this.dPos.x((float) xpos - oldPos.x());
+                LWJGLMouse.this.dPos.y(oldPos.y() - (float) ypos);
 
-                LWJGLMouse.this.pos.x = (float) xpos;
-                LWJGLMouse.this.pos.y = (float) ypos;
+                LWJGLMouse.this.pos.x((float) xpos);
+                LWJGLMouse.this.pos.y((float) ypos);
 
                 LWJGLMouse.this.fireMouseMove(Timing.getGameTiming().frameTime);
             }
@@ -57,8 +57,8 @@ public class LWJGLMouse extends Mouse {
         glfwSetScrollCallback(window, sCbk = new GLFWScrollCallback() {
             @Override
             public void invoke(long window, double xoffset, double yoffset) {
-                LWJGLMouse.this.wheel.x = (float) xoffset;
-                LWJGLMouse.this.wheel.y = (float) yoffset;
+                LWJGLMouse.this.wheel.x((float) xoffset);
+                LWJGLMouse.this.wheel.y((float) yoffset);
 
                 LWJGLMouse.this.fireMouseMove(Timing.getGameTiming().frameTime);
             }
@@ -111,7 +111,7 @@ public class LWJGLMouse extends Mouse {
      */
     @Override
     public void setCursorPosition(Vector2 position) {
-        setCursorPosition(position.x, position.y);
+        setCursorPosition(position.x(), position.y());
     }
 
     /* (non-Javadoc)
@@ -119,9 +119,9 @@ public class LWJGLMouse extends Mouse {
      */
     @Override
     public void release() {
-        cpCbk.release();
-        mbCbk.release();
-        sCbk.release();
+        cpCbk.free();
+        mbCbk.free();
+        sCbk.free();
     }
 
 }

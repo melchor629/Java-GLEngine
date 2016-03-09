@@ -19,7 +19,7 @@ public class ModelMatrix {
         loc = new Vector3(0, 0, 0);
         rot = new Vector3(0, 0, 0);
         scale = new Vector3(1, 1, 1);
-        matrix = new Matrix4();
+        matrix = null;
     }
     
     /**
@@ -31,10 +31,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix setLocation(float x, float y, float z) {
-        loc.x = x;
-        loc.y = y;
-        loc.z = z;
-        calculateMatrix();
+        setVector(loc, x, y, z);
         return this;
     }
 
@@ -46,7 +43,7 @@ public class ModelMatrix {
      */
     public ModelMatrix setLocation(Vector3 loc) {
         this.loc = loc;
-        calculateMatrix();
+        matrix = null;
         return this;
     }
     
@@ -59,10 +56,8 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix translate(float x, float y, float z) {
-        loc.x += x;
-        loc.y += y;
-        loc.z += z;
-        calculateMatrix();
+        loc.add(new Vector3(x, y, z));
+        matrix = null;
         return this;
     }
 
@@ -73,7 +68,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix translate(Vector3 v) {
-        return this.translate(v.x, v.y, v.z);
+        return this.translate(v.x(), v.y(), v.z());
     }
     
     /**
@@ -85,10 +80,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix setRotation(float pitch, float yaw, float roll) {
-        rot.x = pitch;
-        rot.y = yaw;
-        rot.z = roll;
-        calculateMatrix();
+        setVector(rot, pitch, yaw, roll);
         return this;
     }
     
@@ -104,21 +96,21 @@ public class ModelMatrix {
      */
     public ModelMatrix rotate(float angle, float x, float y, float z) {
         if(Float.isInfinite(angle)) return this;
-        if(angle > Math.PI * 2)
+        while(angle > Math.PI * 2)
             angle -= Math.PI * 2;
 
-        rot.x = angle * x + rot.x;
-        rot.y = angle * y + rot.y;
-        rot.z = angle * z + rot.z;
+        rot.x(angle * x + rot.x());
+        rot.y(angle * y + rot.y());
+        rot.z(angle * z + rot.z());
         
-        if(rot.x > 2*Math.PI)
-            rot.x -= 2*Math.PI;
-        if(rot.y > 2*Math.PI)
-            rot.y -= 2*Math.PI;
-        if(rot.z > 2*Math.PI)
-            rot.z -= 2*Math.PI;
+        if(rot.x() > 2*Math.PI)
+            rot.x(rot.x() - 2 * (float) Math.PI);
+        if(rot.y() > 2*Math.PI)
+            rot.y(rot.y() - 2 * (float) Math.PI);
+        if(rot.z() > 2*Math.PI)
+            rot.z(rot.z() - 2 * (float) Math.PI);
 
-        calculateMatrix();
+        matrix = null;
         return this;
     }
 
@@ -131,7 +123,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix rotate(Vector3 v, float angle) {
-        return this.rotate(angle, v.x, v.y, v.z);
+        return this.rotate(angle, v.x(), v.y(), v.z());
     }
 
     /**
@@ -143,7 +135,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix rotate(Vector4 v) {
-        return this.rotate(v.w, v.x, v.y, v.z);
+        return this.rotate(v.w(), v.x(), v.y(), v.z());
     }
     
     /**
@@ -156,10 +148,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix setScale(float x, float y, float z) {
-        scale.x = x;
-        scale.y = y;
-        scale.z = z;
-        calculateMatrix();
+        setVector(scale, x, y, z);
         return this;
     }
 
@@ -172,7 +161,7 @@ public class ModelMatrix {
      */
     public ModelMatrix setScale(Vector3 scale) {
         this.scale = scale;
-        calculateMatrix();
+        matrix = null;
         return this;
     }
     
@@ -187,10 +176,10 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix scale(float x, float y, float z) {
-        scale.x += x;
-        scale.y += y;
-        scale.z += z;
-        calculateMatrix();
+        scale.x(scale.x() + x);
+        scale.y(scale.y() + y);
+        scale.z(scale.z() + z);
+        matrix = null;
         return this;
     }
 
@@ -204,7 +193,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix scale(Vector3 v) {
-        return this.scale(v.x, v.y, v.z);
+        return this.scale(v.x(), v.y(), v.z());
     }
     
     /**
@@ -215,8 +204,7 @@ public class ModelMatrix {
      * @return Itself, for chaining methods
      */
     public ModelMatrix setIdentity() {
-        scale.substract(scale);
-        scale.add(1);
+        scale.fillWithValues(1f, 1f, 1f);
         rot.substract(rot);
         loc.substract(loc);
         matrix.setIdentity();
@@ -229,33 +217,22 @@ public class ModelMatrix {
      * @return Model Matrix
      */
     public Matrix4 getModelMatrix() {
+        if(matrix == null) calculateMatrix();
         return matrix;
     }
     
     private void calculateMatrix() {
-        matrix.setIdentity();
-        matrix.product(translationMatrix());
-        matrix.product(rotationMatrix());
-        matrix.product(scaleMatrix());
+        matrix = GLM.translateMatrix(new Matrix4(), loc);
+        matrix = GLM.rotateMatrix(matrix, rot.x(), new Vector3(1, 0, 0));
+        matrix = GLM.rotateMatrix(matrix, rot.y(), new Vector3(0, 1, 0));
+        matrix = GLM.rotateMatrix(matrix, rot.z(), new Vector3(0, 0, 1));
+        matrix = GLM.scaleMatrix(matrix, scale);
     }
-    
-    private Matrix4 translationMatrix() {
-        Matrix4 trans = new Matrix4();
-        trans = GLM.translateMatrix(trans, loc);
-        return trans;
-    }
-    
-    private Matrix4 rotationMatrix() {
-        Matrix4 rot = new Matrix4();
-        GLM.rotateMatrix(rot, this.rot.x, new Vector3(1, 0, 0));
-        GLM.rotateMatrix(rot, this.rot.y, new Vector3(0, 1, 0));
-        GLM.rotateMatrix(rot, this.rot.z, new Vector3(0, 0, 1));
-        return rot;
-    }
-    
-    private Matrix4 scaleMatrix() {
-        Matrix4 scale = new Matrix4();
-        scale = GLM.scaleMatrix(scale, this.scale);
-        return scale;
+
+    private void setVector(Vector3 vec, float x, float y, float z) {
+        vec.x(x);
+        vec.y(y);
+        vec.z(z);
+        calculateMatrix();
     }
 }
