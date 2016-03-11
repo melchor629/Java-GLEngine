@@ -1471,6 +1471,16 @@ public class LWJGLGLContext implements GLContext {
         return new VertexArrayObject(this);
     }
 
+    @Override
+    public Texture createTexture(TextureFormat format, int width, int height, TextureExternalFormat eformat) {
+        return new Texture(this, format, width, height, eformat);
+    }
+
+    @Override
+    public Texture.Builder createTextureBuilder() {
+        return new Texture.Builder(this);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, int, org.melchor629.engine.gl.GLContext.BufferUsage)
      */

@@ -1,5 +1,6 @@
 package org.melchor629.engine.objects;
 
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.ShaderProgram;
 import org.melchor629.engine.gl.Texture;
 import org.melchor629.engine.loaders.Collada;
@@ -7,7 +8,6 @@ import org.melchor629.engine.loaders.collada.CommonColorOrTextureType;
 import org.melchor629.engine.loaders.collada.Effect;
 import org.melchor629.engine.loaders.collada.Phong;
 import org.melchor629.engine.utils.ShaderManager;
-import org.melchor629.engine.utils.TextureManager;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.Vector4;
 
@@ -36,12 +36,12 @@ public class Material {
         defaultMaterial = new Material();
     }
 
-    public static void loadMaterials(Collada c) {
+    public static void loadMaterials(Game game, Collada c) {
         c.materials.forEach(material -> {
             Effect fx = c.searchForEffectWithId(material.instance_effect_url);
             if(fx == null)
                 throw new NoSuchElementException("Effect with id " + material.instance_effect_url + " doesn't exists");
-            Material mat = new Material(fx, material);
+            Material mat = new Material(game, fx, material);
             materialList.add(mat);
         });
     }
@@ -54,7 +54,7 @@ public class Material {
         return pos < materialList.size() ? materialList.get(pos) : defaultMaterial;
     }
 
-    private Material(Effect effect, org.melchor629.engine.loaders.collada.Material material) {
+    private Material(Game game, Effect effect, org.melchor629.engine.loaders.collada.Material material) {
         id = material.id;
         this.name = material.name;
         if(effect.getPhong() == null)
@@ -66,11 +66,11 @@ public class Material {
         ambient = colorOrDefault(p.getAmbient(), .1f, .1f, .1f);
         emission = colorOrDefault(p.getEmission(), 0, 0, 0);
         reflective = colorOrDefault(p.getReflective(), 1, 1, 1);
-        diffuseTex = textureOrNull(p.getDiffuse());
-        specularTex = textureOrNull(p.getSpecular());
-        ambientTex = textureOrNull(p.getAmbient());
-        emissionTex = textureOrNull(p.getEmission());
-        reflectiveTex = textureOrNull(p.getReflective());
+        diffuseTex = textureOrNull(game, p.getDiffuse());
+        specularTex = textureOrNull(game, p.getSpecular());
+        ambientTex = textureOrNull(game, p.getAmbient());
+        emissionTex = textureOrNull(game, p.getEmission());
+        reflectiveTex = textureOrNull(game, p.getReflective());
         shininess = p.getShininess();
     }
 
@@ -90,9 +90,9 @@ public class Material {
         return new Vector4(r, g, b, 1);
     }
 
-    private Texture textureOrNull(CommonColorOrTextureType o) {
+    private Texture textureOrNull(Game game, CommonColorOrTextureType o) {
         if(o != null && o.getTexture() != null)
-             return TextureManager.getInstance().searchTexture(o.getTexture().getTexture());
+             return game.getTextureManager().searchTexture(o.getTexture().getTexture());
         return null;
     }
 

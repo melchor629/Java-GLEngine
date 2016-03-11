@@ -15,14 +15,11 @@ import java.util.ArrayList;
  * TODO Añadir que para cargar una textura use un json con la información requerida para cargarla
  */
 public class TextureManager {
-    private ArrayList<TextureWrapper> textures;
-    private static final TextureManager instance = new TextureManager();
+    private final ArrayList<TextureWrapper> textures;
+    private final GLContext gl;
 
-    public static TextureManager getInstance() {
-        return instance;
-    }
-
-    private TextureManager() {
+    public TextureManager(GLContext gl) {
+        this.gl = gl;
         textures = new ArrayList<>();
     }
 
@@ -37,7 +34,7 @@ public class TextureManager {
             TextureWrapper textureWrapper = new TextureWrapper();
             textureWrapper.name = name;
             textureWrapper.url = url;
-            textureWrapper.texture = texture = new Texture.builder().setFile(new File(url)).setMipmap(true).
+            textureWrapper.texture = texture = new Texture.Builder(gl).setFile(new File(url)).setMipmap(true).
                     setWrap(GLContext.TextureWrap.CLAMP_TO_BORDER).setMin(GLContext.TextureFilter.NEAREST_MIPMAP_LINEAR)
                     .setMag(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).build();
             textures.add(textureWrapper);
@@ -52,7 +49,7 @@ public class TextureManager {
             TextureWrapper textureWrapper = new TextureWrapper();
             textureWrapper.name = name;
             textureWrapper.url = "";
-            textureWrapper.texture = texture = new Texture.builder().setStreamToFile(io).setMipmap(true).
+            textureWrapper.texture = texture = new Texture.Builder(gl).setStreamToFile(io).setMipmap(true).
                     setWrap(GLContext.TextureWrap.CLAMP_TO_BORDER).setMin(GLContext.TextureFilter.NEAREST_MIPMAP_LINEAR)
                     .setMag(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).build();
             textures.add(textureWrapper);

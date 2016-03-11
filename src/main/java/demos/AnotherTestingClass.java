@@ -98,7 +98,7 @@ public class AnotherTestingClass extends Game {
         try {
             //c = new Collada(new File("mierda.dae"));
             c = new Collada(new File("src/main/resources/scenes/mierdolo.dae"));
-            c.loadElements(gl);
+            c.loadElements(this);
         } catch(Exception e) {
             e.printStackTrace();
             window.destroyWindow();

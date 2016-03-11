@@ -102,6 +102,11 @@ public class EspacioEuclideo extends Game {
     private int glHEIGHT;
     private boolean phosphorEffectEnabler = false;
 
+    private Texture loadTexture(String path) throws IOException {
+        return gl.createTextureBuilder().setStreamToFile(IOUtils.getResourceAsStream(path))
+            .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+    }
+
     @Override
     public void init() {
         window.setVsync(true);
@@ -142,22 +147,14 @@ public class EspacioEuclideo extends Game {
             puntos_shader = new ShaderProgram(
                     IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
                     IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.fs.glsl")));
-            euclides_tex = current = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/euklid.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            aleks_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/aleks.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            falloutPipboy_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/fallout-pipboy.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            melchor_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/melchor.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            pato_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/pato.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            doge_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/doge.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            andres_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/andres.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
-            amgela_tex = new Texture.builder().setStreamToFile(IOUtils.getResourceAsStream("img/angie.png"))
-                    .setMin(GLContext.TextureFilter.LINEAR_MIPMAP_LINEAR).setMipmap(true).build();
+            euclides_tex = current = loadTexture("img/euklid.png");
+            aleks_tex = loadTexture("img/aleks.png");
+            falloutPipboy_tex = loadTexture("img/fallout-pipboy.png");
+            melchor_tex = loadTexture("img/melchor.png");
+            pato_tex = loadTexture("img/pato.png");
+            doge_tex = loadTexture("img/doge.png");
+            andres_tex = loadTexture("img/andres.png");
+            amgela_tex = loadTexture("img/angie.png");
         } catch(IOException e) {
             System.out.printf("Ha habido un problema al cargar las texturas...\n");
             e.printStackTrace();
@@ -203,8 +200,8 @@ public class EspacioEuclideo extends Game {
                 -1,  1, 1, 1
         });
         RenderBuffer currentFrameDepth = gl.createRenderBuffer(GLContext.TextureFormat.DEPTH24_STENCIL8, glWIDTH, glHEIGHT);
-        currentFrame = new Texture(GLContext.TextureFormat.RGB8, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
-        previousFrame = new Texture(GLContext.TextureFormat.RGB8, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
+        currentFrame = gl.createTexture(GLContext.TextureFormat.RGB8, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
+        previousFrame = gl.createTexture(GLContext.TextureFormat.RGB8, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
         sceneFB = gl.createFrameBuffer();
         sceneFB.attachColorTexture(currentFrame, 0);
         sceneFB.attachDepthStencilRenderbuffer(currentFrameDepth);

@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.loaders.collada.*;
 import org.melchor629.engine.objects.Model;
@@ -62,11 +63,11 @@ public class Collada {
         lights(collada);
     }
 
-    public void loadElements(GLContext gl) throws IOException {
-        Model.loadModels(gl, this);
+    public void loadElements(Game game) throws IOException {
+        Model.loadModels(game.getOpenGLContext(), this);
         for(Image i : images)
-            TextureManager.getInstance().loadTexture(i.name, IOUtils.getResourceAsStream("img/" + i.init_from));
-        org.melchor629.engine.objects.Material.loadMaterials(this);
+            game.getTextureManager().loadTexture(i.name, IOUtils.getResourceAsStream("img/" + i.init_from));
+        org.melchor629.engine.objects.Material.loadMaterials(game, this);
     }
 
     public Geometry searchForGeometryWithId(String id) {

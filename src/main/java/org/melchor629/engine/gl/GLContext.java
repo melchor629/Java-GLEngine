@@ -910,6 +910,10 @@ public interface GLContext {
 
     VertexArrayObject createVertexArrayObject();
 
+    Texture createTexture(TextureFormat format, int width, int height, TextureExternalFormat eformat);
+
+    Texture.Builder createTextureBuilder();
+
     //Vertex Arrays
     int genVertexArray();
     void genVertexArrays(int[] buff);

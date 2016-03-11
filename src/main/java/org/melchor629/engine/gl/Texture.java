@@ -1,7 +1,5 @@
 package org.melchor629.engine.gl;
 
-import static org.melchor629.engine.Game.gl;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,10 +23,11 @@ import org.melchor629.engine.utils.ImageIO;
  * @author melchor9000
  */
 public class Texture implements Erasable {
-    protected int texture = -1;
-    protected GLContext.TextureTarget target;
-    protected int dimensions;
-    protected int width, height, comp;
+    private int texture = -1;
+    private GLContext.TextureTarget target;
+    private int dimensions;
+    private int width, height, comp;
+    private final GLContext gl;
 
     /**
      * Create a simple empty 2D texture, with minifier and magnifier filter
@@ -39,7 +38,8 @@ public class Texture implements Erasable {
      * @param eformat External format of the texture (should be the same
      *                or similar from {@code format} parameter.
      */
-    public Texture(GLContext.TextureFormat format, int width, int height, GLContext.TextureExternalFormat eformat) {
+    Texture(GLContext gl, GLContext.TextureFormat format, int width, int height, GLContext.TextureExternalFormat eformat) {
+        this.gl = gl;
         texture = gl.genTexture();
         target = GLContext.TextureTarget.TEXTURE_2D;
         dimensions = 2;
@@ -58,9 +58,11 @@ public class Texture implements Erasable {
     /**
      * Constructor for the Texture.Builder
      */
-    private Texture(File file, TextureFilter mag, TextureFilter min, TextureWrap wrap_s,
-            TextureWrap wrap_t, TextureFormat ifmt, TextureExternalFormat efmt, GLContext.TextureTarget target,
-            boolean mipmap, int width, int height) throws IOException {
+    private Texture(GLContext gl, File file, TextureFilter mag, TextureFilter min,
+                    TextureWrap wrap_s, TextureWrap wrap_t, TextureFormat ifmt,
+                    TextureExternalFormat efmt, GLContext.TextureTarget target,
+                    boolean mipmap, int width, int height) throws IOException {
+        this.gl = gl;
         texture = gl.genTexture();
         this.target = target;
         
@@ -72,14 +74,10 @@ public class Texture implements Erasable {
         
         java.nio.ByteBuffer buffer = null;
         ImageIO.ImageData data = null;
-        //byte[] buffer = null;
         if(file != null) {
-            //IOUtils.Image image = IOUtils.readImage(file);
-            //width = image.width;
-            //height = image.height;
-            //efmt = image.alpha ? TextureExternalFormat.RGBA : TextureExternalFormat.RGB;
-            //buffer = image.buffer;
             data = ImageIO.loadImage(file);
+            if(data.data == null)
+                throw new IOException("Could not decode image");
             width = data.width;
             height = data.height;
             efmt = data.components == 3 ? TextureExternalFormat.RGB : TextureExternalFormat.RGBA;
@@ -161,7 +159,7 @@ public class Texture implements Erasable {
      * Helper class for building textures, really helpful
      * @author melchor9000
      */
-    public static class builder {
+    public static class Builder {
         private File file;
         private InputStream imageStream;
         private GLContext.TextureFilter mag, min;
@@ -171,6 +169,7 @@ public class Texture implements Erasable {
         private GLContext.TextureTarget target;
         private boolean mipmap;
         private int width, height;
+        private GLContext gl;
 
         /**
          * Starts building a new Texture. This constructor set as default
@@ -182,8 +181,10 @@ public class Texture implements Erasable {
          * &nbsp;&nbsp;- No generate mipmaps<br>
          * &nbsp;&nbsp;- Width and height set to negative values,
          *               they have to be changed.
+         * @param gl OpenGL Context
          */
-        public builder() {
+        public Builder(GLContext gl) {
+            this.gl = gl;
             this.file = null;
             this.imageStream = null;
             this.mag = GLContext.TextureFilter.LINEAR;
@@ -202,7 +203,7 @@ public class Texture implements Erasable {
          * Set a file for load a texture
          * @param file the file to set
          */
-        public builder setFile(File file) {
+        public Builder setFile(File file) {
             this.file = file;
             return this;
         }
@@ -212,7 +213,7 @@ public class Texture implements Erasable {
          * @param file the path file to set
          * @return itself
          */
-        public builder setFile(String file) {
+        public Builder setFile(String file) {
             this.file = new File(file);
             return this;
         }
@@ -223,7 +224,7 @@ public class Texture implements Erasable {
          * @param is Input stream to be read as texture
          * @return itself
          */
-        public builder setStreamToFile(InputStream is) {
+        public Builder setStreamToFile(InputStream is) {
             this.imageStream = is;
             return this;
         }
@@ -232,7 +233,7 @@ public class Texture implements Erasable {
          * Sets the magnifier filter for the texture
          * @param mag the filter to set
          */
-        public builder setMag(GLContext.TextureFilter mag) {
+        public Builder setMag(GLContext.TextureFilter mag) {
             this.mag = mag;
             return this;
         }
@@ -241,7 +242,7 @@ public class Texture implements Erasable {
          * Set the minifier filter for the texture
          * @param min the filter to set
          */
-        public builder setMin(GLContext.TextureFilter min) {
+        public Builder setMin(GLContext.TextureFilter min) {
             this.min = min;
             return this;
         }
@@ -251,7 +252,7 @@ public class Texture implements Erasable {
          * right borders.
          * @param wrap_s the wrap method to set
          */
-        public builder setWrap_s(GLContext.TextureWrap wrap_s) {
+        public Builder setWrap_s(GLContext.TextureWrap wrap_s) {
             this.wrap_s = wrap_s;
             return this;
         }
@@ -261,7 +262,7 @@ public class Texture implements Erasable {
          * bottom borders.
          * @param wrap_t the wrap method to set
          */
-        public builder setWrap_t(GLContext.TextureWrap wrap_t) {
+        public Builder setWrap_t(GLContext.TextureWrap wrap_t) {
             this.wrap_t = wrap_t;
             return this;
         }
@@ -271,7 +272,7 @@ public class Texture implements Erasable {
          * @param wrap the wrap method to set
          * @return the builder
          */
-        public builder setWrap(GLContext.TextureWrap wrap) {
+        public Builder setWrap(GLContext.TextureWrap wrap) {
             setWrap_s(wrap);
             return setWrap_t(wrap);
         }
@@ -280,7 +281,7 @@ public class Texture implements Erasable {
          * Set the format of the image internally.
          * @param ifmt the format to set
          */
-        public builder setIfmt(GLContext.TextureFormat ifmt) {
+        public Builder setIfmt(GLContext.TextureFormat ifmt) {
             this.ifmt = ifmt;
             return this;
         }
@@ -290,7 +291,7 @@ public class Texture implements Erasable {
          * this function if you load a texture from disk.
          * @param efmt the format to set
          */
-        public builder setEfmt(GLContext.TextureExternalFormat efmt) {
+        public Builder setEfmt(GLContext.TextureExternalFormat efmt) {
             this.efmt = efmt;
             return this;
         }
@@ -299,7 +300,7 @@ public class Texture implements Erasable {
          * Set whether the GPU will generate MipMaps or not.
          * @param mipmap the mipmap to set
          */
-        public builder setMipmap(boolean mipmap) {
+        public Builder setMipmap(boolean mipmap) {
             this.mipmap = mipmap;
             return this;
         }
@@ -308,7 +309,7 @@ public class Texture implements Erasable {
          * The width of the image, not needed for texture loading.
          * @param width the width to set
          */
-        public builder setWidth(int width) {
+        public Builder setWidth(int width) {
             this.width = width;
             return this;
         }
@@ -317,19 +318,19 @@ public class Texture implements Erasable {
          * The height of the image, not needed for texture loading.
          * @param height the height to set
          */
-        public builder setHeight(int height) {
+        public Builder setHeight(int height) {
             this.height = height;
             return this;
         }
 
-        public builder setTarget(GLContext.TextureTarget target) {
+        public Builder setTarget(GLContext.TextureTarget target) {
             this.target = target;
             return this;
         }
 
         public Texture build() throws IOException {
             if(file != null)
-                return new Texture(file, mag, min, wrap_s, wrap_t, ifmt, efmt, target, mipmap, width, height);
+                return new Texture(gl, file, mag, min, wrap_s, wrap_t, ifmt, efmt, target, mipmap, width, height);
             else if(imageStream != null) {
                 File temp = IOUtils.createTempFile();
                 FileOutputStream fos = new FileOutputStream(temp);
@@ -338,7 +339,7 @@ public class Texture implements Erasable {
                     int read = imageStream.read(buff);
                     fos.write(buff, 0, read);
                 }
-                return new Texture(temp, mag, min, wrap_s, wrap_t, ifmt, efmt, target, mipmap, width, height);
+                return new Texture(gl, temp, mag, min, wrap_s, wrap_t, ifmt, efmt, target, mipmap, width, height);
             } else
                 throw new IllegalArgumentException("Trying to create a texture without a file o stream to read");
         }
