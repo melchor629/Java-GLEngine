@@ -5,6 +5,10 @@ import org.lwjgl.system.Configuration;
 import org.lwjgl.system.Platform;
 import org.lwjgl.system.libffi.Closure;
 import org.melchor629.engine.utils.BufferUtils;
+import org.melchor629.engine.utils.math.GLM;
+import org.melchor629.engine.utils.math.Matrix2;
+import org.melchor629.engine.utils.math.Matrix3;
+import org.melchor629.engine.utils.math.Matrix4;
 
 import java.nio.*;
 
@@ -1236,6 +1240,11 @@ public class LWJGLGLContext implements GLContext {
         buff.clear();
     }
 
+    @Override
+    public void uniformMatrix2(int loc, Matrix2 matrix) {
+        uniformMatrix2(loc, false, GLM.matrixAsArray(matrix));
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#uniformMatrix3(int, boolean, float[])
      */
@@ -1247,6 +1256,11 @@ public class LWJGLGLContext implements GLContext {
         buff.clear();
     }
 
+    @Override
+    public void uniformMatrix3(int loc, Matrix3 matrix) {
+        uniformMatrix3(loc, false, GLM.matrixAsArray(matrix));
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#uniformMatrix4(int, boolean, float[])
      */
@@ -1256,6 +1270,11 @@ public class LWJGLGLContext implements GLContext {
         FloatBuffer buff = BufferUtils.createFloatBuffer(4 * 4).put(matrix);buff.flip();
         glUniformMatrix4fv(loc, trans, buff);
         buff.clear();
+    }
+
+    @Override
+    public void uniformMatrix4(int loc, Matrix4 matrix) {
+        uniformMatrix4(loc, false, GLM.matrixAsArray(matrix));
     }
 
     /* (non-Javadoc)
@@ -1430,6 +1449,11 @@ public class LWJGLGLContext implements GLContext {
         }
         
         return error;
+    }
+
+    @Override
+    public BufferObject createBufferObject(BufferTarget target, BufferUsage usage) {
+        return new BufferObject(this, target, usage);
     }
 
     /* (non-Javadoc)

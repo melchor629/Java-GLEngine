@@ -1,5 +1,9 @@
 package org.melchor629.engine.gl;
 
+import org.melchor629.engine.utils.math.Matrix2;
+import org.melchor629.engine.utils.math.Matrix3;
+import org.melchor629.engine.utils.math.Matrix4;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -898,6 +902,8 @@ public interface GLContext {
      */
     Error getError();
 
+    BufferObject createBufferObject(BufferTarget target, BufferUsage usage);
+
     //Vertex Arrays
     int genVertexArray();
     void genVertexArrays(int[] buff);
@@ -976,11 +982,11 @@ public interface GLContext {
     void uniform4f(int loc, float v1, float v2, float v3, float v4);
     void uniform4i(int loc, int v1, int v2, int v3, int v4);
     void uniformMatrix2(int loc, boolean trans, float[] matrix) throws BufferUnderflowException;
-    //void uniformMatrix2(int loc, mat2 matrix); TODO
+    void uniformMatrix2(int loc, Matrix2 matrix);
     void uniformMatrix3(int loc, boolean trans, float[] matrix) throws BufferUnderflowException;
-    //void uniformMatrix3(int loc, mat3 matrix); TODO
+    void uniformMatrix3(int loc, Matrix3 matrix);
     void uniformMatrix4(int loc, boolean trans, float[] matrix) throws BufferUnderflowException;
-    //void uniformMatrix4(int loc, Matrix4 matrix); TODO
+    void uniformMatrix4(int loc, Matrix4 matrix);
 
     //Texturas
     void setActiveTexture(int i);

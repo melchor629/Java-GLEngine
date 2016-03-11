@@ -1,7 +1,6 @@
 package org.melchor629.engine.objects;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.BufferObject;
 import org.melchor629.engine.gl.ShaderProgram;
@@ -25,6 +24,7 @@ public class Model implements Erasable {
     private VAO vao;
     private BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, colorBuffer;
     private final Geometry geometry;
+    private final GLContext gl;
 
     private static ArrayList<Model> models;
 
@@ -32,10 +32,10 @@ public class Model implements Erasable {
      * Load all models from a Collada document
      * @param c Collada document
      */
-    public static void loadModels(Collada c) {
+    public static void loadModels(GLContext gl, Collada c) {
         if(models == null)
             models = new ArrayList<>(c.geometry.size());
-        models.addAll(c.geometry.stream().map(Model::new).collect(Collectors.toList()));
+        models.addAll(c.geometry.stream().map(g -> new Model(gl, g)).collect(Collectors.toList()));
     }
 
     /**
@@ -64,7 +64,8 @@ public class Model implements Erasable {
      * Loads a model from a Collada file
      * @param g Geometry node
      */
-    private Model(Geometry g) {
+    private Model(GLContext gl, Geometry g) {
+        this.gl = gl;
         geometry = g;
         generateBuffers();
         geometry.mesh.disposeData();
@@ -95,12 +96,12 @@ public class Model implements Erasable {
         Mesh m = geometry.mesh;
         int sources = m.sources.size();
         vao = new VAO();
-        vertexBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        normalBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        colorBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        indexBuffer = new BufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        vertexBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        normalBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        colorBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        indexBuffer = gl.createBufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         if(sources == 3)
-            texCoordBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+            texCoordBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
 
         IntBuffer ibuff = BufferUtils.createIntBuffer(m.polylist.p.capacity() / sources);
         for(int i = 0; i < m.polylist.p.capacity(); i += sources)
@@ -157,7 +158,7 @@ public class Model implements Erasable {
         if(s != null && model != null)
             s.setUniformMatrix("model", model.getModelMatrix());
         vao.bind();
-        Game.gl.drawElements(GLContext.DrawMode.TRIANGLES, facesCount * 3, GLContext.type.UNSIGNED_INT, 0);
+        gl.drawElements(GLContext.DrawMode.TRIANGLES, facesCount * 3, GLContext.type.UNSIGNED_INT, 0);
         vao.unbind();
     }
 

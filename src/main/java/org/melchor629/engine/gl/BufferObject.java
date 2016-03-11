@@ -5,8 +5,6 @@ import java.nio.IntBuffer;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.GLError;
 
 /**
  * Class for manage all types of *BO (<i>Buffer Objects</i>) like VBO
@@ -15,21 +13,24 @@ import org.melchor629.engine.gl.GLError;
  * @author melchor9000
  */
 public class BufferObject implements Erasable {
-    protected int bo;
-    protected GLContext.BufferTarget target;
-    protected GLContext.BufferUsage usage;
+    private int bo;
+    private GLContext.BufferTarget target;
+    private GLContext.BufferUsage usage;
+    private GLContext gl;
 
     /**
      * Create and bind a Buffer object of type {@code target}. Binding the
      * BO, it fixes its type to the {@code target}.
+     * @param gl a OpenGL Context
      * @param target Type of the Buffer Object
      * @param usage Specifies the expected usage pattern of the data store, can be null (default STATIC_DRAW)
      */
-    public BufferObject(GLContext.BufferTarget target, GLContext.BufferUsage usage) {
+    BufferObject(GLContext gl, GLContext.BufferTarget target, GLContext.BufferUsage usage) {
+        this.gl = gl;
         this.target = target;
         this.usage = usage != null ? usage : GLContext.BufferUsage.STATIC_DRAW;
-        bo = Game.gl.genBuffer();
-        Game.gl.bindBuffer(target, bo);
+        bo = gl.genBuffer();
+        gl.bindBuffer(target, bo);
 
         Game.erasableList.add(this);
     }
@@ -40,7 +41,7 @@ public class BufferObject implements Erasable {
      */
     public void bind() {
         if(bo != -1)
-            Game.gl.bindBuffer(target, bo);
+            gl.bindBuffer(target, bo);
         else
             throw new GLError("glBindBuffer", "Cannot bind a deleted buffer");
     }
@@ -49,7 +50,7 @@ public class BufferObject implements Erasable {
      * Unbinds this BO. Shortcut of {@code glBindBuffer(target, 0) }
      */
     public void unbind() {
-        Game.gl.bindBuffer(target, 0);
+        gl.bindBuffer(target, 0);
     }
 
     /**
@@ -58,7 +59,7 @@ public class BufferObject implements Erasable {
      */
     public void delete() {
         if(bo == -1) return;
-        Game.gl.deleteBuffer(bo);
+        gl.deleteBuffer(bo);
         bo = -1;
     }
 
@@ -69,7 +70,7 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(byte[] buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
 
     /**
@@ -79,7 +80,7 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(short[] buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
 
     /**
@@ -89,7 +90,7 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(int[] buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
 
     /**
@@ -99,7 +100,7 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(IntBuffer buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
 
     /**
@@ -109,7 +110,7 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(float[] buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
 
     /**
@@ -119,7 +120,7 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(FloatBuffer buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
 
     /**
@@ -129,12 +130,12 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(double[] buff) {
         bind();
-        Game.gl.bufferData(target, buff, usage);
+        gl.bufferData(target, buff, usage);
     }
     
     public void initPartialFillBuffer(int count) {
         bind();
-        Game.gl.bufferData(target, count, usage);
+        gl.bufferData(target, count, usage);
     }
     
     /**
@@ -145,7 +146,7 @@ public class BufferObject implements Erasable {
      */
     public void partiallyFillBuffer(long offset, IntBuffer buff) {
         bind();
-        Game.gl.bufferSubData(target, offset, buff);
+        gl.bufferSubData(target, offset, buff);
     }  
     
     /**
@@ -156,10 +157,10 @@ public class BufferObject implements Erasable {
      */
     public void partiallyFillBuffer(long offset, FloatBuffer buff) {
         bind();
-        Game.gl.bufferSubData(target, offset, buff);
+        gl.bufferSubData(target, offset, buff);
     }
 
-    // http://onrendering.blogspot.com.es/2011/10/buffer-object-streaming-in-opengl.html
+    //TODO http://onrendering.blogspot.com.es/2011/10/buffer-object-streaming-in-opengl.html
     public void clearData() {}
 
     /**
@@ -167,7 +168,7 @@ public class BufferObject implements Erasable {
      * @return the size of the buffer object, measured in bytes
      */
     public long getBufferSize() {
-        return Game.gl.getBufferParameteri64(target, GLContext.GLGetBuffer.BUFFER_SIZE);
+        return gl.getBufferParameteri64(target, GLContext.GLGetBuffer.BUFFER_SIZE);
     }
 
     /**
@@ -175,11 +176,5 @@ public class BufferObject implements Erasable {
      */
     public GLContext.BufferUsage getBufferUsage() {
         return usage;
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        delete();
     }
 }

@@ -119,8 +119,8 @@ public class EspacioEuclideo extends Game {
         camera.setMouseSensibility(0);
 
         puntos_vao = new VAO();
-        BufferObject plano_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        puntos_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STREAM_DRAW);
+        BufferObject plano_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        puntos_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STREAM_DRAW);
 
         puntos = generarEspacioEuclídeo();
         puntos_buff = BufferUtils.createFloatBuffer(puntos.size() * 3);
@@ -193,7 +193,7 @@ public class EspacioEuclideo extends Game {
         /**
          * Post-processing effects
          */
-        BufferObject screen_vbo = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        BufferObject screen_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         screen_vbo.fillBuffer(new float[] {
                 1, -1, 0, 0,
                 1,  1, 1, 0,
@@ -295,10 +295,10 @@ public class EspacioEuclideo extends Game {
         puntos_shader.setUniform("opacity", 1.f + 0.f*opacity);
 
         if(pasos++ % 5 == 0) {
-            cantidad = obtenerVisibles(puntos_buff, camera, puntos);
-            puntos_vbo.fillBuffer(puntos_buff);
-            System.out.printf("Cantidad de puntos visibles: %d     \r", cantidad);
-            System.out.flush();
+            postInBackground(() -> {
+                cantidad = obtenerVisibles(puntos_buff, camera, puntos);
+                post(() -> puntos_vbo.fillBuffer(puntos_buff));
+            });
             pasos %= 5;
         }
 

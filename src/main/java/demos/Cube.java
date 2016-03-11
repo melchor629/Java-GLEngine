@@ -18,8 +18,6 @@ import org.melchor629.engine.gl.BufferObject;
 import org.melchor629.engine.gl.ShaderProgram;
 import org.melchor629.engine.gl.VAO;
 
-import static org.melchor629.engine.Game.gl;
-
 class Cube {
 
     BufferObject positionBuffer,
@@ -29,7 +27,10 @@ class Cube {
             indexBuffer;
     VAO vao;
 
-    Cube() {
+    GLContext gl;
+
+    Cube(GLContext _gl) {
+        gl = _gl;
         vao = new VAO();
 
         float[] vertices = {
@@ -146,11 +147,11 @@ class Cube {
                 0.0f, 1.0f}
         ;
 
-        positionBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        normalBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        textureCoordBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        colorBuffer = new BufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        indexBuffer = new BufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        positionBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        normalBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        textureCoordBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        colorBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
+        indexBuffer = gl.createBufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
 
         positionBuffer.fillBuffer(vertices);
         textureCoordBuffer.fillBuffer(textureCoords);

@@ -17,7 +17,6 @@ import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.Vector3;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class AnotherTestingClass extends Game {
     
@@ -99,7 +98,7 @@ public class AnotherTestingClass extends Game {
         try {
             //c = new Collada(new File("mierda.dae"));
             c = new Collada(new File("src/main/resources/scenes/mierdolo.dae"));
-            c.loadElements();
+            c.loadElements(gl);
         } catch(Exception e) {
             e.printStackTrace();
             window.destroyWindow();
@@ -114,7 +113,7 @@ public class AnotherTestingClass extends Game {
         cs.enableAttributes();
         //s.unbind();
 
-        cube = new Cube();
+        cube = new Cube(gl);
 
         ModelMatrix model = new ModelMatrix();
         cubeModel = new ModelMatrix();
