@@ -2,20 +2,21 @@ package org.melchor629.engine.gl;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.GLError;
 
 /**
  * Vertex Array Object class
  * @author melchor9000
  */
-public class VAO implements Erasable {
-    protected int vao = -1;
+public class VertexArrayObject implements Erasable {
+    private int vao = -1;
+    private final GLContext gl;
 
     /**
      * Generates a Vertex Array Buffer and then it's binded
      */
-    public VAO() {
-        vao = Game.gl.genVertexArray();
+    VertexArrayObject(GLContext gl) {
+        this.gl = gl;
+        vao = gl.genVertexArray();
         Game.erasableList.add(this);
     }
 
@@ -25,7 +26,7 @@ public class VAO implements Erasable {
      */
     public void bind()  {
         if(vao != -1)
-            Game.gl.bindVertexArray(vao);
+            gl.bindVertexArray(vao);
         else
             throw new GLError("This Vertex Array Object was deleted before");
     }
@@ -34,7 +35,7 @@ public class VAO implements Erasable {
      * Unbinds this VAO. Shortcut for {@code glBindVertexArray(0)}
      */
     public void unbind() {
-        Game.gl.bindVertexArray(0);
+        gl.bindVertexArray(0);
     }
 
     /**
@@ -42,13 +43,7 @@ public class VAO implements Erasable {
      */
     public void delete() {
         if(vao == -1) return;
-        Game.gl.deleteVertexArray(vao);
+        gl.deleteVertexArray(vao);
         vao = -1;
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        delete();
     }
 }

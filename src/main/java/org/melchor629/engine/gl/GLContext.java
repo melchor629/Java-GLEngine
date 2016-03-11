@@ -908,6 +908,8 @@ public interface GLContext {
 
     RenderBuffer createRenderBuffer(TextureFormat fmt, int width, int height);
 
+    VertexArrayObject createVertexArrayObject();
+
     //Vertex Arrays
     int genVertexArray();
     void genVertexArrays(int[] buff);

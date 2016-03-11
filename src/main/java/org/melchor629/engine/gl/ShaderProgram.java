@@ -142,7 +142,7 @@ public class ShaderProgram implements Erasable {
      * @see <a href="http://stackoverflow.com/questions/13403807/glvertexattribpointer-raising-gl-invalid-operation">
      *      glVertexAttribPointer raising GL_INVALID_OPERATION</a>
      */
-    public void enableAttribs(VAO vao, String... attribss) {
+    public void enableAttribs(VertexArrayObject vao, String... attribss) {
         vao.bind();
         bind();
         for(String attribS : attribss) {

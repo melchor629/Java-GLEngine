@@ -4,7 +4,7 @@ import org.melchor629.engine.Erasable;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.BufferObject;
 import org.melchor629.engine.gl.ShaderProgram;
-import org.melchor629.engine.gl.VAO;
+import org.melchor629.engine.gl.VertexArrayObject;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.collada.*;
 import org.melchor629.engine.utils.BufferUtils;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * From Dart experiment
  */
 public class Model implements Erasable {
-    private VAO vao;
+    private VertexArrayObject vao;
     private BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, colorBuffer;
     private final Geometry geometry;
     private final GLContext gl;
@@ -95,7 +95,7 @@ public class Model implements Erasable {
     private void generateBuffers() {
         Mesh m = geometry.mesh;
         int sources = m.sources.size();
-        vao = new VAO();
+        vao = gl.createVertexArrayObject();
         vertexBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         normalBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         colorBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);

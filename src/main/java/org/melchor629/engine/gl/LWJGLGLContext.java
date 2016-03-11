@@ -1466,6 +1466,11 @@ public class LWJGLGLContext implements GLContext {
         return new RenderBuffer(this, fmt, width, height);
     }
 
+    @Override
+    public VertexArrayObject createVertexArrayObject() {
+        return new VertexArrayObject(this);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, int, org.melchor629.engine.gl.GLContext.BufferUsage)
      */

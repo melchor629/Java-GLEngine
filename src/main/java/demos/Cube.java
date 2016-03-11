@@ -16,7 +16,7 @@ package demos;// Copyright (c) 2013, John Thomas McDole.
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.BufferObject;
 import org.melchor629.engine.gl.ShaderProgram;
-import org.melchor629.engine.gl.VAO;
+import org.melchor629.engine.gl.VertexArrayObject;
 
 class Cube {
 
@@ -25,13 +25,13 @@ class Cube {
             textureCoordBuffer,
             colorBuffer,
             indexBuffer;
-    VAO vao;
+    VertexArrayObject vao;
 
     GLContext gl;
 
     Cube(GLContext _gl) {
         gl = _gl;
-        vao = new VAO();
+        vao = gl.createVertexArrayObject();
 
         float[] vertices = {
             // Front face

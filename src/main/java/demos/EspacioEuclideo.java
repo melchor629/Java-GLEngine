@@ -91,7 +91,7 @@ public class EspacioEuclideo extends Game {
     }
 
     private Camera camera;
-    private VAO puntos_vao, phosphorEffectVao;
+    private VertexArrayObject puntos_vao, phosphorEffectVao;
     private ShaderProgram puntos_shader, phosphorEffect;
     private TreeSet<Vector3> puntos;
     private BufferObject puntos_vbo;
@@ -118,7 +118,7 @@ public class EspacioEuclideo extends Game {
         camera.setMovementMultiplier(0);
         camera.setMouseSensibility(0);
 
-        puntos_vao = new VAO();
+        puntos_vao = gl.createVertexArrayObject();
         BufferObject plano_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         puntos_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STREAM_DRAW);
 
@@ -210,7 +210,7 @@ public class EspacioEuclideo extends Game {
         sceneFB.attachDepthStencilRenderbuffer(currentFrameDepth);
         sceneFB.unbind();
 
-        phosphorEffectVao = new VAO();
+        phosphorEffectVao = gl.createVertexArrayObject();
         try {
             phosphorEffect = new ShaderProgram(
                     IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/base.vs.glsl")),
