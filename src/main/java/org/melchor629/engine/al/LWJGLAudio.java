@@ -2,6 +2,7 @@ package org.melchor629.engine.al;
 
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALContext;
+import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
@@ -13,6 +14,7 @@ import static org.lwjgl.openal.AL10.*;
  */
 public class LWJGLAudio implements AL {
 	ALContext context;
+	private org.melchor629.engine.al.Listener listener;
 
 	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#createContext()
@@ -22,6 +24,7 @@ public class LWJGLAudio implements AL {
 		try {
 			context = ALContext.create();
             context.makeCurrent();
+            listener = new org.melchor629.engine.al.Listener(this);
 		} catch(Exception e) {
 			ALError err = new ALError("Error creating context");
 			err.initCause(e);
@@ -41,9 +44,39 @@ public class LWJGLAudio implements AL {
         }
 	}
 
-	/* (non-Javadoc)
-	 * @see org.melchor629.engine.al.AL#bufferData(int, org.melchor629.engine.al.AL.Format, byte[], int)
-	 */
+	@Override
+	public org.melchor629.engine.al.Listener getListener() {
+		return listener;
+	}
+
+    @Override
+    public org.melchor629.engine.al.Buffer createBuffer(AudioContainer ac) {
+        return new org.melchor629.engine.al.Buffer(this, ac);
+    }
+
+    @Override
+    public org.melchor629.engine.al.Buffer createBuffer(short[] data, Format f, int freq) {
+        return new org.melchor629.engine.al.Buffer(this, data, f, freq);
+    }
+
+    @Override
+    public org.melchor629.engine.al.Buffer createBuffer(ShortBuffer data, Format f, int freq) {
+        return new org.melchor629.engine.al.Buffer(this, data, f, freq);
+    }
+
+    @Override
+    public org.melchor629.engine.al.Source createSource(AudioContainer ac) {
+        return new org.melchor629.engine.al.Source(this, ac);
+    }
+
+    @Override
+    public org.melchor629.engine.al.Source createSource(org.melchor629.engine.al.Buffer b) {
+        return new org.melchor629.engine.al.Source(this, b);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.al.AL#bufferData(int, org.melchor629.engine.al.AL.Format, byte[], int)
+     */
 	@Override
 	public void bufferData(int buffer, Format format, byte[] data, int freq) {
 		if(!isBuffer(buffer))

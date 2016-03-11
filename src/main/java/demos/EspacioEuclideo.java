@@ -2,6 +2,7 @@ package demos;
 
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
+import org.melchor629.engine.gl.LWJGLWindow;
 import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.gl.types.*;
 import org.melchor629.engine.input.Keyboard;
@@ -82,7 +83,7 @@ public class EspacioEuclideo extends Game {
     }
 
     public EspacioEuclideo() {
-        super();
+        super(new LWJGLWindow(), null);
         window.setResizable(false);
         window.setVisible(false);
         window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);

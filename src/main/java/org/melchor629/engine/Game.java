@@ -27,7 +27,7 @@ public abstract class Game {
     protected Queue<Runnable> events;
     public static Window window;
     public static GLContext gl;
-    public static AL al;
+    protected AL al;
     public static Keyboard keyboard;
     public static Mouse mouse;
     public static List<Erasable> erasableList;
@@ -38,7 +38,7 @@ public abstract class Game {
     /**
      * Default constructor for test games
      */
-    protected Game() {
+    protected Game(Window window, AL audio) {
         width = 1280;
         height = 720;
         fullscreen = false;
@@ -49,7 +49,8 @@ public abstract class Game {
         erasableList = new ArrayList<>();
         events = new ConcurrentLinkedQueue<>();
         lock = new Object();
-        window = new LWJGLWindow();
+        this.window = window;
+        this.al = audio;
     }
 
     private void makeGame() {
@@ -90,6 +91,10 @@ public abstract class Game {
         }
         erasableList.forEach(Erasable::delete);
         closing();
+        window.destroyWindow();
+        if(al != null) {
+            al.deleteContext();
+        }
     }
 
     protected void startEngine() {

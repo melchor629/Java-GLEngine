@@ -3,6 +3,7 @@ package org.melchor629.engine.utils.math;
 import org.junit.Test;
 import org.melchor629.engine.objects.Camera;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.melchor629.engine.utils.math.ArithmeticOperations.doubles;
 
@@ -210,6 +211,20 @@ public class MatrixOperationTests {
                 1f, -0f, -1f, 1f
             ),
             camera.getViewMatrix()
+        );
+    }
+
+    @Test
+    public void matrixToArray() {
+        assertArrayEquals(
+            new float[] {
+                1, 0, 0, 0,
+                3, 2, 5, 1,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            },
+            GLM.matrixAsArray((Matrix4) new Matrix4().setRow(2, new Vector4(3, 2, 5, 1))),
+            0.001f
         );
     }
 }

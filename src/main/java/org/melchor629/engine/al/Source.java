@@ -1,13 +1,10 @@
-package org.melchor629.engine.al.types;
+package org.melchor629.engine.al;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.al.AL;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.math.Vector3;
 import org.melchor629.engine.utils.math.GLM;
-
-import static org.melchor629.engine.Game.al;
 
 /**
  * Source of a sound, with its position, gain, speed, and so...
@@ -15,20 +12,22 @@ import static org.melchor629.engine.Game.al;
  */
 //TODO Clamp values within their intervals
 public class Source implements Erasable {
-    protected Buffer buffer;
-    protected int source;
-    protected boolean relative = false;
-    protected boolean looping = false;
-    protected float reference_distance = 1.0f, rolloff_factor = 1.0f, max_distance = Float.MAX_VALUE;
-    protected float pitch = 1.0f;
-    protected Vector3 direction;
-    protected float cone_inner_angle = 360.0f, cone_outer_angle = 360.0f, cone_outer_gain = 0.0f;
-    protected Vector3 position, velocity;
-    protected float gain;
+    private Buffer buffer;
+    private int source;
+    private boolean relative = false;
+    private boolean looping = false;
+    private float reference_distance = 1.0f, rolloff_factor = 1.0f, max_distance = Float.MAX_VALUE;
+    private float pitch = 1.0f;
+    private Vector3 direction;
+    private float cone_inner_angle = 360.0f, cone_outer_angle = 360.0f, cone_outer_gain = 0.0f;
+    private Vector3 position, velocity;
+    private float gain;
+    private AL al;
     
     public float min_gain, max_gain;
 
-    public Source(Buffer buffer0) {
+    Source(AL al, Buffer buffer0) {
+        this.al = al;
         if(buffer0 == null || !buffer0.isComplete())
             throw new IllegalArgumentException("Cannot pass a null or incomplete buffer");
         buffer = buffer0;
@@ -40,8 +39,8 @@ public class Source implements Erasable {
         Game.erasableList.add(this);
     }
     
-    public Source(AudioContainer data) {
-    	this(new Buffer(data));
+    Source(AL al, AudioContainer data) {
+    	this(al, new Buffer(al, data));
     }
     
     public void setPosition(Vector3 pos) {

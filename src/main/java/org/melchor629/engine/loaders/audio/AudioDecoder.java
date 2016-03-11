@@ -1,5 +1,6 @@
 package org.melchor629.engine.loaders.audio;
 
+import org.melchor629.engine.utils.logger.Logger;
 import org.reflections.Reflections;
 
 import java.io.EOFException;
@@ -15,6 +16,7 @@ import java.util.Map;
  */
 public abstract class AudioDecoder {
     private static Map<String, Class<? extends AudioDecoder>> decoders = new HashMap<>();
+    private static Logger LOG = Logger.getLogger(AudioDecoder.class);
     protected AudioContainer container;
 
     static {
@@ -25,8 +27,7 @@ public abstract class AudioDecoder {
                     try {
                         e.getConstructor().newInstance().addItselfToDecoders();
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
-                        System.err.println("Cannot add " + e.getName() + " to decoders");
-                        e1.printStackTrace();
+                        LOG.throwable("Cannot add " + e.getName() + " to decoders", e1);
                     }
                 });
     }

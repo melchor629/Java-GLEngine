@@ -591,6 +591,24 @@ public class GLM {
                 array[i++] = mat.getValueAt(x, y);
         return array;
     }
+
+    public static float[] matrixAsArray(Matrix3 mat) {
+        float[] array = new float[9];
+        int i = 0;
+        for(int x = 1; x <= 3; x++)
+            for(int y = 1; y <= 3; y++)
+                array[i++] = mat.getValueAt(x, y);
+        return array;
+    }
+
+    public static float[] matrixAsArray(Matrix2 mat) {
+        float[] array = new float[4];
+        int i = 0;
+        for(int x = 1; x <= 2; x++)
+            for(int y = 1; y <= 2; y++)
+                array[i++] = mat.getValueAt(x, y);
+        return array;
+    }
     
     /**
      * Useful function that checks if a number belongs to an

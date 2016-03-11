@@ -33,7 +33,7 @@ public class Lua implements ScriptEngine {
                     "function loadmodule(name)\n" +
                         "return __eng:initModule(name)\n" +
                     "end\n");
-        } catch(Exception ignore) {ignore.printStackTrace();}
+        } catch(Exception ignore) {}
     }
 
     @Override
@@ -66,9 +66,13 @@ public class Lua implements ScriptEngine {
         try {
             engine.eval(code);
         } catch(ScriptException e) {
-            throw new ScriptError(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e.getFileName());
+            ScriptError err =  new ScriptError(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e.getFileName());
+            err.initCause(e);
+            throw err;
         } catch(LuaError e) {
-            throw new ScriptError(e.getMessage());
+            ScriptError err =  new ScriptError(e.getMessage());
+            err.initCause(e);
+            throw err;
         }
     }
 

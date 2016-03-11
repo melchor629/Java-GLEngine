@@ -2,6 +2,7 @@ package org.melchor629.engine.script;
 
 import org.melchor629.engine.script.engines.JavaScript;
 import org.melchor629.engine.script.engines.Lua;
+import org.melchor629.engine.utils.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.function.Function;
  * bind Java code with the different scripting langs supported by this engine.
  */
 public class ScriptEngineManager {
+    private static final Logger LOG = Logger.getLogger(ScriptEngineManager.class);
     private static List<ScriptEngine> engines;
 
     static {
@@ -27,6 +29,7 @@ public class ScriptEngineManager {
      */
     public static void addObject(String objectName, Object object) {
         engines.forEach(e -> e.addObject(objectName, object));
+        LOG.trace("Added object %s to scripts", objectName);
     }
 
     /**
@@ -39,7 +42,10 @@ public class ScriptEngineManager {
         try {
             ScriptModule _module = module.newInstance();
             engines.forEach(e -> e.addModule(objectName, _module));
-        } catch(Exception ignore) {}
+            LOG.trace("Added module %s to scripts", objectName);
+        } catch(Exception e) {
+            LOG.throwable("Error adding module to scripts", e);
+        }
     }
 
     /**
@@ -49,6 +55,7 @@ public class ScriptEngineManager {
      */
     public static void addFunction(String objectName, Function<Object[], Object> function) {
         engines.forEach(e -> e.addFunction(objectName, function));
+        LOG.trace("Added function %s to scripts", objectName);
     }
 
     /**

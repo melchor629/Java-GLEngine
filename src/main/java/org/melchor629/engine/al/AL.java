@@ -1,5 +1,7 @@
 package org.melchor629.engine.al;
 
+import org.melchor629.engine.loaders.audio.AudioContainer;
+
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -120,6 +122,15 @@ public interface AL {
      */
     void deleteContext();
     //TODO Dispositivos
+
+    org.melchor629.engine.al.Listener getListener();
+
+    org.melchor629.engine.al.Buffer createBuffer(AudioContainer ac);
+    org.melchor629.engine.al.Buffer createBuffer(short[] data, Format f, int freq);
+    org.melchor629.engine.al.Buffer createBuffer(ShortBuffer data, Format f, int freq);
+
+    org.melchor629.engine.al.Source createSource(AudioContainer ac);
+    org.melchor629.engine.al.Source createSource(org.melchor629.engine.al.Buffer b);
 
     /**
      * This function fills a buffer with audio data. All the pre-defined formats are

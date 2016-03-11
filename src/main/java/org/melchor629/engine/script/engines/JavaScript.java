@@ -70,7 +70,9 @@ public class JavaScript implements ScriptEngine {
         try {
             engine.eval(code);
         } catch(javax.script.ScriptException e) {
-            throw new ScriptError(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e.getFileName());
+            ScriptError err =  new ScriptError(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e.getFileName());
+            err.initCause(e);
+            throw err;
         }
     }
 

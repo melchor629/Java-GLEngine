@@ -104,7 +104,7 @@ public class IOUtils {
         InputStream in = con.getInputStream();
 
         String enc = con.getHeaderField("Content-Type");
-        enc = enc.substring(enc.indexOf("charset=") > 0 ? enc.indexOf("charset=") + 8 : enc.length());
+        enc = enc.substring(enc.contains("charset=") ? enc.indexOf("charset=") + 8 : enc.length());
         if(enc.length() < 3) enc = "UTF-8";
         
         BufferedReader br = new BufferedReader(new InputStreamReader(in, enc));

@@ -5,8 +5,8 @@ import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.al.LWJGLAudio;
-import org.melchor629.engine.al.types.Buffer;
-import org.melchor629.engine.al.types.Source;
+import org.melchor629.engine.al.Buffer;
+import org.melchor629.engine.al.Source;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.utils.Timing;
@@ -30,7 +30,7 @@ public class AudioTests {
     public static void main(String[] args) throws Exception {
         Native.setProtected(true);
 
-        AL al = Game.al = new LWJGLAudio();
+        AL al = new LWJGLAudio();
         Game.erasableList = new ArrayList<>();
         al.createContext();
         AudioDecoder decoder = AudioDecoder.createDecoderForFile(new File(archivo));
@@ -45,8 +45,8 @@ public class AudioTests {
         log.info("Time spent decoding %s %dms", ext, timeDecode);
 
         data.getDataAsShort().clear();
-        Buffer sd_buffer = new Buffer(data.getDataAsShort(), AL.Format.STEREO16, data.getSampleRate());
-        Source sd_source = new Source(sd_buffer);
+        Buffer sd_buffer = al.createBuffer(data.getDataAsShort(), AL.Format.STEREO16, data.getSampleRate());
+        Source sd_source = al.createSource(sd_buffer);
         data.cleanUpNativeResources();
         sd_source.setGain(1.00f);
         sd_source.play();

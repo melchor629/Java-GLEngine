@@ -3,9 +3,8 @@ package demos;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.al.LWJGLAudio;
-import org.melchor629.engine.al.types.Buffer;
-import org.melchor629.engine.al.types.Listener;
-import org.melchor629.engine.al.types.Source;
+import org.melchor629.engine.al.Buffer;
+import org.melchor629.engine.al.Source;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.GLContext.GLEnable;
 import org.melchor629.engine.gl.LWJGLWindow;
@@ -62,7 +61,7 @@ public class AnotherTestingClass {
     public static void colladaxd() {
         Game.erasableList = new ArrayList<>();
         Window window = Game.window = new LWJGLWindow();
-        AL al = Game.al = new LWJGLAudio();
+        AL al = new LWJGLAudio();
         Timing t = Timing.getGameTiming();
         window.setResizable(true);
         window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
@@ -85,8 +84,8 @@ public class AnotherTestingClass {
                     decoder.readHeader();
                     decoder.decode();
                     sound = decoder.getAudioContainer();
-                    sound_buffer = new Buffer(sound.getDataAsShort(), AL.Format.STEREO16, sound.getSampleRate());
-                    sound_source = new Source(sound_buffer);
+                    sound_buffer = al.createBuffer(sound.getDataAsShort(), AL.Format.STEREO16, sound.getSampleRate());
+                    sound_source = al.createSource(sound_buffer);
                 }
 
                 sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
@@ -152,9 +151,9 @@ public class AnotherTestingClass {
             keyboard.fireEvent(t.frameTime);
             mouse.update(t.frameTime);
             camera.updateIfNeeded();
-            Listener.setPosition(camera.getPosition());
-            Listener.setOrientation(camera.getLookingAtDirection(), new Vector3(0, 0, 1));
-            Listener.setVelocity(camera.getSpeed());
+            al.getListener().setPosition(camera.getPosition());
+            al.getListener().setOrientation(camera.getLookingAtDirection(), new Vector3(0, 0, 1));
+            al.getListener().setVelocity(camera.getSpeed());
             t.split("cpu");
             System.out.printf("CPU: %.6f\tGPU: %.6f    \r", t.getSplitTime("cpu"), t.getSplitTime("gpu"));
         }
