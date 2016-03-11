@@ -1,8 +1,6 @@
 package demos;
 
 import com.sun.jna.Native;
-import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.al.LWJGLAudio;
 import org.melchor629.engine.al.Buffer;
@@ -13,7 +11,6 @@ import org.melchor629.engine.utils.Timing;
 import org.melchor629.engine.utils.logger.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 
 /**
  * Probando descodificadores de audio
@@ -31,7 +28,6 @@ public class AudioTests {
         Native.setProtected(true);
 
         AL al = new LWJGLAudio();
-        Game.erasableList = new ArrayList<>();
         al.createContext();
         AudioDecoder decoder = AudioDecoder.createDecoderForFile(new File(archivo));
         AudioContainer data;
@@ -55,7 +51,6 @@ public class AudioTests {
         do{ c = System.in.read(); } while(c != '\n');
 
         sd_source.stop();
-        Game.erasableList.forEach(Erasable::delete);
-        al.deleteContext();
+        al.destroyContext();
     }
 }

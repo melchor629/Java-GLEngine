@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.Platform;
 import org.lwjgl.system.libffi.Closure;
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.Matrix2;
@@ -13,6 +14,8 @@ import org.melchor629.engine.utils.math.Matrix4;
 import java.io.File;
 import java.io.IOException;
 import java.nio.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexImage3D;
@@ -35,15 +38,19 @@ import static org.lwjgl.opengl.GL33.*;
 public class LWJGLGLContext implements GLContext {
     private org.lwjgl.opengl.GLCapabilities context;
     private Closure debugClosure;
+    private List<Erasable> erasableList;
 
     LWJGLGLContext(boolean core) {
         context = org.lwjgl.opengl.GL.createCapabilities(core && Platform.get() == Platform.MACOSX);
         debugClosure = GLUtil.setupDebugMessageCallback();
         Configuration.DEBUG.set(true);
+        erasableList = new ArrayList<>();
     }
 
     @Override
     public void destroyContext() {
+        erasableList.forEach(Erasable::delete);
+        erasableList.clear();
         if(debugClosure != null)
             debugClosure.free();
     }
@@ -1501,6 +1508,11 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public ShaderProgram createShader(File vertex, File fragment) throws IOException {
         return new ShaderProgram(this, vertex, fragment);
+    }
+
+    @Override
+    public void addErasable(Erasable e) {
+        erasableList.add(e);
     }
 
     /* (non-Javadoc)

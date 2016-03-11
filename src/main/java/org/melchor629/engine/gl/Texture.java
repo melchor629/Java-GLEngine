@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext.TextureExternalFormat;
 import org.melchor629.engine.gl.GLContext.TextureFilter;
 import org.melchor629.engine.gl.GLContext.TextureFormat;
@@ -20,6 +19,7 @@ import org.melchor629.engine.utils.ImageIO;
 /**
  * Class for manage textures. Create textures from files, or from
  * the internet, or simply empty textures for use in Framebuffers.
+ * Textures stores pixel data in the GPU using an internal format.
  * @author melchor9000
  */
 public class Texture implements Erasable {
@@ -52,7 +52,7 @@ public class Texture implements Erasable {
         gl.texParameteri(target, GLContext.TextureParameter.MAG_FILTER, GLContext.TextureFilter.LINEAR);
         gl.texImage2D(target, 0, format, width, height, 0, eformat, GLContext.type.UNSIGNED_BYTE);
 
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     /**
@@ -97,7 +97,7 @@ public class Texture implements Erasable {
         this.width = width;
         this.height = height;
 
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     public void bind() {

@@ -1,5 +1,6 @@
 package org.melchor629.engine.al;
 
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 
 import java.nio.ByteBuffer;
@@ -120,16 +121,66 @@ public interface AL {
     /**
      * Deletes the context for this thread
      */
-    void deleteContext();
+    void destroyContext();
     //TODO Dispositivos
 
+    /**
+     * Adds an erasable to be deleted when this AL Context is destroyed
+     * @param e erasable object to delete
+     */
+    void addErasable(Erasable e);
+
+    /**
+     * @return This context listener
+     * @see org.melchor629.engine.al.Listener
+     */
     org.melchor629.engine.al.Listener getListener();
 
+    /**
+     * Creates a Buffer using an {@link AudioContainer}
+     * @param ac audio container from the loader
+     * @return a new Buffer
+     * @see org.melchor629.engine.al.Buffer
+     */
     org.melchor629.engine.al.Buffer createBuffer(AudioContainer ac);
+
+    /**
+     * Creates a Buffer with the data in a audio format and a determined sample
+     * rate
+     * @param data interleaved pcm samples
+     * @param f audio format
+     * @param freq samplerate
+     * @return a new Buffer
+     * @see org.melchor629.engine.al.Buffer
+     */
     org.melchor629.engine.al.Buffer createBuffer(short[] data, Format f, int freq);
+
+    /**
+     * Creates a Buffer with the data in a audio format and a determined sample
+     * rate
+     * @param data interleaved pcm samples
+     * @param f audio format
+     * @param freq samplerate
+     * @return a new Buffer
+     * @see org.melchor629.engine.al.Buffer
+     */
     org.melchor629.engine.al.Buffer createBuffer(ShortBuffer data, Format f, int freq);
 
+    /**
+     * Creates a new Audio Source from the given AudioContainer creating also
+     * its {@link org.melchor629.engine.al.Buffer}
+     * @param ac audio container from the audio loader
+     * @return a new source
+     * @see org.melchor629.engine.al.Source
+     */
     org.melchor629.engine.al.Source createSource(AudioContainer ac);
+
+    /**
+     * Creates a new Audio Source from the given {@link org.melchor629.engine.al.Buffer}
+     * @param b buffer
+     * @return a new Source
+     * @see org.melchor629.engine.al.Source
+     */
     org.melchor629.engine.al.Source createSource(org.melchor629.engine.al.Buffer b);
 
     /**

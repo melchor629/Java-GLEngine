@@ -2,10 +2,13 @@ package org.melchor629.engine.al;
 
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALContext;
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.openal.AL10.*;
 
@@ -15,6 +18,7 @@ import static org.lwjgl.openal.AL10.*;
 public class LWJGLAudio implements AL {
 	ALContext context;
 	private org.melchor629.engine.al.Listener listener;
+	private List<Erasable> erasableList;
 
 	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#createContext()
@@ -25,6 +29,7 @@ public class LWJGLAudio implements AL {
 			context = ALContext.create();
             context.makeCurrent();
             listener = new org.melchor629.engine.al.Listener(this);
+            erasableList = new ArrayList<>();
 		} catch(Exception e) {
 			ALError err = new ALError("Error creating context");
 			err.initCause(e);
@@ -33,15 +38,22 @@ public class LWJGLAudio implements AL {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.melchor629.engine.al.AL#deleteContext()
+	 * @see org.melchor629.engine.al.AL#destroyContext()
 	 */
 	@Override
-	public void deleteContext() {
+	public void destroyContext() {
 		if(context != null) {
             context.destroy();
             context.getDevice().close();
             context = null;
+            erasableList.forEach(Erasable::delete);
+            erasableList.clear();
         }
+	}
+
+	@Override
+	public void addErasable(Erasable e) {
+        erasableList.add(e);
 	}
 
 	@Override

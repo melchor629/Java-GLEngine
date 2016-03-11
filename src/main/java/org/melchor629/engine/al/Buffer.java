@@ -1,13 +1,16 @@
 package org.melchor629.engine.al;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 
 import java.nio.ShortBuffer;
 
 /**
  * Sound buffer
+ * <p>
+ *     An OpenAL object that stores interleaved pcm sound in the device
+ *     that can be used in any {@link Source} to be played
+ * </p>
  * @author melchor9000
  */
 public class Buffer implements Erasable {
@@ -40,27 +43,27 @@ public class Buffer implements Erasable {
             throw new ALError("Unsupported bit depth (" + data.getBitDepth() + ")");
         }
 		al.bufferData(buffer, fformat, data.getDataAsByte(), data.getSampleRate());
-        Game.erasableList.add(this);
+        al.addErasable(this);
     }
 
 	Buffer(AL al, short[] data, AL.Format format, int freq) {
         this.al = al;
 		buffer = al.genBuffer();
 		al.bufferData(buffer, format, data, freq);
-        Game.erasableList.add(this);
+        al.addErasable(this);
 	}
 
 	Buffer(AL al, ShortBuffer data, AL.Format format, int freq) {
         this.al = al;
 		buffer = al.genBuffer();
 		al.bufferData(buffer, format, data, freq);
-        Game.erasableList.add(this);
+        al.addErasable(this);
 	}
 
 	public Buffer(byte[] data, AL.Format format, int freq) {
 		buffer = al.genBuffer();
 		al.bufferData(buffer, format, data, freq);
-        Game.erasableList.add(this);
+        al.addErasable(this);
 	}
 	
 	public int getBuffer() {

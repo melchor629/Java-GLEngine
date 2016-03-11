@@ -1,13 +1,17 @@
 package org.melchor629.engine.al;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.math.Vector3;
 import org.melchor629.engine.utils.math.GLM;
 
 /**
  * Source of a sound, with its position, gain, speed, and so...
+ * <p>
+ *     Source is an OpenAL Object that represents a Source of a sound. Its
+ *     attributes defines how the source acts. The audio comes from one
+ *     {@link Buffer} or a stream of {@link Buffer}s.
+ * </p>
  * @author melchor9000
  */
 //TODO Clamp values within their intervals
@@ -36,7 +40,7 @@ public class Source implements Erasable {
         source = al.genSource();
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
 
-        Game.erasableList.add(this);
+        al.addErasable(this);
     }
     
     Source(AL al, AudioContainer data) {

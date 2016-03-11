@@ -9,8 +9,6 @@ import org.melchor629.engine.utils.ShaderManager;
 import org.melchor629.engine.utils.TextureManager;
 import org.melchor629.engine.utils.Timing;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -29,7 +27,6 @@ public abstract class Game {
     protected AL al;
     protected TextureManager textureManager;
     protected ShaderManager shaderManager;
-    public static List<Erasable> erasableList;
 
     private final Object lock;
     private boolean destroyed = false;
@@ -45,7 +42,6 @@ public abstract class Game {
         vsync = true;
         title = "";
 
-        erasableList = new ArrayList<>();
         events = new ConcurrentLinkedQueue<>();
         lock = new Object();
         this.window = window;
@@ -96,10 +92,10 @@ public abstract class Game {
             }
         }
 
-        erasableList.forEach(Erasable::delete);
         closing();
+        gl.destroyContext();
         if(al != null) {
-            al.deleteContext();
+            al.destroyContext();
         }
     }
 

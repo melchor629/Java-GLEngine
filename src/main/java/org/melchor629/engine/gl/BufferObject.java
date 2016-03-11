@@ -4,14 +4,19 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 
 /**
  * Class for manage all types of *BO (<i>Buffer Objects</i>) like VBO
  * (<i>Vertex Buffer Object</i>) or EBO (<i>Element Buffer Object</i>)
- * Incomplete, but 100% usable TODO (Buffers and glBufferSubData)
+ * <p>
+ *     Buffer Object is an OpenGL Object that stores unformatted data in
+ *     GPU's memory. This object can be a very frequently mutable object,
+ *     or one time modified object. Can represent vertex, colors, pixels,
+ *     and other kind of data.
+ * </p>
  * @author melchor9000
  */
+//TODO (Buffers and glBufferSubData)
 public class BufferObject implements Erasable {
     private int bo;
     private GLContext.BufferTarget target;
@@ -32,7 +37,7 @@ public class BufferObject implements Erasable {
         bo = gl.genBuffer();
         gl.bindBuffer(target, bo);
 
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     /**

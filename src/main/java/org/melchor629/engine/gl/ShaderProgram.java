@@ -1,7 +1,6 @@
 package org.melchor629.engine.gl;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.Matrix2;
@@ -17,6 +16,23 @@ import java.util.*;
  * Class for create shaders and shaders programs, manage them and
  * make games be better. Shaders can be created from files or passing
  * them as Strings.
+ * <p>
+ *     A ShaderProgram is a set of Shaders that works together to run in a
+ *     part of a rendering. The Shaders can be:
+ *     <ul>
+ *         <li>Vertex Shader</li>
+ *         <li>Fragment Shader</li>
+ *         <li>Geometry Shader</li>
+ *         <li>Tessellation Shader (<i>4.0 or ARB_tessellation_shader</i>)</li>
+ *         <li>Evaluation Shader (<i>4.0 or ARB_tessellation_shader</i>)</li>
+ *         <li>Compute Shader (<i>4.3 or ARB_compute_shader</i>)</li>
+ *     </ul>
+ * </p>
+ * <p>
+ *     A Shader is a piece of code that runs on a stage of the rendering process.
+ *     Vertex Shaders
+ *
+ * </p>
  * @author melchor9000
  */
 public class ShaderProgram implements Erasable {
@@ -86,7 +102,7 @@ public class ShaderProgram implements Erasable {
 
         shaderProgram = createProgram();
 
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     /**

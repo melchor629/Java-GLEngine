@@ -228,7 +228,6 @@ public class LWJGLWindow implements Window {
 
     @Override
     public void destroyWindow() {
-        context.destroyContext();
         glfwDestroyWindow(window);
         window = -1;
         resizeListeners.clear();

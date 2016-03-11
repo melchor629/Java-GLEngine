@@ -1,5 +1,6 @@
 package org.melchor629.engine.gl;
 
+import org.melchor629.engine.Erasable;
 import org.melchor629.engine.utils.math.Matrix2;
 import org.melchor629.engine.utils.math.Matrix3;
 import org.melchor629.engine.utils.math.Matrix4;
@@ -904,21 +905,66 @@ public interface GLContext {
      */
     Error getError();
 
+    /**
+     * Creates a Buffer Object
+     * @param target target of the buffer
+     * @param usage usage of the buffer
+     * @return a new Buffer Object
+     * @see BufferObject
+     */
     BufferObject createBufferObject(BufferTarget target, BufferUsage usage);
 
+    /**
+     * Creates an empty Frame Buffer
+     * @return a new Frame Buffer
+     * @see FrameBuffer
+     */
     FrameBuffer createFrameBuffer();
 
+    /**
+     * Creates a Render Buffer
+     * @param fmt format of the pixel storage
+     * @param width width of the render buffer
+     * @param height height of the render buffer
+     * @return a new Render Buffer
+     * @see RenderBuffer
+     */
     RenderBuffer createRenderBuffer(TextureFormat fmt, int width, int height);
 
+    /**
+     * Creates an empty Vertex Array Object
+     * @return a new VAO
+     * @see VertexArrayObject
+     */
     VertexArrayObject createVertexArrayObject();
 
+    /**
+     * Creates a blank texture with the parameters given
+     * @param format format of the pixel internal storage
+     * @param width width of the texture
+     * @param height height of the texture
+     * @param eformat format of the pixel for exports
+     * @return a new texture
+     * @see Texture
+     */
     Texture createTexture(TextureFormat format, int width, int height, TextureExternalFormat eformat);
+
+    /**
+     * @return Texture Builder
+     * @see org.melchor629.engine.gl.Texture.Builder
+     */
     Texture.Builder createTextureBuilder();
 
     ShaderProgram createShader(String vertex, String fragment, String geometry);
     ShaderProgram createShader(String vertex, String fragment);
     ShaderProgram createShader(File vertex, File fragment, File geometry) throws IOException;
     ShaderProgram createShader(File vertex, File fragment) throws IOException;
+
+    /**
+     * Adds an erasable object to be deleted before this GLContext is destroyed
+     * @param e erasable object to be deleted
+     */
+    void addErasable(Erasable e);
 
     //Vertex Arrays
     int genVertexArray();

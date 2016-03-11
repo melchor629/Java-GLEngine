@@ -1,10 +1,14 @@
 package org.melchor629.engine.gl;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 
 /**
  * Class for manage Renderbuffers
+ * <p>
+ *     Render Buffer Object is an OpenGL Object that stores images on it.
+ *     Is like a {@link Texture} but is optimized to be used with
+ *     {@link FrameBuffer}s.
+ * </p>
  * @author melchor9000
  */
 public class RenderBuffer implements Erasable {
@@ -19,7 +23,7 @@ public class RenderBuffer implements Erasable {
         gl.bindRenderbuffer(rbo);
         gl.renderbufferStorage(fmt, width, height);
         gl.bindRenderbuffer(0);
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     public void delete() {

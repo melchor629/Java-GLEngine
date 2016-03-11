@@ -1,10 +1,20 @@
 package org.melchor629.engine.gl;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 
 /**
- * Vertex Array Object class
+ * Vertex Array Object class.
+ * <p>
+ *     A Vertex Array Object stores all of the state needed to supply vertex
+ *     data. Stores the format of the vertex data as well as the {@link BufferObject}
+ *     providing the vertex data arrays. VAO only stores references to this
+ *     {@link BufferObject}s. Any change to one of theese, will be seen on this
+ *     VAO.
+ * </p>
+ * <p>
+ *     An VAO has to enable the vertex attributes to be able to be used in
+ *     the shaders.
+ * </p>
  * @author melchor9000
  */
 public class VertexArrayObject implements Erasable {
@@ -17,7 +27,7 @@ public class VertexArrayObject implements Erasable {
     VertexArrayObject(GLContext gl) {
         this.gl = gl;
         vao = gl.genVertexArray();
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     /**

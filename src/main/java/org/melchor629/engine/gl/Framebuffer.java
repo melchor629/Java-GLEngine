@@ -1,10 +1,23 @@
 package org.melchor629.engine.gl;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.Game;
 
 /**
  * Class for create and manage Framebuffers
+ * <p>
+ *     A buffer that is used as target of a result of some render. By default
+ *     one FrameBuffer is used in the render pipeline, the default one. This
+ *     class can create more FrameBuffers to make Post-Processing or another
+ *     kind of image processing over renders. FrameBuffers references
+ *     {@link Texture}s or {@link RenderBuffer}s where the output of the render
+ *     is stored.
+ * </p>
+ * <p>
+ *     A FrameBuffer must have a <i>Color Attachment to work</i>. This attachments
+ *     are the {@link Texture}s and {@link RenderBuffer}s referenced before,
+ *     and FrameBuffer is able to attach one Depth attachment, one Stencil
+ *     attachment and several Color attachments.
+ * </p>
  * @author melchor9000
  */
 public class FrameBuffer implements Erasable {
@@ -20,7 +33,7 @@ public class FrameBuffer implements Erasable {
     FrameBuffer(GLContext gl) {
         this.gl = gl;
         fb = gl.genFramebuffer();
-        Game.erasableList.add(this);
+        gl.addErasable(this);
     }
 
     /**
