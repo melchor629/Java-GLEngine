@@ -904,6 +904,10 @@ public interface GLContext {
 
     BufferObject createBufferObject(BufferTarget target, BufferUsage usage);
 
+    FrameBuffer createFrameBuffer();
+
+    RenderBuffer createRenderBuffer(TextureFormat fmt, int width, int height);
+
     //Vertex Arrays
     int genVertexArray();
     void genVertexArrays(int[] buff);
@@ -1045,7 +1049,7 @@ public interface GLContext {
     void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, IntBuffer b);
     void texSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, TextureExternalFormat efmt, type t, FloatBuffer b);
 
-    //Framebuffer & Renderbuffer
+    //FrameBuffer & RenderBuffer
     int genFramebuffer();
     void genFramebuffers(int[] fbs);
     void deleteFramebuffer(int fb);

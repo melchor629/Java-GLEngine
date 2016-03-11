@@ -88,7 +88,7 @@ public interface Window {
     }
 
     /**
-     * Represents size of something about the Screen. Framebuffer's size,
+     * Represents size of something about the Screen. FrameBuffer's size,
      * Window size, Viewport size, Screen size...
      */
     class Size {
@@ -295,7 +295,7 @@ public interface Window {
     /**
      * Its default value is 1. But some screens have high-DPI,
      * on this ones, this value will be higher than 1. This value
-     * is calculated using the real Framebuffer width with the
+     * is calculated using the real FrameBuffer width with the
      * window width.<br><br>
      *     {@code screenDensityMultiplier = fbo.width / window.width};
      * @return the above quocient value

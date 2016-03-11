@@ -1,7 +1,5 @@
 package org.melchor629.engine.gl;
 
-import static org.melchor629.engine.Game.gl;
-
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
 
@@ -9,16 +7,18 @@ import org.melchor629.engine.Game;
  * Class for create and manage Framebuffers
  * @author melchor9000
  */
-public class Framebuffer implements Erasable {
-    protected int fb = -1;
-    protected boolean checked;
+public class FrameBuffer implements Erasable {
+    private int fb = -1;
+    private boolean checked;
+    private final GLContext gl;
 
     /**
      * Generates a framebuffer. To make this framebuffer working,
      * first you have to attach something and at least 1 Color texture or
      * renderbuffer (OpenGL 4.1 or fewer).
      */
-    public Framebuffer() {
+    FrameBuffer(GLContext gl) {
+        this.gl = gl;
         fb = gl.genFramebuffer();
         Game.erasableList.add(this);
     }
@@ -26,7 +26,7 @@ public class Framebuffer implements Erasable {
     /**
      * Attach a color texture passing an empty texture and a number
      * from 0 to {@code GLContext.getInt(GLGet.MAX_COLOR_ATTACHMENTS) - 1}.
-     * <b>Framebuffer don't clean textures!!</b> Also use a texture
+     * <b>FrameBuffer don't clean textures!!</b> Also use a texture
      * format valid for a color textures, they are RGB, RGBA, and all
      * similar stuff.
      * @param texture the empty texture
@@ -51,14 +51,14 @@ public class Framebuffer implements Erasable {
     /**
      * Attach a color renderbuffer passing a renderbuffer and a number
      * from 0 to {@code GLContext.getInt(GLGet.MAX_COLOR_ATTACHMENTS) - 1}.
-     * <b>Framebuffer don't clean renderbuffers!!</b> Also, renderbuffer must
+     * <b>FrameBuffer don't clean renderbuffers!!</b> Also, renderbuffer must
      * have a valid format for color, like RGB, RGBA, and all similar stuff.
      * @param rbo a renderbuffer
      * @param num number of the color attachment
      * @throws GLError If {@code num} is greater than your GPU Max
      *                 color attachments
      */
-    public void attachColorRenderbuffer(Renderbuffer rbo, int num) {
+    public void attachColorRenderbuffer(RenderBuffer rbo, int num) {
         gl.bindFramebuffer(fb);
         int max = gl.getInt(GLContext.GLGet.MAX_COLOR_ATTACHMENTS);
         if(num > max)
@@ -68,7 +68,7 @@ public class Framebuffer implements Erasable {
 
     /**
      * Attach a depth texture passing an empty texture.
-     * <b>Framebuffer don't clean textures!!</b> Also use a texture
+     * <b>FrameBuffer don't clean textures!!</b> Also use a texture
      * format valid for a depth textures, they are DEPTH_COMPONENT, and all
      * similar stuff. 3D textures uses Z value = 1;
      * @param texture the empty texture
@@ -85,20 +85,20 @@ public class Framebuffer implements Erasable {
     }
 
     /**
-     * Attach a depth renderbuffer passing a renderbuffer. <b>Framebuffer
+     * Attach a depth renderbuffer passing a renderbuffer. <b>FrameBuffer
      * don't clean renderbuffers!!</b> Also, renderbuffer must have a valid
      * format of depth, like DEPTH_COMPONENT and the seamless others ending
      * by a number.
      * @param rbo A renderbuffer
      */
-    public void attachDepthRenderbuffer(Renderbuffer rbo) {
+    public void attachDepthRenderbuffer(RenderBuffer rbo) {
         gl.bindFramebuffer(fb);
         gl.framebufferRenderbuffer(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, rbo._get_rbo_());
     }
 
     /**
      * Attach a stencil texture passing an empty texture.
-     * <b>Framebuffer don't clean textures!!</b> Also use a texture
+     * <b>FrameBuffer don't clean textures!!</b> Also use a texture
      * format valid for a stencil textures, they are STENCIL_INDEX,
      * and all similar stuff. 3D textures uses Z value = 1;
      * @param texture the empty texture
@@ -115,13 +115,13 @@ public class Framebuffer implements Erasable {
     }
 
     /**
-     * Attach a stencil renderbuffer passing a renderbuffer. <b>Framebuffer
+     * Attach a stencil renderbuffer passing a renderbuffer. <b>FrameBuffer
      * don't clean renderbuffers!!</b> Also, renderbuffer must have a valid
      * format of stencil, like STENCIL_INDEX and the seamless others ending
      * by a number.
      * @param rbo A renderbuffer
      */
-    public void attachStencilRenderbuffer(Renderbuffer rbo) {
+    public void attachStencilRenderbuffer(RenderBuffer rbo) {
         gl.bindFramebuffer(fb);
         gl.framebufferRenderbuffer(GLContext.FramebufferAttachment.STENCIL_ATTACHMENT, rbo._get_rbo_());
     }
@@ -129,7 +129,7 @@ public class Framebuffer implements Erasable {
 
     /**
      * Attach a depth-stencil texture passing an empty texture.
-     * <b>Framebuffer don't clean textures!!</b> Also use a texture
+     * <b>FrameBuffer don't clean textures!!</b> Also use a texture
      * format {@code DEPTH_STENCIL}. 3D textures uses Z value = 1;
      * @param texture the empty texture
      */
@@ -145,18 +145,18 @@ public class Framebuffer implements Erasable {
     }
 
     /**
-     * Attach a depth-stencil renderbuffer passing a renderbuffer. <b>Framebuffer
+     * Attach a depth-stencil renderbuffer passing a renderbuffer. <b>FrameBuffer
      * don't clean renderbuffers!!</b> Also, renderbuffer must have format
      * {@code DEPTH_STENCIL}.
      * @param rbo A renderbuffer
      */
-    public void attachDepthStencilRenderbuffer(Renderbuffer rbo) {
+    public void attachDepthStencilRenderbuffer(RenderBuffer rbo) {
         gl.bindFramebuffer(fb);
         gl.framebufferRenderbuffer(GLContext.FramebufferAttachment.DEPTH_STENCIL_ATTACHMENT, rbo._get_rbo_());
     }
 
     /**
-     * Binds this Framebuffer. Also, this checks for errors, if was not
+     * Binds this FrameBuffer. Also, this checks for errors, if was not
      * checked before, so can throw an error if there is one.
      * @throws GLError If the FBO was deleted or incomplete
      */
@@ -183,12 +183,6 @@ public class Framebuffer implements Erasable {
         fb = -1;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        delete();
-    }
-
     /**
      * Transform the number to a {@link GLContext.FramebufferAttachment}
      * @param num Number from 0 to 32(?)
@@ -209,7 +203,7 @@ public class Framebuffer implements Erasable {
     }
 
     /**
-     * Check for errors in this Framebuffer
+     * Check for errors in this FrameBuffer
      * @see <a href="https://www.opengl.org/sdk/docs/man3/xhtml/glCheckFramebufferStatus.xml">glCheckFramebufferStatus</a>
      * @throws GLError if framebuffer status is not equal to {@code GL_FRAMEBUFFER_COMPLETE}
      */
@@ -217,7 +211,7 @@ public class Framebuffer implements Erasable {
         if(checked) return;
         GLContext.FramebufferStatus status = gl.checkFramebufferStatus();
         if(status != GLContext.FramebufferStatus.COMPLETE)
-            throw new GLError("glCheckFramebufferStatus", "Framebuffer status is not good: " + status.toString());
+            throw new GLError("glCheckFramebufferStatus", "FrameBuffer status is not good: " + status.toString());
         checked = true;
     }
 }

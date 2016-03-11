@@ -16,7 +16,7 @@ public class BufferObject implements Erasable {
     private int bo;
     private GLContext.BufferTarget target;
     private GLContext.BufferUsage usage;
-    private GLContext gl;
+    private final GLContext gl;
 
     /**
      * Create and bind a Buffer object of type {@code target}. Binding the

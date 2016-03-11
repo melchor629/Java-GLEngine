@@ -97,7 +97,7 @@ public class EspacioEuclideo extends Game {
     private BufferObject puntos_vbo;
     private FloatBuffer puntos_buff;
     private Texture currentFrame, previousFrame, current;
-    private Framebuffer sceneFB;
+    private FrameBuffer sceneFB;
     private int glWIDTH;
     private int glHEIGHT;
     private boolean phosphorEffectEnabler = false;
@@ -202,10 +202,10 @@ public class EspacioEuclideo extends Game {
                 1, -1, 0, 0,
                 -1,  1, 1, 1
         });
-        Renderbuffer currentFrameDepth = new Renderbuffer(GLContext.TextureFormat.DEPTH24_STENCIL8, glWIDTH, glHEIGHT);
+        RenderBuffer currentFrameDepth = gl.createRenderBuffer(GLContext.TextureFormat.DEPTH24_STENCIL8, glWIDTH, glHEIGHT);
         currentFrame = new Texture(GLContext.TextureFormat.RGB8, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
         previousFrame = new Texture(GLContext.TextureFormat.RGB8, glWIDTH, glHEIGHT, GLContext.TextureExternalFormat.RGB);
-        sceneFB = new Framebuffer();
+        sceneFB = gl.createFrameBuffer();
         sceneFB.attachColorTexture(currentFrame, 0);
         sceneFB.attachDepthStencilRenderbuffer(currentFrameDepth);
         sceneFB.unbind();

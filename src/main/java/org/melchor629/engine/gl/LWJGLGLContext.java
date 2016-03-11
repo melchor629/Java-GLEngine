@@ -1456,6 +1456,16 @@ public class LWJGLGLContext implements GLContext {
         return new BufferObject(this, target, usage);
     }
 
+    @Override
+    public FrameBuffer createFrameBuffer() {
+        return new FrameBuffer(this);
+    }
+
+    @Override
+    public RenderBuffer createRenderBuffer(TextureFormat fmt, int width, int height) {
+        return new RenderBuffer(this, fmt, width, height);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#bufferData(org.melchor629.engine.gl.GLContext.BufferTarget, int, org.melchor629.engine.gl.GLContext.BufferUsage)
      */
