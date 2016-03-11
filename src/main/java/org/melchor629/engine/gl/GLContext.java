@@ -1093,10 +1093,4 @@ public interface GLContext {
     void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, ShortBuffer data);
     void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, IntBuffer data);
     void readPixels(int x, int y, int width, int height, TextureFormat fmt, type type, FloatBuffer data);
-
-    /**
-     * Function called at the end of the game loop
-     * @param fps Frame per second of the game (maybe is util)
-     */
-    void _game_loop_sync(int fps);
 }

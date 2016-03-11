@@ -1,4 +1,4 @@
-package org.melchor629.engine.gl.types;
+package org.melchor629.engine.gl;
 
 import static org.melchor629.engine.Game.gl;
 

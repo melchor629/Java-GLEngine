@@ -1,4 +1,4 @@
-package org.melchor629.engine.gl.types;
+package org.melchor629.engine.gl;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;

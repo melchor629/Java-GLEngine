@@ -1,6 +1,6 @@
 package org.melchor629.engine.utils;
 
-import org.melchor629.engine.gl.types.ShaderProgram;
+import org.melchor629.engine.gl.ShaderProgram;
 
 import java.io.File;
 import java.io.IOException;

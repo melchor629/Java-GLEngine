@@ -1,5 +1,8 @@
 package org.melchor629.engine.gl;
 
+import org.melchor629.engine.input.Keyboard;
+import org.melchor629.engine.input.Mouse;
+
 /**
  * OpenGL Context creator and Window manager. {@link Window} interface
  * encloses all basic and not at all basic functions to create a context
@@ -258,6 +261,11 @@ public interface Window {
         pollEvents();
     }
 
+    /**
+     * Posts a runnable to the main event loop. If runnable is null, sends
+     * a wake up signal to the event loop
+     * @param r runnable to post
+     */
     void postEvent(Runnable r);
 
     /**
@@ -310,4 +318,14 @@ public interface Window {
      * Destroys the Window and the context.
      */
     void destroyWindow();
+
+    /**
+     * @return mouse controller associated to this window
+     */
+    Mouse getMouseController();
+
+    /**
+     * @return keyboard controller associated to this window
+     */
+    Keyboard getKeyboardController();
 }

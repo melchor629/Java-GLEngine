@@ -1,12 +1,13 @@
 package org.melchor629.engine.gl;
 
+import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.Configuration;
 import org.lwjgl.system.Platform;
-import org.melchor629.engine.Game;
+import org.lwjgl.system.libffi.Closure;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexImage3D;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -27,13 +28,19 @@ import static org.lwjgl.opengl.GL33.*;
  */
 public class LWJGLGLContext implements GLContext {
     private org.lwjgl.opengl.GLCapabilities context;
+    private Closure debugClosure;
 
     LWJGLGLContext(boolean core) {
         context = org.lwjgl.opengl.GL.createCapabilities(core && Platform.get() == Platform.MACOSX);
+        debugClosure = GLUtil.setupDebugMessageCallback();
+        Configuration.DEBUG.set(true);
     }
 
     @Override
-    public void destroyContext() { }
+    public void destroyContext() {
+        if(debugClosure != null)
+            debugClosure.free();
+    }
 
     @Override
     public boolean hasCapability(String name) {
@@ -44,12 +51,6 @@ public class LWJGLGLContext implements GLContext {
             e.printStackTrace();
         }
         return ret;
-    }
-
-    public void _game_loop_sync(int fps) {
-        glfwSwapBuffers(((LWJGLWindow) Game.window).window);
-        glfwPollEvents();
-        //TODO Sync with FPS
     }
 
     /* (non-Javadoc)

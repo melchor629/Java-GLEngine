@@ -88,7 +88,7 @@ public class Timing {
     }
 
     public String toString() {
-        return String.format("%c%s timing (%.1f)", name.charAt(0) - 'a' + 'A', name, totalTime());
+        return String.format("%c%s timing (%.1f)", name.charAt(0) - 'a' + 'A', name.substring(1), totalTime());
     }
     
     /**

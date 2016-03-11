@@ -1,10 +1,7 @@
 package demos;
 
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.LWJGLWindow;
-import org.melchor629.engine.gl.Window;
-import org.melchor629.engine.gl.types.*;
+import org.melchor629.engine.gl.*;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.utils.BufferUtils;
@@ -115,7 +112,7 @@ public class EspacioEuclideo extends Game {
         glHEIGHT = window.getFramebufferSize().height;
         System.out.printf("%s %s %f\n", window.getWindowSize(), window.getFramebufferSize(), window.getPixelScaleFactor());
 
-        camera = new Camera();
+        camera = new Camera(this);
         camera.setAspectRation(glWIDTH, glHEIGHT);
         camera.setClipPanes(0.1, 100);
         camera.setMovementMultiplier(0);
@@ -239,15 +236,15 @@ public class EspacioEuclideo extends Game {
         phosphorEffect.unbind();
         plano_vbo.unbind();
 
-        keyboard.addListener((Keyboard.OnPressKeyEvent) (self, key) -> {
+        getKeyboard().addListener((Keyboard.OnPressKeyEvent) (self, key) -> {
             if(self.getStringRepresentation(key) == null) return;
             if(self.getStringRepresentation(key).equals("F")) {
                 phosphorEffectEnabler = !phosphorEffectEnabler;
                 if(!phosphorEffectEnabler)
-                    postRunnable(previousFrame::clearTexture);
+                    post(previousFrame::clearTexture);
             }
-            if(self.getStringRepresentation(key).equals("P")) {
-                postRunnable(() -> {
+            if("P".equals(self.getStringRepresentation(key))) {
+                post(() -> {
                     ByteBuffer data = BufferUtils.createByteBuffer(glWIDTH * glHEIGHT * 4);
                     gl.readBuffer(GLContext.CullFaceMode.FRONT);
                     gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data.asIntBuffer());
@@ -258,21 +255,21 @@ public class EspacioEuclideo extends Game {
                 });
             }
 
-            if(self.getStringRepresentation(key).equals("1"))
+            if("1".equals(self.getStringRepresentation(key)))
                 current = euclides_tex;
-            if(self.getStringRepresentation(key).equals("2"))
+            if("2".equals(self.getStringRepresentation(key)))
                 current = falloutPipboy_tex;
-            if(self.getStringRepresentation(key).equals("3"))
+            if("3".equals(self.getStringRepresentation(key)))
                 current = pato_tex;
-            if(self.getStringRepresentation(key).equals("4"))
+            if("4".equals(self.getStringRepresentation(key)))
                 current = melchor_tex;
-            if(self.getStringRepresentation(key).equals("5"))
+            if("5".equals(self.getStringRepresentation(key)))
                 current = aleks_tex;
-            if(self.getStringRepresentation(key).equals("6"))
+            if("6".equals(self.getStringRepresentation(key)))
                 current = doge_tex;
-            if(self.getStringRepresentation(key).equals("7"))
+            if("7".equals(self.getStringRepresentation(key)))
                 current = andres_tex;
-            if(self.getStringRepresentation(key).equals("8"))
+            if("8".equals(self.getStringRepresentation(key)))
                 current = amgela_tex;
         });
 
@@ -335,7 +332,7 @@ public class EspacioEuclideo extends Game {
             gl.copyTexImage2D(GLContext.TextureTarget.TEXTURE_2D, 0, GLContext.TextureFormat.RGB, 0, 0, glWIDTH, glHEIGHT);
         }
 
-        if(keyboard.isKeyPressed("k"))
+        if(getKeyboard().isKeyPressed("k"))
             gl.enable(GLContext.GLEnable.FRAMEBUFFER_SRGB);
         else
             gl.disable(GLContext.GLEnable.FRAMEBUFFER_SRGB);

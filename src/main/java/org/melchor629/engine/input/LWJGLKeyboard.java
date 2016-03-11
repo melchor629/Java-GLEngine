@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.LWJGLWindow;
 
 /**
@@ -22,9 +21,9 @@ import org.melchor629.engine.gl.LWJGLWindow;
 public class LWJGLKeyboard extends Keyboard {
     private static GLFWKeyCallback kCbk;
 
-    public LWJGLKeyboard() {
+    public LWJGLKeyboard(LWJGLWindow window) {
         super();
-        glfwSetKeyCallback(((LWJGLWindow) Game.window).window, kCbk = new GLFWKeyCallback() {
+        glfwSetKeyCallback(window.window, kCbk = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if(key == -1) key = 1023;

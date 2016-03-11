@@ -1,6 +1,5 @@
 package org.melchor629.engine.input;
 
-import org.melchor629.engine.Game;
 import org.melchor629.engine.utils.math.Vector2;
 
 import java.util.ArrayList;
@@ -168,22 +167,6 @@ public abstract class Mouse {
      */
     public final Vector2 getWheelSpeed() {
         return wheel;
-    }
-    
-    public final boolean isShiftPressed() {
-        return Game.keyboard.shiftPressed;
-    }
-    
-    public final boolean isCtrlPressed() {
-        return Game.keyboard.controlPressed;
-    }
-    
-    public final boolean isAltPressed() {
-        return Game.keyboard.altPressed;
-    }
-    
-    public final boolean isSuperPressed() {
-        return Game.keyboard.superPressed;
     }
     
     /**

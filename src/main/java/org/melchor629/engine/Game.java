@@ -2,11 +2,8 @@ package org.melchor629.engine;
 
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.LWJGLWindow;
 import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.input.Keyboard;
-import org.melchor629.engine.input.LWJGLKeyboard;
-import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.utils.Timing;
 
@@ -25,11 +22,9 @@ public abstract class Game {
     protected String title;
     protected Timing t;
     protected Queue<Runnable> events;
-    public static Window window;
+    protected Window window;
     public static GLContext gl;
     protected AL al;
-    public static Keyboard keyboard;
-    public static Mouse mouse;
     public static List<Erasable> erasableList;
 
     private final Object lock;
@@ -62,18 +57,21 @@ public abstract class Game {
 
         synchronized(lock) {
             destroyed = true;
+            window.destroyWindow();
         }
-
-        keyboard.release();
-        mouse.release();
-        window.destroyWindow();
     }
 
     private void wrapRenderLoop() {
         gl = window.createContext();
-        keyboard = new LWJGLKeyboard();
-        mouse = new LWJGLMouse();
+        if(al != null) {
+            al.createContext();
+        }
         init();
+
+        window.getKeyboardController().addListener((Keyboard.OnPressKeyEvent) (self, key) -> {
+            if(self.isKeyPressed("ESCAPE"))
+                this.window.setWindowShouldClose(true);
+        });
 
         t = Timing.getGameTiming();
         while(!destroyed) {
@@ -83,21 +81,21 @@ public abstract class Game {
                 if(!destroyed) {
                     window.syncGPU();
                     t.update();
-                    keyboard.fireEvent(t.frameTime);
-                    mouse.update(t.frameTime);
+                    window.getKeyboardController().fireEvent(t.frameTime);
+                    window.getMouseController().update(t.frameTime);
                     while(!events.isEmpty()) events.poll().run();
                 }
             }
         }
+
         erasableList.forEach(Erasable::delete);
         closing();
-        window.destroyWindow();
         if(al != null) {
             al.deleteContext();
         }
     }
 
-    protected void startEngine() {
+    protected final void startEngine() {
         if(fullscreen)
             window.createFullscreenWindow(width, height, title);
         else
@@ -111,8 +109,12 @@ public abstract class Game {
         makeGame();
     }
 
-    protected void postRunnable(Runnable r) {
+    protected final void post(Runnable r) {
         events.add(r);
+    }
+
+    protected final void postInBackground(Runnable r) {
+        window.postEvent(r);
     }
 
     public abstract void init();
@@ -120,4 +122,16 @@ public abstract class Game {
     public abstract void render();
 
     public abstract void closing();
+
+    public final Mouse getMouse() {
+        return window.getMouseController();
+    }
+
+    public final Keyboard getKeyboard() {
+        return window.getKeyboardController();
+    }
+
+    public final Window getWindow() {
+        return window;
+    }
 }

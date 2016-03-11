@@ -181,7 +181,7 @@ public class MatrixOperationTests {
 
     @Test
     public void camera() {
-        Camera camera = new Camera();
+        Camera camera = new Camera(null);
         assertEquals(
             new Matrix4().fillWithValues(
                 1.358f, 0f, 0f, 0f,

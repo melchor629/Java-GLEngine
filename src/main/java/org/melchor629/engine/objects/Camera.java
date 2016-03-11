@@ -33,7 +33,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * a FOV of 45º, an aspect ratio of 16:9, and a near distance of
      * 1 and far 10.
      */
-    public Camera() {
+    public Camera(Game game) {
         pos = new Vector3();
         dir = new Vector3(1, 0, 0);
         up = new Vector3(0, 0, 1);
@@ -45,7 +45,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         aspect = 16. / 9.;
         mouseSensibility = movementMultiplier = 1;
         
-        initListeners();
+        initListeners(game);
     }
     
     /**
@@ -55,7 +55,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param pos Initial position
      * @param rot Initial rotation of pitch (x), yaw (y) and roll (z)
      */
-    public Camera(Vector3 pos, Vector3 rot) {
+    public Camera(Game game, Vector3 pos, Vector3 rot) {
         this.pos = pos;
         this.rot = rot;
         up = new Vector3(0, 0, 1);
@@ -70,7 +70,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         aspect = 16. / 9.;
         mouseSensibility = movementMultiplier = 1;
         
-        initListeners();
+        initListeners(game);
     }
     
     /**
@@ -82,7 +82,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * @param dir Direction to look at
      * @param up Where the head points at
      */
-    public Camera(Vector3 pos, Vector3 dir, Vector3 up) {
+    public Camera(Game game, Vector3 pos, Vector3 dir, Vector3 up) {
         this.pos = pos;
         this.dir = dir;
         this.up = up == null ? new Vector3(0, 0, 1) : up;
@@ -102,7 +102,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
         if(rot.x() >= 90.f && dir.z() < 0f)
             rot.x(-90.f);
         
-        initListeners();
+        initListeners(game);
     }
 
     /**
@@ -305,13 +305,10 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
 
 
 
-    private void initListeners() {
-        if(Game.keyboard != null && Game.mouse != null) {
-            Game.keyboard.addListener(this);
-            Game.mouse.addListener((OnMouseMoveEvent) this);
-            //Arreglar esto
-            Game.mouse.addListener((OnMouseClickEvent) this);
-        }
+    private void initListeners(Game game) {
+        game.getKeyboard().addListener(this);
+        game.getMouse().addListener((OnMouseMoveEvent) this);
+        game.getMouse().addListener((OnMouseClickEvent) this);
     }
 
     public void invoke(Keyboard self, double delta) {
@@ -330,8 +327,6 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
             pos.z(pos.z() + cameraSpeed);
         if(self.isKeyPressed("E"))
             pos.z(pos.z() - cameraSpeed);
-        if(self.isKeyPressed("ESCAPE"))
-            Game.window.setWindowShouldClose(true);
         
         speed.x(pos.x() - x).y(pos.y() - y).z(pos.z() - z);
         if(speed.x() != 0.f || speed.y() != 0.f || speed.z() != 0.f)

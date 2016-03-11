@@ -1,7 +1,7 @@
 package org.melchor629.engine.objects;
 
-import org.melchor629.engine.gl.types.ShaderProgram;
-import org.melchor629.engine.gl.types.Texture;
+import org.melchor629.engine.gl.ShaderProgram;
+import org.melchor629.engine.gl.Texture;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.collada.CommonColorOrTextureType;
 import org.melchor629.engine.loaders.collada.Effect;

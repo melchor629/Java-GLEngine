@@ -1,4 +1,4 @@
-package org.melchor629.engine.gl.types;
+package org.melchor629.engine.gl;
 
 import static org.melchor629.engine.Game.gl;
 
@@ -10,8 +10,6 @@ import java.nio.ByteBuffer;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.Game;
-import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.GLError;
 import org.melchor629.engine.gl.GLContext.TextureExternalFormat;
 import org.melchor629.engine.gl.GLContext.TextureFilter;
 import org.melchor629.engine.gl.GLContext.TextureFormat;

@@ -1,7 +1,7 @@
 package org.melchor629.engine.utils;
 
 import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.types.Texture;
+import org.melchor629.engine.gl.Texture;
 
 import java.io.File;
 import java.io.FileNotFoundException;

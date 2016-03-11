@@ -5,6 +5,10 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.system.Platform;
+import org.melchor629.engine.input.Keyboard;
+import org.melchor629.engine.input.LWJGLKeyboard;
+import org.melchor629.engine.input.LWJGLMouse;
+import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -29,6 +33,8 @@ public class LWJGLWindow implements Window {
     private GLFWErrorCallback errorCallback;
     private boolean core;
     private ConcurrentLinkedQueue<Runnable> events;
+    private LWJGLMouse mouse;
+    private LWJGLKeyboard keyboard;
 
     public LWJGLWindow() {
         if(glfwInit() == 0)
@@ -177,7 +183,9 @@ public class LWJGLWindow implements Window {
 
     @Override
     public void postEvent(Runnable r) {
-        events.add(r);
+        if(r != null) {
+            events.add(r);
+        }
         glfwPostEmptyEvent();
     }
 
@@ -232,7 +240,20 @@ public class LWJGLWindow implements Window {
         glfwTerminate();
     }
 
+    @Override
+    public Mouse getMouseController() {
+        return mouse;
+    }
+
+    @Override
+    public Keyboard getKeyboardController() {
+        return keyboard;
+    }
+
     private void setListenerCallbacks() {
+        mouse = new LWJGLMouse(this);
+        keyboard = new LWJGLKeyboard(this);
+
         glfwSetWindowSizeCallback(window, sizeCallback = new GLFWWindowSizeCallback() {
             public void invoke(long window, int width, int height) {
                 resizeListeners.forEach((l) -> l.invoke(width, height));

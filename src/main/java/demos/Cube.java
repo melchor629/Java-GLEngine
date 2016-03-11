@@ -14,9 +14,9 @@ package demos;// Copyright (c) 2013, John Thomas McDole.
  */
 
 import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.types.BufferObject;
-import org.melchor629.engine.gl.types.ShaderProgram;
-import org.melchor629.engine.gl.types.VAO;
+import org.melchor629.engine.gl.BufferObject;
+import org.melchor629.engine.gl.ShaderProgram;
+import org.melchor629.engine.gl.VAO;
 
 import static org.melchor629.engine.Game.gl;
 
