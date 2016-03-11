@@ -135,7 +135,8 @@ public class Matrix<T extends Number> implements Cloneable {
      * @return this matrix
      * @throws IllegalArgumentException If has not enough values to fill
      */
-    public Matrix<T> fillWithValues(T... values) {
+    @SafeVarargs
+    public final Matrix<T> fillWithValues(T... values) {
         if(values.length < storage.length)
             throw new IllegalArgumentException("Number of values is less than needed");
 

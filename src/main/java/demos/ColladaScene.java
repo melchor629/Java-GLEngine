@@ -1,5 +1,6 @@
 package demos;
 
+import org.melchor629.engine.Game;
 import org.melchor629.engine.loaders.collada.Instance_Geometry;
 import org.melchor629.engine.loaders.collada.Node;
 import org.melchor629.engine.loaders.collada.VisualScene;
@@ -16,11 +17,13 @@ import java.util.NoSuchElementException;
  * Loads a Collada Scene and renders it
  */
 public class ColladaScene {
-    private ArrayList<Model> models;
-    private ArrayList<ModelMatrix> modelMatrices;
-    private ArrayList<Material> materials;
+    private final ArrayList<Model> models;
+    private final ArrayList<ModelMatrix> modelMatrices;
+    private final ArrayList<Material> materials;
+    private final Game game;
 
-    public ColladaScene(VisualScene vs) {
+    public ColladaScene(VisualScene vs, Game game) {
+        this.game = game;
         models = new ArrayList<>();
         modelMatrices = new ArrayList<>();
         materials = new ArrayList<>();
@@ -57,7 +60,7 @@ public class ColladaScene {
                     String name = ((Instance_Geometry) n.instance).instance_material_target;
                     materials.add(Material.getMaterial(name));
                 } else {
-                    materials.add(Material.getMaterial("")); //Default Material
+                    materials.add(new Material(game)); //Default Material
                 }
             }
         });

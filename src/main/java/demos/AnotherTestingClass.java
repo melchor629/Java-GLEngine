@@ -105,9 +105,9 @@ public class AnotherTestingClass extends Game {
             System.exit(1);
         }
 
-        cs = new ColladaScene(c.visual_scenes.get(0));
+        cs = new ColladaScene(c.visual_scenes.get(0), this);
 
-        s = new ShaderProgram(vertex_shader, fragment_shader);
+        s = gl.createShader(vertex_shader, fragment_shader);
         s.bindFragDataLocation("outColor", 0);
         s.unbind();
         cs.enableAttributes();

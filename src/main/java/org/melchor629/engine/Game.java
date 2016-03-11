@@ -5,6 +5,7 @@ import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;
+import org.melchor629.engine.utils.ShaderManager;
 import org.melchor629.engine.utils.TextureManager;
 import org.melchor629.engine.utils.Timing;
 
@@ -24,9 +25,10 @@ public abstract class Game {
     protected Timing t;
     protected Queue<Runnable> events;
     protected Window window;
-    public static GLContext gl;
+    protected GLContext gl;
     protected AL al;
     protected TextureManager textureManager;
+    protected ShaderManager shaderManager;
     public static List<Erasable> erasableList;
 
     private final Object lock;
@@ -70,6 +72,7 @@ public abstract class Game {
         }
 
         textureManager = new TextureManager(gl);
+        shaderManager = new ShaderManager(gl);
 
         init();
 
@@ -146,5 +149,9 @@ public abstract class Game {
 
     public final TextureManager getTextureManager() {
         return textureManager;
+    }
+
+    public final ShaderManager getShaderManager() {
+        return shaderManager;
     }
 }

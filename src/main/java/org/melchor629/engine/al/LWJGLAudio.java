@@ -205,14 +205,6 @@ public class LWJGLAudio implements AL {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.melchor629.engine.al.AL#dopplerVelocity(float)
-	 */
-	@Override
-	public void dopplerVelocity(float speed) {
-		alDopplerVelocity(speed);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#enable(int)
 	 */
 	@Override

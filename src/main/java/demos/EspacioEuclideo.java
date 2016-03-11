@@ -144,9 +144,10 @@ public class EspacioEuclideo extends Game {
 
         Texture euclides_tex, aleks_tex, falloutPipboy_tex, melchor_tex, pato_tex, doge_tex, andres_tex, amgela_tex;
         try {
-            puntos_shader = new ShaderProgram(
+            puntos_shader = gl.createShader(
                     IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.vs.glsl")),
-                    IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.fs.glsl")));
+                    IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/espacioEuclideo.fs.glsl"))
+            );
             euclides_tex = current = loadTexture("img/euklid.png");
             aleks_tex = loadTexture("img/aleks.png");
             falloutPipboy_tex = loadTexture("img/fallout-pipboy.png");
@@ -209,7 +210,7 @@ public class EspacioEuclideo extends Game {
 
         phosphorEffectVao = gl.createVertexArrayObject();
         try {
-            phosphorEffect = new ShaderProgram(
+            phosphorEffect = gl.createShader(
                     IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/base.vs.glsl")),
                     IOUtils.readStream(IOUtils.getResourceAsStream("shaders/espEucl/phosphor.fs.glsl"))
             );

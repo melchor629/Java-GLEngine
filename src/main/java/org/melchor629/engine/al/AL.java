@@ -282,16 +282,6 @@ public interface AL {
      */
     void dopplerFactor(float factor);
 
-    /**
-     * Sets the speed of the sound for calculate Doppler effect.
-     * Use {@link #speedOfSound(float)} instead. This function has marked as
-     * deprecated because the function name makes some confusion.
-     * @deprecated for OpenAL 1.1
-     * @param speed Speed of the medium
-     * @see <a href="http://en.wikipedia.org/wiki/Doppler_effect">Doppler effect on Wikipedia</a>
-     */
-    @Deprecated
-    void dopplerVelocity(float speed);
     void enable(int cap);
 
     /**

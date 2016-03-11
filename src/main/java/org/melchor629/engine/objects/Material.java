@@ -7,7 +7,6 @@ import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.collada.CommonColorOrTextureType;
 import org.melchor629.engine.loaders.collada.Effect;
 import org.melchor629.engine.loaders.collada.Phong;
-import org.melchor629.engine.utils.ShaderManager;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.Vector4;
 
@@ -24,19 +23,14 @@ public class Material {
     private Vector4 emission, ambient, diffuse, specular, reflective;
     private Texture emissionTex, ambientTex, diffuseTex, specularTex, reflectiveTex;
     private float shininess;
-    private static ShaderProgram phongShader;
+    private ShaderProgram phongShader;
     private final static List<Material> materialList;
-    private final static Material defaultMaterial;
 
     static {
-        try {
-            phongShader = ShaderManager.getInstance().loadShader("Phong", "phong.vs", "phong.fs");
-        } catch(IOException ignore) {}
         materialList = new ArrayList<>();
-        defaultMaterial = new Material();
     }
 
-    public static void loadMaterials(Game game, Collada c) {
+    public static void loadMaterials(Game game, Collada c) throws IOException {
         c.materials.forEach(material -> {
             Effect fx = c.searchForEffectWithId(material.instance_effect_url);
             if(fx == null)
@@ -51,7 +45,7 @@ public class Material {
         int pos = 0;
         while(pos < materialList.size() && (!materialList.get(pos).name.equals(id) && !materialList.get(pos).id.equals(id)))
             pos++;
-        return pos < materialList.size() ? materialList.get(pos) : defaultMaterial;
+        return pos < materialList.size() ? materialList.get(pos) : null;
     }
 
     private Material(Game game, Effect effect, org.melchor629.engine.loaders.collada.Material material) {
@@ -72,16 +66,28 @@ public class Material {
         emissionTex = textureOrNull(game, p.getEmission());
         reflectiveTex = textureOrNull(game, p.getReflective());
         shininess = p.getShininess();
+        phongShader(game);
     }
 
     //Default Material constructor
-    private Material() {
+    public Material(Game game) {
         id = "";
         name = "Default Material";
         diffuse = new Vector4(1, 0, 1, 1);
         specular = new Vector4(1, 1, 1, 1);
         ambient = emission = reflective = new Vector4(0, 0, 0, 1);
         shininess = 32;
+        phongShader(game);
+    }
+
+    private void phongShader(Game game) {
+        try {
+            phongShader = game.getShaderManager().loadShader("Phong", "phong.vs", "phong.fs");
+        } catch(IOException e) {
+            RuntimeException r = new RuntimeException("Phong shader not found");
+            r.initCause(e);
+            throw r;
+        }
     }
 
     private Vector4 colorOrDefault(CommonColorOrTextureType o, float r, float g, float b) {

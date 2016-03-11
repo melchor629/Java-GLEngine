@@ -4,6 +4,8 @@ import org.melchor629.engine.utils.math.Matrix2;
 import org.melchor629.engine.utils.math.Matrix3;
 import org.melchor629.engine.utils.math.Matrix4;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -911,8 +913,12 @@ public interface GLContext {
     VertexArrayObject createVertexArrayObject();
 
     Texture createTexture(TextureFormat format, int width, int height, TextureExternalFormat eformat);
-
     Texture.Builder createTextureBuilder();
+
+    ShaderProgram createShader(String vertex, String fragment, String geometry);
+    ShaderProgram createShader(String vertex, String fragment);
+    ShaderProgram createShader(File vertex, File fragment, File geometry) throws IOException;
+    ShaderProgram createShader(File vertex, File fragment) throws IOException;
 
     //Vertex Arrays
     int genVertexArray();

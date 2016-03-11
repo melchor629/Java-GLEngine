@@ -10,6 +10,8 @@ import org.melchor629.engine.utils.math.Matrix2;
 import org.melchor629.engine.utils.math.Matrix3;
 import org.melchor629.engine.utils.math.Matrix4;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.*;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -1479,6 +1481,26 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public Texture.Builder createTextureBuilder() {
         return new Texture.Builder(this);
+    }
+
+    @Override
+    public ShaderProgram createShader(String vertex, String fragment, String geometry) {
+        return new ShaderProgram(this, vertex, fragment, geometry);
+    }
+
+    @Override
+    public ShaderProgram createShader(String vertex, String fragment) {
+        return new ShaderProgram(this, vertex, fragment);
+    }
+
+    @Override
+    public ShaderProgram createShader(File vertex, File fragment, File geometry) throws IOException {
+        return new ShaderProgram(this, vertex, fragment, geometry);
+    }
+
+    @Override
+    public ShaderProgram createShader(File vertex, File fragment) throws IOException {
+        return new ShaderProgram(this, vertex, fragment);
     }
 
     /* (non-Javadoc)
