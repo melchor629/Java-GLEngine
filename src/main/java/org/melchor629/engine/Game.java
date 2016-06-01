@@ -8,15 +8,21 @@ import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.utils.ShaderManager;
 import org.melchor629.engine.utils.TextureManager;
 import org.melchor629.engine.utils.Timing;
+import org.melchor629.engine.utils.logger.Logger;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Basic class for every game
  * @author melchor9000
  */
 public abstract class Game {
+    private static final Logger LOG = Logger.getLogger(Game.class);
+
     protected short width, height;
     protected boolean fullscreen, resizable, vsync;
     protected String title;
@@ -28,7 +34,8 @@ public abstract class Game {
     protected TextureManager textureManager;
     protected ShaderManager shaderManager;
 
-    private final Object lock;
+    private final Lock lock = new ReentrantLock(true);
+    private final Condition waitClosing;
     private boolean destroyed = false;
     
     /**
@@ -43,22 +50,34 @@ public abstract class Game {
         title = "";
 
         events = new ConcurrentLinkedQueue<>();
-        lock = new Object();
+        waitClosing = lock.newCondition();
         this.window = window;
         this.al = audio;
     }
 
     private void makeGame() {
-        new Thread(this::wrapRenderLoop, "RenderLoop").start();
+        Thread renderLoop = new Thread(this::wrapRenderLoop, "RenderLoop");
+        renderLoop.setName("Render Loop");
+        renderLoop.start();
 
         while(!window.windowShouldClose()) {
             window.waitEvents();
         }
 
-        synchronized(lock) {
+        try {
+            lock.lock();
             destroyed = true;
-            window.destroyWindow();
+            waitClosing.await();
+        } catch(InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
+
+        try {
+            renderLoop.join();
+        } catch(InterruptedException ignore) {}
+        window.destroyWindow();
     }
 
     private void wrapRenderLoop() {
@@ -81,33 +100,42 @@ public abstract class Game {
         while(!destroyed) {
             render();
 
-            synchronized(lock) {
-                if(!destroyed) {
-                    window.syncGPU();
-                    t.update();
-                    window.getKeyboardController().fireEvent(t.frameTime);
-                    window.getMouseController().update(t.frameTime);
-                    while(!events.isEmpty()) events.poll().run();
-                }
+            lock.lock();
+            if(!destroyed) {
+                window.syncGPU();
+                t.update();
+                window.getKeyboardController().fireEvent(t.frameTime);
+                window.getMouseController().update(t.frameTime);
+                while(!events.isEmpty()) events.poll().run();
             }
+            lock.unlock();
         }
 
+        lock.lock();
+        window.hideWindow();
         closing();
         gl.destroyContext();
+        waitClosing.signal();
+        lock.unlock();
+
         if(al != null) {
             al.destroyContext();
         }
     }
 
     protected final void startEngine() {
-        if(fullscreen)
+        if(fullscreen) {
             window.createFullscreenWindow(width, height, title);
-        else
+            LOG.debug("Created fullscreen window %dx%d with title %s", width, height, title);
+        } else {
             window.createWindow(width, height, title);
+            LOG.debug("Created window %dx%d with title %s", width, height, title);
+        }
 
         window.addResizeEventListener((newWidth, newHeight) -> {
             this.width = (short) newWidth;
             this.height = (short) newHeight;
+            post(() -> gl.viewport(0, 0, window.getFramebufferSize().width, window.getFramebufferSize().height));
         });
 
         makeGame();

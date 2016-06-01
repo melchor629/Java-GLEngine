@@ -79,7 +79,7 @@ public class EspacioEuclideo extends Game {
         buff.flip();
     }
 
-    public EspacioEuclideo() {
+    private EspacioEuclideo() {
         super(new LWJGLWindow(), null);
         window.setResizable(false);
         window.setVisible(false);
@@ -100,6 +100,7 @@ public class EspacioEuclideo extends Game {
     private FrameBuffer sceneFB;
     private int glWIDTH;
     private int glHEIGHT;
+    private int cantidad, pasos = 0;
     private boolean phosphorEffectEnabler = false;
 
     private Texture loadTexture(String path) throws IOException {
@@ -235,15 +236,14 @@ public class EspacioEuclideo extends Game {
         plano_vbo.unbind();
 
         getKeyboard().addListener((Keyboard.OnPressKeyEvent) (self, key) -> {
-            if(self.getStringRepresentation(key) == null) return;
-            if(self.getStringRepresentation(key).equals("F")) {
+            if("F".equals(self.getStringRepresentation(key))) {
                 phosphorEffectEnabler = !phosphorEffectEnabler;
                 if(!phosphorEffectEnabler)
-                    post(previousFrame::clearTexture);
+                    post(previousFrame::clear);
             }
             if("P".equals(self.getStringRepresentation(key))) {
                 post(() -> {
-                    ByteBuffer data = BufferUtils.createByteBuffer(glWIDTH * glHEIGHT * 4);
+                    ByteBuffer data = BufferUtils.createByteBuffer(glWIDTH * glHEIGHT * 3);
                     gl.readBuffer(GLContext.CullFaceMode.FRONT);
                     gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data.asIntBuffer());
                     new Thread(() -> {
@@ -272,14 +272,18 @@ public class EspacioEuclideo extends Game {
         });
 
         window.addResizeEventListener((width, height) -> {
-            glWIDTH = width;
-            glHEIGHT = height;
+            glWIDTH = window.getFramebufferSize().width;
+            glHEIGHT = window.getFramebufferSize().height;
+            post(() -> {
+                currentFrame.resize(glWIDTH, glHEIGHT);
+                previousFrame.resize(glWIDTH, glHEIGHT);
+                currentFrameDepth.resize(glWIDTH, glHEIGHT);
+            });
+            camera.setAspectRation(width, height);
         });
 
         window.showWindow();
     }
-
-    int cantidad, pasos = 0;
 
     @Override
     public void render() {
@@ -303,6 +307,7 @@ public class EspacioEuclideo extends Game {
         if(phosphorEffectEnabler)
             sceneFB.bind();
         gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
+
         puntos_shader.setUniformMatrix("view", camera.getViewMatrix());
         gl.setActiveTexture(0);
         current.bind();
