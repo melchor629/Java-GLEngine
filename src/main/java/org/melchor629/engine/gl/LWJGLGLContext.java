@@ -1,9 +1,9 @@
 package org.melchor629.engine.gl;
 
 import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.Callback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.Platform;
-import org.lwjgl.system.libffi.Closure;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.math.GLM;
@@ -37,7 +37,7 @@ import static org.lwjgl.opengl.GL33.*;
  */
 public class LWJGLGLContext implements GLContext {
     private org.lwjgl.opengl.GLCapabilities context;
-    private Closure debugClosure;
+    private Callback debugClosure;
     private List<Erasable> erasableList;
 
     LWJGLGLContext(boolean core) {
@@ -1095,7 +1095,7 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public boolean getBoolean(GLGet get) {
-        return glGetBoolean(get.e);
+        return glGetBoolean(get.e) == 1;
     }
 
     /* (non-Javadoc)

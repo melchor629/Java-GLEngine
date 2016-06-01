@@ -28,7 +28,7 @@ out vec4 outColor;
 
 vec4 diffuseColor() {
     if(material.useDiffuseTex)
-        return vec4(f_texCoord, 0.0, 1.0);//texture(material.diffuseTex, f_texCoord);
+        return texture(material.diffuseTex, f_texCoord);
     else
         return vec4(material.diffuse, material.transparency);
 }
@@ -62,7 +62,7 @@ vec4 colorPointLight(Light l) {
     vec4 diffuseLight = diff * diffuseColor();
 
     vec3 viewDir = normalize(cameraPos - f_pos);
-    vec3 reflectDir = normalize(lightDir + cameraDir);//reflect(-lightDir, norm);
+    vec3 reflectDir = normalize(lightDir + cameraDir);//reflect(-lightDir,norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec4 specularLight = spec * specularColor();
     //TODO specular map

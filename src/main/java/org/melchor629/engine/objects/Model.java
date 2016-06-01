@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  */
 public class Model implements Erasable {
     private VertexArrayObject vao;
-    private BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, colorBuffer;
+    private BufferObject vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer;
     private final Geometry geometry;
     private final GLContext gl;
 
@@ -98,7 +99,6 @@ public class Model implements Erasable {
         vao = gl.createVertexArrayObject();
         vertexBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         normalBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
-        colorBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         indexBuffer = gl.createBufferObject(GLContext.BufferTarget.ELEMENT_ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
         if(sources == 3)
             texCoordBuffer = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
@@ -111,40 +111,33 @@ public class Model implements Erasable {
 
         vertexBuffer.fillBuffer(m.sources.get(0).buff);
         normalBuffer.fillBuffer(reorganizarVectores(m.sources.get(1).buff, 3, obtenerRelación(m.polylist.p, 1, sources)));
-        colorBuffer.fillBuffer(reorganizarVectores(m.sources.get(1).buff, 3, obtenerRelación(m.polylist.p, 1, sources)));
         if(sources == 3)
             texCoordBuffer.fillBuffer(reorganizarVectores(m.sources.get(2).buff, 2, obtenerRelación(m.polylist.p, 2, sources)));
         indexBuffer.unbind();
         vertexBuffer.unbind();
     }
 
-    public void enableAttribs(ShaderProgram s, String... attribs) {
+    public void enableAttribs(ShaderProgram s, String pos, String norm, String tex) {
         s.bind();
         vao.bind();
         indexBuffer.bind();
 
-        if(attribs[0] != null) {
+        if(pos != null) {
             vertexBuffer.bind();
-            s.vertexAttribPointer(attribs[0], 3, GLContext.type.FLOAT, false, 0, 0);
-            s.enableAttrib(attribs[0]);
+            s.vertexAttribPointer(pos, 3, GLContext.type.FLOAT, false, 0, 0);
+            s.enableAttrib(pos);
         }
 
-        if(attribs[1] != null) {
+        if(norm != null) {
             normalBuffer.bind();
-            s.vertexAttribPointer(attribs[1], 3, GLContext.type.FLOAT, false, 0, 0);
-            s.enableAttrib(attribs[1]);
+            s.vertexAttribPointer(norm, 3, GLContext.type.FLOAT, false, 0, 0);
+            s.enableAttrib(norm);
         }
 
-        if(attribs[2] != null && texCoordBuffer != null) {
+        if(tex != null && texCoordBuffer != null) {
             texCoordBuffer.bind();
-            s.vertexAttribPointer(attribs[2], 2, GLContext.type.FLOAT, false, 0, 0);
-            s.enableAttrib(attribs[2]);
-        }
-
-        if(attribs[3] != null) {
-            colorBuffer.bind();
-            s.vertexAttribPointer(attribs[3], 3, GLContext.type.FLOAT, false, 0, 0);
-            s.enableAttrib(attribs[3]);
+            s.vertexAttribPointer(tex, 2, GLContext.type.FLOAT, false, 0, 0);
+            s.enableAttrib(tex);
         }
 
         vao.unbind();

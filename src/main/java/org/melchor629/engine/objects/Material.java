@@ -82,7 +82,7 @@ public class Material {
 
     private void phongShader(Game game) {
         try {
-            phongShader = game.getShaderManager().loadShader("Phong", "phong.vs", "phong.fs");
+            phongShader = game.getShaderManager().loadShader("Phong", "phong.vs.glsl", "phong.fs.glsl");
         } catch(IOException e) {
             RuntimeException r = new RuntimeException("Phong shader not found");
             r.initCause(e);
@@ -103,7 +103,7 @@ public class Material {
     }
 
     public void enableShaderAttributes(Model model) {
-        model.enableAttribs(phongShader, "position", "normal", "texCoord", "color");
+        model.enableAttribs(phongShader, "position", "normal", "texCoord");
     }
 
     public void prepareMaterialToDraw(Camera camera, ModelMatrix modelMatrix) {
@@ -116,16 +116,21 @@ public class Material {
         phongShader.setUniform("material.useReflectiveTex", reflectiveTex != null ? 1 : 0);
 
         phongShader.setUniform("material.diffuse", diffuse.x(), diffuse.y(), diffuse.z());
-        if (specular != null)
+        if(specular != null)
             phongShader.setUniform("material.specular", specular.x(), specular.y(), specular.z());
         else
             phongShader.setUniform("material.specular", 1, 1, 1);
-        if (ambient != null)
+        if(ambient != null)
             phongShader.setUniform("material.ambient", ambient.x(), ambient.y(), ambient.z());
-        if (emission != null)
+        if(emission != null)
             phongShader.setUniform("material.emission", emission.x(), emission.y(), emission.z());
-        if (reflective != null)
+        if(reflective != null)
             phongShader.setUniform("material.reflective", reflective.x(), reflective.y(), reflective.z());
+
+        if(diffuseTex != null) {
+            phongShader.setUniform("material.diffuseTex", 0);
+            diffuseTex.bind();
+        }
 
         phongShader.setUniform("material.shininess", shininess);
 

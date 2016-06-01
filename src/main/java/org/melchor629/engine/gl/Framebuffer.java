@@ -24,6 +24,10 @@ public class FrameBuffer implements Erasable {
     private int fb = -1;
     private boolean checked;
     private final GLContext gl;
+    private RenderBuffer depthRB, stencilRB;
+    private Texture depthTex, stencilTex;
+    private Texture[] colorTexs;
+    private RenderBuffer[] colorRBs;
 
     /**
      * Generates a framebuffer. To make this framebuffer working,
@@ -34,6 +38,8 @@ public class FrameBuffer implements Erasable {
         this.gl = gl;
         fb = gl.genFramebuffer();
         gl.addErasable(this);
+        colorTexs = new Texture[gl.getInt(GLContext.GLGet.MAX_COLOR_ATTACHMENTS)];
+        colorRBs = new RenderBuffer[gl.getInt(GLContext.GLGet.MAX_COLOR_ATTACHMENTS)];
     }
 
     /**
@@ -59,6 +65,7 @@ public class FrameBuffer implements Erasable {
         } else if(texture.is3D()) {
             gl.framebufferTexture3D(coloratt(num), texture.getTarget(), texture._get_texture_(), 0, num >> 8);
         }
+        colorTexs[num] = texture;
     }
 
     /**
@@ -77,6 +84,7 @@ public class FrameBuffer implements Erasable {
         if(num > max)
             throw new GLError(String.format("Trying to attach a color attachment nº %d, where max is %d", num, max));
         gl.framebufferRenderbuffer(coloratt(num), rbo._get_rbo_());
+        colorRBs[num] = rbo;
     }
 
     /**
@@ -95,6 +103,7 @@ public class FrameBuffer implements Erasable {
         } else if(texture.is3D()) {
             gl.framebufferTexture3D(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
         }
+        depthTex = texture;
     }
 
     /**
@@ -107,6 +116,7 @@ public class FrameBuffer implements Erasable {
     public void attachDepthRenderbuffer(RenderBuffer rbo) {
         gl.bindFramebuffer(fb);
         gl.framebufferRenderbuffer(GLContext.FramebufferAttachment.DEPTH_ATTACHMENT, rbo._get_rbo_());
+        depthRB = rbo;
     }
 
     /**
@@ -125,6 +135,7 @@ public class FrameBuffer implements Erasable {
         } else if(texture.is3D()) {
             gl.framebufferTexture3D(GLContext.FramebufferAttachment.STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
         }
+        stencilTex = texture;
     }
 
     /**
@@ -137,6 +148,7 @@ public class FrameBuffer implements Erasable {
     public void attachStencilRenderbuffer(RenderBuffer rbo) {
         gl.bindFramebuffer(fb);
         gl.framebufferRenderbuffer(GLContext.FramebufferAttachment.STENCIL_ATTACHMENT, rbo._get_rbo_());
+        stencilRB = rbo;
     }
 
 
@@ -155,6 +167,7 @@ public class FrameBuffer implements Erasable {
         } else if(texture.is3D()) {
             gl.framebufferTexture3D(GLContext.FramebufferAttachment.DEPTH_STENCIL_ATTACHMENT, texture.getTarget(), texture._get_texture_(), 0, 1);
         }
+        depthTex = stencilTex = texture;
     }
 
     /**
@@ -166,6 +179,7 @@ public class FrameBuffer implements Erasable {
     public void attachDepthStencilRenderbuffer(RenderBuffer rbo) {
         gl.bindFramebuffer(fb);
         gl.framebufferRenderbuffer(GLContext.FramebufferAttachment.DEPTH_STENCIL_ATTACHMENT, rbo._get_rbo_());
+        depthRB = stencilRB = rbo;
     }
 
     /**
@@ -196,12 +210,36 @@ public class FrameBuffer implements Erasable {
         fb = -1;
     }
 
+    public Texture getColorTexAttachment(int num) {
+        return colorTexs[num];
+    }
+
+    public Texture getDepthTexAttachment() {
+        return depthTex;
+    }
+
+    public Texture getStencilTexAttachment() {
+        return stencilTex;
+    }
+
+    public RenderBuffer getColorRBAttachment(int num) {
+        return colorRBs[num];
+    }
+
+    public RenderBuffer getDepthRBAttachment() {
+        return depthRB;
+    }
+
+    public RenderBuffer getStencilRBAttachment() {
+        return stencilRB;
+    }
+
     /**
      * Transform the number to a {@link GLContext.FramebufferAttachment}
      * @param num Number from 0 to 32(?)
      * @return the equivalent to this enum
      */
-    protected final GLContext.FramebufferAttachment coloratt(int num) {
+    private GLContext.FramebufferAttachment coloratt(int num) {
         switch(num) {
             case 1: return GLContext.FramebufferAttachment.COLOR_ATTACHMENT1;
             case 2: return GLContext.FramebufferAttachment.COLOR_ATTACHMENT2;
@@ -220,7 +258,7 @@ public class FrameBuffer implements Erasable {
      * @see <a href="https://www.opengl.org/sdk/docs/man3/xhtml/glCheckFramebufferStatus.xml">glCheckFramebufferStatus</a>
      * @throws GLError if framebuffer status is not equal to {@code GL_FRAMEBUFFER_COMPLETE}
      */
-    protected final void checkForErrors() {
+    private void checkForErrors() {
         if(checked) return;
         GLContext.FramebufferStatus status = gl.checkFramebufferStatus();
         if(status != GLContext.FramebufferStatus.COMPLETE)

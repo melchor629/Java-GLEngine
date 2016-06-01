@@ -28,6 +28,10 @@ public class Texture implements Erasable {
     private int dimensions;
     private int width, height, comp;
     private final GLContext gl;
+    private final boolean resizable;
+    private GLContext.TextureExternalFormat efmt;
+    private GLContext.TextureFormat ifmt;
+    private GLContext.type type;
 
     /**
      * Create a simple empty 2D texture, with minifier and magnifier filter
@@ -46,6 +50,10 @@ public class Texture implements Erasable {
         this.width = width;
         this.height = height;
         this.comp = eformat == TextureExternalFormat.RGB ? 3 : 4; //TODO Más general
+        this.resizable = true;
+        this.ifmt = format;
+        this.efmt = eformat;
+        this.type = GLContext.type.UNSIGNED_BYTE;
 
         gl.bindTexture(target, texture);
         gl.texParameteri(target, GLContext.TextureParameter.MIN_FILTER, GLContext.TextureFilter.LINEAR);
@@ -65,6 +73,10 @@ public class Texture implements Erasable {
         this.gl = gl;
         texture = gl.genTexture();
         this.target = target;
+        this.resizable = false;
+        this.ifmt = ifmt;
+        this.efmt = efmt;
+        this.type = GLContext.type.UNSIGNED_BYTE;
         
         gl.bindTexture(target, texture);
         gl.texParameteri(target, TextureParameter.MIN_FILTER, min);
@@ -109,12 +121,22 @@ public class Texture implements Erasable {
         gl.bindTexture(target, 0);
     }
 
-    public void clearTexture() {
-        ByteBuffer ff = BufferUtils.createByteBuffer(width * height * comp);
+    public void clear() {
         bind();
-        gl.texSubImage2D(target, 0, 0, 0, width, height,
-                comp == 3 ? TextureExternalFormat.RGB : TextureExternalFormat.RGBA, GLContext.type.UNSIGNED_BYTE, ff);
+        gl.texImage2D(target, 0, ifmt, width, 0, height, efmt, type);
         unbind();
+    }
+
+    public void resize(int width, int height) {
+        if(resizable) {
+            bind();
+            gl.texImage2D(target, 0, ifmt, width, 0, height, efmt, type);
+            this.width = width;
+            this.height = height;
+            unbind();
+        } else {
+            throw new UnsupportedOperationException("Cannot resize unresizable texture (ex: loaded from a file)");
+        }
     }
 
     public void delete() {
@@ -142,15 +164,11 @@ public class Texture implements Erasable {
     final int _get_texture_() { return texture; }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        delete();
-    }
-
     public boolean equals(Object o) {
         return (o instanceof Texture) && ((Texture) o).texture == texture;
     }
 
+    @Override
     public int hashCode() {
         return texture * 17 + dimensions;
     }

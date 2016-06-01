@@ -27,12 +27,9 @@ import java.util.*;
  *         <li>Evaluation Shader (<i>4.0 or ARB_tessellation_shader</i>)</li>
  *         <li>Compute Shader (<i>4.3 or ARB_compute_shader</i>)</li>
  *     </ul>
- * </p>
  * <p>
  *     A Shader is a piece of code that runs on a stage of the rendering process.
  *     Vertex Shaders
- *
- * </p>
  * @author melchor9000
  */
 public class ShaderProgram implements Erasable {

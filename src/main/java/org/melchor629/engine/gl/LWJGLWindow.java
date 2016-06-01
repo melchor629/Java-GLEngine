@@ -37,7 +37,7 @@ public class LWJGLWindow implements Window {
     private LWJGLKeyboard keyboard;
 
     public LWJGLWindow() {
-        if(glfwInit() == 0)
+        if(!glfwInit())
             throw new GLError("Could not initiate GLFW");
         glfwDefaultWindowHints();
 
@@ -74,7 +74,7 @@ public class LWJGLWindow implements Window {
 
     @Override
     public void setDoublebuffered(boolean doublebuffered) {
-        glfwWindowHint(GLFW_DOUBLE_BUFFER, doublebuffered ? 1 : 0);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, doublebuffered ? 1 : 0);
     }
 
     @Override
@@ -119,12 +119,12 @@ public class LWJGLWindow implements Window {
 
     @Override
     public boolean windowShouldClose() {
-        return glfwWindowShouldClose(window) == 1;
+        return glfwWindowShouldClose(window);
     }
 
     @Override
     public void setWindowShouldClose(boolean close) {
-        glfwSetWindowShouldClose(window, close ? 1 : 0);
+        glfwSetWindowShouldClose(window, close);
         glfwPostEmptyEvent();
     }
 
@@ -260,8 +260,8 @@ public class LWJGLWindow implements Window {
         });
 
         glfwSetWindowFocusCallback(window, focusCallback = new GLFWWindowFocusCallback() {
-            public void invoke(long window, int focused) {
-                if(focused == 0)
+            public void invoke(long window, boolean focused) {
+                if(focused)
                     blurListeners.forEach(OnBlurEvent::invoke);
                 else
                     focusListeners.forEach(OnFocusEvent::invoke);
@@ -272,7 +272,7 @@ public class LWJGLWindow implements Window {
             @Override
             public void invoke(int error, long description) {
                 ByteBuffer native_str = org.lwjgl.system.MemoryUtil.memByteBufferNT1(description);
-                String java_str = org.lwjgl.system.MemoryUtil.memDecodeUTF8(native_str);
+                String java_str = org.lwjgl.system.MemoryUtil.memUTF8(native_str);
                 System.out.printf("GLFW [ERROR %d]: %s\n", error, java_str);
             }
         });

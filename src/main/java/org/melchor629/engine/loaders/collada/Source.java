@@ -19,7 +19,7 @@ public class Source {
         
         buff = org.melchor629.engine.utils.BufferUtils.createFloatBuffer(count);
         String floats = src.getElementsByTagName("float_array").item(0).getTextContent();
-        int pos = 0, newPos = 0;
+        int pos = 0, newPos;
         for(int i = 0; i < count; i++) {
             newPos = floats.indexOf(' ', pos + 1);
             if(newPos != -1)

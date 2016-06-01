@@ -111,7 +111,6 @@ public class AnotherTestingClass extends Game {
         s.bindFragDataLocation("outColor", 0);
         s.unbind();
         cs.enableAttributes();
-        //s.unbind();
 
         cube = new Cube(gl);
 

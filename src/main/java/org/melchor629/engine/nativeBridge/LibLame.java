@@ -12,7 +12,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 /**
- * Java Binding to lame encoder & decoder
+ * Java Binding to lame encoder and decoder
  */
 public interface LibLame extends Library {
     LibLame INSTANCE = (LibLame) Native.loadLibrary("mp3lame", LibLame.class);

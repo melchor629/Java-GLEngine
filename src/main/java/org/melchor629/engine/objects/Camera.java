@@ -306,9 +306,11 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
 
 
     private void initListeners(Game game) {
-        game.getKeyboard().addListener(this);
-        game.getMouse().addListener((OnMouseMoveEvent) this);
-        game.getMouse().addListener((OnMouseClickEvent) this);
+        if(game != null) {
+            game.getKeyboard().addListener(this);
+            game.getMouse().addListener((OnMouseMoveEvent) this);
+            game.getMouse().addListener((OnMouseClickEvent) this);
+        }
     }
 
     public void invoke(Keyboard self, double delta) {

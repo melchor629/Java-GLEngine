@@ -32,5 +32,11 @@ public class RenderBuffer implements Erasable {
         rbo = -1;
     }
 
+    public void resize(int width, int height) {
+        gl.bindRenderbuffer(rbo);
+        gl.renderbufferStorage(format, width, height);
+        gl.bindRenderbuffer(0);
+    }
+
     int _get_rbo_() { return rbo; }
 }
