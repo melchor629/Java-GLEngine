@@ -1,7 +1,9 @@
 package org.melchor629.engine.al;
 
 import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.ALContext;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.BufferUtils;
@@ -16,7 +18,9 @@ import static org.lwjgl.openal.AL10.*;
  * @author melchor9000
  */
 public class LWJGLAudio implements AL {
-	ALContext context;
+    private long device, context;
+    private ALCCapabilities alcCap;
+    private ALCapabilities alCap;
 	private org.melchor629.engine.al.Listener listener;
 	private List<Erasable> erasableList;
 
@@ -26,8 +30,11 @@ public class LWJGLAudio implements AL {
 	@Override
 	public void createContext() throws ALError {
 		try {
-			context = ALContext.create();
-            context.makeCurrent();
+			device = org.lwjgl.openal.ALC10.alcOpenDevice((String) null);
+            context = org.lwjgl.openal.ALC10.alcCreateContext(device, (IntBuffer) null);
+            org.lwjgl.openal.ALC10.alcMakeContextCurrent(context);
+            alcCap = ALC.createCapabilities(device);
+            alCap = org.lwjgl.openal.AL.createCapabilities(alcCap);
             listener = new org.melchor629.engine.al.Listener(this);
             erasableList = new ArrayList<>();
 		} catch(Exception e) {
@@ -42,10 +49,11 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void destroyContext() {
-		if(context != null) {
-            context.destroy();
-            context.getDevice().close();
-            context = null;
+		if(context != 0) {
+            org.lwjgl.openal.ALC10.alcDestroyContext(context);
+            org.lwjgl.openal.ALC10.alcCloseDevice(device);
+            context = 0;
+            device = 0;
             erasableList.forEach(Erasable::delete);
             erasableList.clear();
         }
