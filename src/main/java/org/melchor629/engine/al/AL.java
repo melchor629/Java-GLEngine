@@ -172,16 +172,26 @@ public interface AL {
      * @param ac audio container from the audio loader
      * @return a new source
      * @see org.melchor629.engine.al.Source
+     * @see org.melchor629.engine.al.StaticSource
      */
-    org.melchor629.engine.al.Source createSource(AudioContainer ac);
+    org.melchor629.engine.al.StaticSource createSource(AudioContainer ac);
 
     /**
      * Creates a new Audio Source from the given {@link org.melchor629.engine.al.Buffer}
      * @param b buffer
      * @return a new Source
      * @see org.melchor629.engine.al.Source
+     * @see org.melchor629.engine.al.StaticSource
      */
-    org.melchor629.engine.al.Source createSource(org.melchor629.engine.al.Buffer b);
+    org.melchor629.engine.al.StaticSource createSource(org.melchor629.engine.al.Buffer b);
+
+    /**
+     * Creates a new Audio Source for streaming audio
+     * @return a new source
+     * @see org.melchor629.engine.al.Source
+     * @see org.melchor629.engine.al.StreamingSource
+     */
+    org.melchor629.engine.al.StreamingSource createSource();
 
     /**
      * This function fills a buffer with audio data. All the pre-defined formats are

@@ -1,7 +1,6 @@
 package org.melchor629.engine.al;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.utils.math.Vector3;
 import org.melchor629.engine.utils.math.GLM;
 
@@ -12,12 +11,11 @@ import org.melchor629.engine.utils.math.GLM;
  *     attributes defines how the source acts. The audio comes from one
  *     {@link Buffer} or a stream of {@link Buffer}s.
  * </p>
+ * Base class for OpenAL Sources
  * @author melchor9000
  */
-//TODO Clamp values within their intervals
-public class Source implements Erasable {
-    private Buffer buffer;
-    private int source;
+public abstract class Source implements Erasable {
+    protected int source;
     private boolean relative = false;
     private boolean looping = false;
     private float reference_distance = 1.0f, rolloff_factor = 1.0f, max_distance = Float.MAX_VALUE;
@@ -26,25 +24,16 @@ public class Source implements Erasable {
     private float cone_inner_angle = 360.0f, cone_outer_angle = 360.0f, cone_outer_gain = 0.0f;
     private Vector3 position, velocity;
     private float gain;
-    private AL al;
+    protected final AL al;
     
-    public float min_gain, max_gain;
+    private float min_gain = 0.f, max_gain = 1.f;
 
-    Source(AL al, Buffer buffer0) {
+    protected Source(AL al) {
         this.al = al;
-        if(buffer0 == null || !buffer0.isComplete())
-            throw new IllegalArgumentException("Cannot pass a null or incomplete buffer");
-        buffer = buffer0;
         position = new Vector3();
         velocity = new Vector3();
         source = al.genSource();
-        al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
-
         al.addErasable(this);
-    }
-    
-    Source(AL al, AudioContainer data) {
-    	this(al, new Buffer(al, data));
     }
     
     public void setPosition(Vector3 pos) {
@@ -98,13 +87,12 @@ public class Source implements Erasable {
     }
     
     public void setGainBounds(float min, float max) {
-        this.min_gain = GLM.belongsToInterval(min, 0.0f, 1.0f) ? min : 0.0f;
-        this.max_gain = GLM.belongsToInterval(max, 0.0f, 1.0f) ? max : 1.0f;
-        al.sourcef(source, AL.Source.MIN_GAIN, min_gain);
-        al.sourcef(source, AL.Source.MAX_GAIN, max_gain);
+        setMaximumGain(max);
+        setMinimumGain(min);
     }
     
     public void setReferenceDistance(float dist) {
+        assert(0.f <= dist);
         reference_distance = Math.abs(dist);
         al.sourcef(source, AL.Source.REFERENCE_DISTANCE, reference_distance);
     }
@@ -114,6 +102,7 @@ public class Source implements Erasable {
     }
     
     public void setRolloffFactor(float factor) {
+        assert(0.f <= factor);
         rolloff_factor = Math.abs(factor);
         al.sourcef(source, AL.Source.ROLLOFF_FACTOR, Math.abs(factor));
     }
@@ -123,13 +112,17 @@ public class Source implements Erasable {
     }
     
     public void setMaxDistance(float dist) {
+        assert(0.f <= dist);
         max_distance = Math.abs(dist);
         al.sourcef(source, AL.Source.MAX_DISTANCE, max_distance);
     }
+
+    public float getMaxDistance(float dist) {
+        return max_distance;
+    }
     
     public void setPitch(float pitch) {
-        if(pitch <= 0.0f)
-            pitch = 1.f;
+        assert(0.f < pitch);
         this.pitch = pitch;
         al.sourcef(source, AL.Source.PITCH, pitch);
     }
@@ -171,12 +164,13 @@ public class Source implements Erasable {
     }
     
     public void setConeOuterGain(float gain) {
-        cone_outer_gain = GLM.belongsToInterval(gain, 0.0f, 1.0f) ? gain : 0.0f;
+        assert(GLM.belongsToInterval(gain, 0.f, 1.f));
+        cone_outer_gain = gain;
         al.sourcef(source, AL.Source.CONE_OUTER_GAIN, cone_outer_gain);
     }
     
     public float getConeOuterGain() {
-        return gain;
+        return cone_outer_gain;
     }
     
     public void setPlaybackPosition(float pos) {
@@ -202,8 +196,28 @@ public class Source implements Erasable {
     public float getPlaybackBytes() {
         return al.getSourcef(source, AL.Source.BYTE_OFFSET);
     }
-    
-    //Buffers (Un)Queue functions go here
+
+    public void setMinimumGain(float min) {
+        if(GLM.belongsToInterval(min, 0.f, 1.f)) {
+            min_gain = min;
+            al.sourcef(source, AL.Source.MIN_GAIN, min_gain);
+        }
+    }
+
+    public float getMinimumGain() {
+        return min_gain;
+    }
+
+    public void setMaximumGain(float min) {
+        if(GLM.belongsToInterval(min, 0.f, 1.f)) {
+            max_gain = min;
+            al.sourcef(source, AL.Source.MAX_GAIN, min_gain);
+        }
+    }
+
+    public float getMaximumGain() {
+        return max_gain;
+    }
     
     public void play() {
         al.sourcePlay(source);
@@ -244,9 +258,6 @@ public class Source implements Erasable {
     public void delete() {
         if(source != 0)
             al.deleteSource(source);
-        if(buffer != null)
-        	buffer.delete();
         source = 0;
-        buffer = null;
     }
 }

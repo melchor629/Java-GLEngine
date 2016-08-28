@@ -60,11 +60,9 @@ public class Buffer implements Erasable {
         al.addErasable(this);
 	}
 
-	public Buffer(byte[] data, AL.Format format, int freq) {
-		buffer = al.genBuffer();
-		al.bufferData(buffer, format, data, freq);
-        al.addErasable(this);
-	}
+	Buffer(int buffer) {
+	    this.buffer = buffer;
+    }
 	
 	public int getBuffer() {
 		return buffer;
@@ -75,6 +73,18 @@ public class Buffer implements Erasable {
 	}
 	
 	public void delete() {
-		al.deleteBuffer(buffer);
+	    if(buffer != 0)
+		    al.deleteBuffer(buffer);
+        buffer = 0;
+	}
+
+	@Override
+    public int hashCode() {
+		return 37 * buffer;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return ((o instanceof Buffer) && ((Buffer) o).buffer == buffer);
 	}
 }

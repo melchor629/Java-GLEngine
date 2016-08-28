@@ -85,13 +85,18 @@ public class LWJGLAudio implements AL {
     }
 
     @Override
-    public org.melchor629.engine.al.Source createSource(AudioContainer ac) {
-        return new org.melchor629.engine.al.Source(this, ac);
+    public org.melchor629.engine.al.StaticSource createSource(AudioContainer ac) {
+        return new org.melchor629.engine.al.StaticSource(this, ac);
     }
 
     @Override
-    public org.melchor629.engine.al.Source createSource(org.melchor629.engine.al.Buffer b) {
-        return new org.melchor629.engine.al.Source(this, b);
+    public org.melchor629.engine.al.StaticSource createSource(org.melchor629.engine.al.Buffer b) {
+        return new org.melchor629.engine.al.StaticSource(this, b);
+    }
+
+    @Override
+    public org.melchor629.engine.al.StreamingSource createSource() {
+        return new org.melchor629.engine.al.StreamingSource(this);
     }
 
     /* (non-Javadoc)
