@@ -15,7 +15,10 @@ dependencies {
     compile 'net.java.dev.jna:jna:4.+'
     compile 'org.reflections:reflections:0.9.+'
     compile 'org.luaj:luaj-jse:3.0.+'
-    compile files('../Library/lwjgl/jar/lwjgl.jar');
+    compile 'org.lwjgl:lwjgl:3.0.+'
+    compile 'org.lwjgl:lwjgl-platform:3.0.+:natives-windows'
+    compile 'org.lwjgl:lwjgl-platform:3.0.+:natives-linux'
+    compile 'org.lwjgl:lwjgl-platform:3.0.+:natives-osx'
 
     testCompile 'junit:junit:4.12'
 }
