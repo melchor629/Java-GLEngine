@@ -20,7 +20,7 @@ public class AudioTests {
 
     public static final String archivo =
             //"/Volumes/OSX/Música/13. Aria Math.wav";
-            "/Volumes/OSX/Música/Muse/Drones/11 - The Globalist.flac";
+            "/Volumes/OSX/Música/Floating Points/J&W Beat/Floating Points - K&G Beat (Original Mix).flac";
             //"/Volumes/OSX/Música/Floating Points/Floating Points - Vacuum Boogie.mp3";
             //"/Volumes/OSX/Música/Deadmau5 - Live at iTunes Festival 2014.ogg";
 

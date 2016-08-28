@@ -50,12 +50,12 @@ public class LWJGLAudio implements AL {
 	@Override
 	public void destroyContext() {
 		if(context != 0) {
+            erasableList.forEach(Erasable::delete);
+            erasableList.clear();
             org.lwjgl.openal.ALC10.alcDestroyContext(context);
             org.lwjgl.openal.ALC10.alcCloseDevice(device);
             context = 0;
             device = 0;
-            erasableList.forEach(Erasable::delete);
-            erasableList.clear();
         }
 	}
 
@@ -170,6 +170,7 @@ public class LWJGLAudio implements AL {
 	public void deleteBuffer(int buffer) {
 		if(!isBuffer(buffer))
 			throw new ALError("alDeleteBuffer", "Buffer is not a buffer");
+		alDeleteBuffers(buffer);
 	}
 
 	/* (non-Javadoc)
