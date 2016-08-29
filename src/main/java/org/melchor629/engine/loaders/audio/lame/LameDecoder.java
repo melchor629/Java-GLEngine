@@ -2,8 +2,9 @@ package org.melchor629.engine.loaders.audio.lame;
 
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.melchor629.engine.loaders.audio.AudioFormat;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.nativeBridge.LibLame;
-import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
 import org.melchor629.engine.utils.BufferUtils;
@@ -19,13 +20,13 @@ import java.nio.ShortBuffer;
  * Decodes mp3 audio
  */
 public class LameDecoder extends AudioDecoder {
-    PointerByReference decoder;
-    LibLame.mp3data_struct data;
-    FileInputStream input;
-    int delay, padding;
+    private PointerByReference decoder;
+    private LibLame.mp3data_struct data;
+    private FileInputStream input;
+    private int delay, padding;
 
     @Override
-    public void readHeader() throws IOException {
+    public AudioFormat readHeader() throws IOException {
         if(!configureDecoder()) throw new AudioDecoderException("Cannot parse mp3 header (may be invalid)");
         if(data.totalframes == 0) {
             //Calcular una aproximación de lo que hay
@@ -34,21 +35,21 @@ public class LameDecoder extends AudioDecoder {
             data.totalframes = data.nsamp.intValue() / data.framesize + 1;
         }
 
-        container.setBitDepth(AudioContainer.bitDepthFromNumber(16));
-        container.setSampleRate(data.samplerate);
-        container.setChannels(data.stereo);
-        container.setSamples(data.nsamp.longValue());
+        format.setBitDepth(AudioFormat.bitDepthFromNumber(16));
+        format.setSampleRate(data.samplerate);
+        format.setChannels(data.stereo);
+        format.setSamples(data.nsamp.longValue());
+        return format;
     }
 
     @Override
-    public void decode() throws IOException {
+    public AudioPCM decodeAll() throws IOException {
         int samplesRead, offset, skip_start = 0, skip_end = 0,
                 frameSize = data.framesize, totalFrames = data.totalframes,
                 frame = 0;
         short left[] = new short[1152], right[] = new short[1152];
         boolean doneEncoding = false;
         ShortBuffer pcm = BufferUtils.createShortBuffer(data.nsamp.intValue() * data.stereo);
-        container.setBuffer(pcm);
 
         if(delay > -1 || padding > -1) {
             if(delay > -1) {
@@ -90,8 +91,23 @@ public class LameDecoder extends AudioDecoder {
             }
         }
 
-        input.close();
-        LibLame.INSTANCE.hip_decode_exit(decoder);
+        delete();
+        return new AudioPCM(format, pcm);
+    }
+
+    @Override
+    public AudioPCM decodeOne() throws IOException {
+        throw new UnsupportedOperationException("not yet :(");
+    }
+
+    @Override
+    public void delete() {
+        if(decoder != null) {
+            LibLame.INSTANCE.hip_decode_exit(decoder);
+            decoder = null;
+            try { input.close(); } catch(Exception ignore) {}
+            input = null;
+        }
     }
 
     @Override

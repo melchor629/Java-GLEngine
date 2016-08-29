@@ -1,6 +1,6 @@
 package org.melchor629.engine.al;
 
-import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 
 /**
  * Source of a sound, with its position, gain, speed, and so...
@@ -14,7 +14,6 @@ import org.melchor629.engine.loaders.audio.AudioContainer;
  */
 public class StaticSource extends Source {
     private Buffer buffer;
-    private int source;
 
     StaticSource(AL al, Buffer buffer0) {
         super(al);
@@ -24,7 +23,7 @@ public class StaticSource extends Source {
         al.sourcei(source, AL.Source.BUFFER, buffer.getBuffer());
     }
 
-    StaticSource(AL al, AudioContainer data) {
+    StaticSource(AL al, AudioPCM data) {
         this(al, new Buffer(al, data));
     }
 

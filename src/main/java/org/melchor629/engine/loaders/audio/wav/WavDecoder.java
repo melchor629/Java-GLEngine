@@ -1,8 +1,9 @@
 package org.melchor629.engine.loaders.audio.wav;
 
-import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.io.*;
@@ -11,14 +12,14 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 /**
- * Load wav files using riff container
+ * Load wav files using riff format
  */
 public class WavDecoder extends AudioDecoder {
     private DataInputStream fis;
     private long sizeOfWavData;
 
     @Override
-    public void readHeader() throws IOException {
+    public AudioFormat readHeader() throws IOException {
         byte[] buff = {0,0,0,0};
         int read, bitDepth;
         throwIfEOF(fis.read(buff));
@@ -34,13 +35,13 @@ public class WavDecoder extends AudioDecoder {
             throw new AudioDecoderException("Wav Format Header not found");
 
         bitDepth = toNativeOrder(fis.readInt());
-        container.setBitDepth(AudioContainer.bitDepthFromNumber(bitDepth));
+        format.setBitDepth(AudioFormat.bitDepthFromNumber(bitDepth));
 
         read = toNativeOrder(fis.readShort());
         if(read != 1) throw new AudioDecoderException("Wave format is not PCM. Unsupported form " + read);
 
-        container.setChannels(toNativeOrder(fis.readUnsignedShort()) >> 16);
-        container.setSampleRate(toNativeOrder(fis.readInt()));
+        format.setChannels(toNativeOrder(fis.readUnsignedShort()) >> 16);
+        format.setSampleRate(toNativeOrder(fis.readInt()));
         fis.readInt();
         fis.readInt();
 
@@ -48,13 +49,14 @@ public class WavDecoder extends AudioDecoder {
         if(!new String(buff, Charset.defaultCharset()).equals("data")) throw new AudioDecoderException("No data section");
 
         sizeOfWavData = toNativeOrder(fis.readInt());
-        container.setSamples(sizeOfWavData / container.getChannels() / bitDepth * 8);
+        format.setSamples(sizeOfWavData / format.getChannels() / bitDepth * 8);
+        return format;
     }
 
     @Override
-    public void decode() throws IOException {
+    public AudioPCM decodeAll() throws IOException {
+        if(fis == null) return null;
         ByteBuffer buff = BufferUtils.createByteBuffer((int) sizeOfWavData);
-        container.setBuffer(buff);
 
         int size = (int) sizeOfWavData;
         int read;
@@ -71,6 +73,37 @@ public class WavDecoder extends AudioDecoder {
         }
 
         fis.close();
+        fis = null;
+        return new AudioPCM(format, buff);
+    }
+
+    @Override
+    public AudioPCM decodeOne() throws IOException {
+        if(fis == null) return null;
+        int bytesToRead = format.getSampleRate() / 10 * format.getChannels() * format.getBitDepth().bitDepth;
+        if(fis.available() < bytesToRead) bytesToRead = fis.available();
+        ByteBuffer buff = BufferUtils.createByteBuffer(bytesToRead);
+        byte[] tmp = new byte[bytesToRead];
+
+        bytesToRead = fis.read(tmp);
+        buff.put(tmp);
+
+        if(fis.available() == 0 || bytesToRead == -1) {
+            fis.close();
+            fis = null;
+        }
+
+        return new AudioPCM(format, buff);
+    }
+
+    @Override
+    public void delete() {
+        if(fis != null) {
+            try {
+                fis.close();
+            } catch (IOException ignore) {}
+            fis = null;
+        }
     }
 
     @Override

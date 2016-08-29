@@ -25,6 +25,8 @@ public class LibFlac {
                                                             Pointer client_data);
     public static native boolean FLAC__stream_decoder_process_until_end_of_stream(Pointer decoder);
     public static native boolean FLAC__stream_decoder_process_until_end_of_metadata(Pointer decoder);
+    public static native boolean FLAC__stream_decoder_process_single(Pointer decoder);
+    public static native int FLAC__stream_decoder_get_state(Pointer decoder);
 
 
     public interface FlacStreamDecoderWriteStatusCallback extends Callback {

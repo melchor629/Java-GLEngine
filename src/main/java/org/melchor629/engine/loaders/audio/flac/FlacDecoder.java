@@ -2,13 +2,15 @@ package org.melchor629.engine.loaders.audio.flac;
 
 import com.sun.jna.Pointer;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
-import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.nativeBridge.LibFlac;
 import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.logger.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ShortBuffer;
 
@@ -35,9 +37,13 @@ public class FlacDecoder extends AudioDecoder {
                 return LibFlac.FlacStreamDecoderWriteStatus.ABORT;
             }
 
+            if(buffer == null) {
+                buffer = BufferUtils.createShortBuffer(frame.header.blockSize * frame.header.channels);
+            }
+
             try {
                 for(long i = 0; i < frame.header.blockSize; i++) {
-                    for(long ch = 0; ch < container.getChannels(); ch++) {
+                    for(long ch = 0; ch < format.getChannels(); ch++) {
                         Pointer channelBuffer = frameBuffer.getPointer(ch * Pointer.SIZE);
                         this.buffer.put((short) (channelBuffer.getInt(i * 4L) & 0xFFFF));
                     }
@@ -51,11 +57,11 @@ public class FlacDecoder extends AudioDecoder {
         };
         metadataCallback = (Pointer _d, LibFlac.FlacStreamMetadata m, Pointer c) -> {
             if(m.type == LibFlac.FlacMetadataType.STREAMINFO) {
-                container.setBitDepth(AudioContainer.bitDepthFromNumber(m.data.bitsPerSample));
-                container.setChannels(m.data.channels);
-                container.setSampleRate(m.data.sampleRate);
-                container.setSamples(m.data.totalSamples.longValue());
-                pcmSize = m.data.bitsPerSample * container.getChannels() * (int) container.getNumberOfSamples();
+                format.setBitDepth(AudioFormat.bitDepthFromNumber(m.data.bitsPerSample));
+                format.setChannels(m.data.channels);
+                format.setSampleRate(m.data.sampleRate);
+                format.setSamples(m.data.totalSamples.longValue());
+                pcmSize = m.data.bitsPerSample * format.getChannels() * (int) format.getNumberOfSamples();
             }
         };
         errorCallback = (Pointer _d, int error, Pointer c) -> flacError = error;
@@ -65,12 +71,26 @@ public class FlacDecoder extends AudioDecoder {
      * Decodes FLAC file
      */
     @Override
-    public void decode() {
-        buffer = BufferUtils.createShortBuffer(pcmSize);
+    public AudioPCM decodeAll() {
+        if(decoder == null) return null;
+        buffer = BufferUtils.createShortBuffer(pcmSize / 2);
         if(!LibFlac.FLAC__stream_decoder_process_until_end_of_stream(decoder) && flacError != 0) {
             throw new AudioDecoderException("FLAC decoder failed: errno " + flacError);
         }
-        container.setBuffer(buffer);
+        clear();
+        return new AudioPCM(format, buffer);
+    }
+
+    @Override
+    public AudioPCM decodeOne() throws IOException {
+        if(decoder == null) return null;
+        buffer = null;
+        if(!LibFlac.FLAC__stream_decoder_process_single(decoder) && flacError != 0 && flacError != 4) {
+            throw new AudioDecoderException("FLAC decoder failed: " + flacError);
+        }
+
+        if(LibFlac.FLAC__stream_decoder_get_state(decoder) == 4) clear();
+        return new AudioPCM(format, buffer);
     }
 
     /**
@@ -85,7 +105,7 @@ public class FlacDecoder extends AudioDecoder {
     }
 
     @Override
-    public void readHeader() {
+    public AudioFormat readHeader() {
         decoder = LibFlac.FLAC__stream_decoder_new();
         if(decoder == null)
             throw new NullPointerException("Could not create FLAC decoder");
@@ -98,7 +118,14 @@ public class FlacDecoder extends AudioDecoder {
             errorCallback,
             null);
         LibFlac.FLAC__stream_decoder_process_until_end_of_metadata(decoder);
-        setCleanUpFunction((self) -> clear());
+        return format;
+    }
+
+    @Override
+    public void delete() {
+        if(decoder != null) {
+            clear();
+        }
     }
 
     @Override

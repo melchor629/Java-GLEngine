@@ -1,8 +1,9 @@
 package org.melchor629.engine.loaders.audio.vorbis;
 
 import com.sun.jna.ptr.IntByReference;
+import org.melchor629.engine.loaders.audio.AudioFormat;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.nativeBridge.LibVorbisFile;
-import org.melchor629.engine.loaders.audio.AudioContainer;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
 import org.melchor629.engine.utils.BufferUtils;
@@ -20,7 +21,7 @@ public class VorbisDecoder extends AudioDecoder {
     private File file;
 
     @Override
-    public void readHeader() throws IOException {
+    public AudioFormat readHeader() throws IOException {
         synchronized (this) {
             vf = new LibVorbisFile.OggVorbis_File();
             String _filePath = file.getAbsolutePath();
@@ -36,18 +37,20 @@ public class VorbisDecoder extends AudioDecoder {
             }
 
             LibVorbisFile.vorbis_info.byReference vinfo = LibVorbisFile.ov_info(vf, -1);
-            container.setChannels(vinfo.channels);
-            container.setSampleRate(vinfo.rate.intValue());
-            container.setSamples(LibVorbisFile.ov_pcm_total(vf, -1).longValue());
-            container.setBitDepth(AudioContainer.BitDepth.INT16); //Solo soportaremos 16 (vorbis solo soporta 8 y 16)
+            format.setChannels(vinfo.channels);
+            format.setSampleRate(vinfo.rate.intValue());
+            format.setSamples(LibVorbisFile.ov_pcm_total(vf, -1).longValue());
+            format.setBitDepth(AudioFormat.BitDepth.INT16); //Solo soportaremos 16 (vorbis solo soporta 8 y 16)
         }
+        return format;
     }
 
     @Override
-    public void decode() throws IOException {
+    public AudioPCM decodeAll() throws IOException {
+        if(vf == null) return null;
+        ByteBuffer pcm = BufferUtils.createByteBuffer((int) format.getNumberOfSamples() * format.getChannels() * 2);
         synchronized (this) {
             boolean eof = false;
-            ByteBuffer pcm = BufferUtils.createByteBuffer((int) container.getNumberOfSamples() * container.getChannels() * 2);
             byte[] buff = new byte[4096];
             IntByReference currentSection = new IntByReference();
 
@@ -63,8 +66,38 @@ public class VorbisDecoder extends AudioDecoder {
                 }
             }
 
-            container.setBuffer(pcm);
+            delete();
+        }
+        return new AudioPCM(format, pcm);
+    }
+
+    @Override
+    public AudioPCM decodeOne() throws IOException {
+        if(vf == null) return null;
+        ByteBuffer pcm;
+        synchronized (this) {
+            byte[] buff = new byte[format.getSampleRate() / 50 * format.getChannels() * format.getBitDepth().bitDepth / 8];
+            IntByReference currentSection = new IntByReference();
+
+            long ret = LibVorbisFile.ov_read(vf, buff, buff.length, 0, 2, 1, currentSection).longValue();
+            if(ret == 0) {
+                delete();
+                return null;
+            } else if(ret < 0) {
+                throw new AudioDecoderException("An error ocurred: " + ret);
+            } else {
+                pcm = BufferUtils.createByteBuffer((int) ret);
+                pcm.put(buff, 0, (int) ret);
+                return new AudioPCM(format, pcm);
+            }
+        }
+    }
+
+    @Override
+    public void delete() {
+        if(vf != null) {
             LibVorbisFile.ov_clear(vf);
+            vf = null;
         }
     }
 

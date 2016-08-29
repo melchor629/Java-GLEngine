@@ -1,31 +1,13 @@
 package org.melchor629.engine.loaders.audio;
 
-import com.sun.jna.Native;
-import sun.nio.ch.DirectBuffer;
-
-import java.nio.*;
-
 /**
  * Superclass for containing lPCM audio. Ready to be encoded or
  * decoded from other codecs.
  */
-public final class AudioContainer {
+public final class AudioFormat {
     private int samplerate = -1, channels = -1;
     private long samples = -1;
     private BitDepth bitDepth;
-    private Buffer pcm;
-    private long pcmAddress, pcmSize;
-    CleanUpFunction cleanUpFunction;
-
-    /**
-     * Interface for CleanUpFunction
-     * This function will be called when {@link #cleanUpNativeResources()}
-     * is called and implementor should free native resources, close files
-     * and other stuff.
-     */
-    public interface CleanUpFunction {
-        void clean(AudioContainer self);
-    }
 
     /**
      * Enumeration enclosing supported PCM formats.
@@ -38,8 +20,8 @@ public final class AudioContainer {
         INT24_NOPACKED(32, Integer.class),
         FLOAT32(32, Float.class);
 
-        int bitDepth;
-        Class type;
+        public final int bitDepth;
+        final Class type;
         BitDepth(int i, Class t) { bitDepth = i; type = t; }
     }
 
@@ -71,38 +53,10 @@ public final class AudioContainer {
     /**
      * Gets the Bit Depth of the PCM data.
      * @return bit depth
-     * @see org.melchor629.engine.loaders.audio.AudioContainer.BitDepth
+     * @see AudioFormat.BitDepth
      */
     public BitDepth getBitDepth() {
         return bitDepth;
-    }
-
-    /**
-     * @return Sound data as Short array
-     */
-    public ShortBuffer getDataAsShort() {
-        return getDataAsByte().asShortBuffer();
-    }
-
-    /**
-     * @return Sound data as Byte array (char*)
-     */
-    public ByteBuffer getDataAsByte() {
-        return Native.getDirectByteBuffer(pcmAddress, pcmSize);
-    }
-
-    /**
-     * @return Sound data as Integer array
-     */
-    public IntBuffer getDataAsInt() {
-        return getDataAsByte().asIntBuffer();
-    }
-
-    /**
-     * @return Sound data as Float array
-     */
-    public FloatBuffer getDataAsFloat() {
-        return getDataAsByte().asFloatBuffer();
     }
 
     /**
@@ -137,38 +91,6 @@ public final class AudioContainer {
      */
     public void setBitDepth(BitDepth bd) {
         bitDepth = bd;
-    }
-
-    /**
-     * Sets the buffer with sound data for the Audio
-     * @param buffer pcm buffer
-     */
-    public void setBuffer(Buffer buffer) {
-        if(!buffer.isDirect()) throw new RuntimeException("Buffer is not direct allocated");
-        pcmAddress = ((DirectBuffer) buffer).address();
-        pcmSize = buffer.capacity();
-        pcm = buffer;
-
-        if(buffer instanceof ShortBuffer)
-            pcmSize *= 2;
-        else if(buffer instanceof IntBuffer || buffer instanceof FloatBuffer)
-            pcmSize *= 4;
-    }
-
-    /**
-     * Clean up all native resources for encoding/decoding audio
-     */
-    public void cleanUpNativeResources() {
-        if(cleanUpFunction != null) cleanUpFunction.clean(this);
-        pcm = null;
-    }
-
-    /**
-     * Indicates when this object can be used by the external code or not
-     * @return true if can be used or not
-     */
-    boolean isReadyToBeUsed() {
-        return pcm != null && samplerate != -1 && channels != -1 && samples != -1L;
     }
 
     /**

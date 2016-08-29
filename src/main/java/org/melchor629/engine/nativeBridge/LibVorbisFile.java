@@ -121,7 +121,7 @@ public class LibVorbisFile implements Library {
     public static native NativeLong ov_pcm_total(OggVorbis_File vf, int link);
 
     /**
-     * This is the main function used to decode a Vorbis file within a loop. It returns up to the specified number of
+     * This is the main function used to decodeAll a Vorbis file within a loop. It returns up to the specified number of
      * bytes of decoded PCM audio in the requested endianness, signedness, and word size. If the audio is multichannel,
      * the channels are interleaved in the output buffer. If the passed in buffer is large, {@code ov_read()} will not
      * fill it; the passed in buffer size is treated as a limit and not a request.

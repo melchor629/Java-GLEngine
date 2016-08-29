@@ -5,7 +5,8 @@ import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioFormat;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
@@ -70,7 +71,7 @@ public class LWJGLAudio implements AL {
 	}
 
     @Override
-    public org.melchor629.engine.al.Buffer createBuffer(AudioContainer ac) {
+    public org.melchor629.engine.al.Buffer createBuffer(AudioPCM ac) {
         return new org.melchor629.engine.al.Buffer(this, ac);
     }
 
@@ -85,7 +86,7 @@ public class LWJGLAudio implements AL {
     }
 
     @Override
-    public org.melchor629.engine.al.StaticSource createSource(AudioContainer ac) {
+    public org.melchor629.engine.al.StaticSource createSource(AudioPCM ac) {
         return new org.melchor629.engine.al.StaticSource(this, ac);
     }
 
@@ -697,14 +698,6 @@ public class LWJGLAudio implements AL {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.melchor629.engine.al.AL#sourceUnqueueBuffers(int, int)
-	 */
-	@Override
-	public void sourceUnqueueBuffers(int source, int buffer) {
-		sourceUnqueueBuffers(source, new int[] { buffer });
-	}
-
-	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#sourceUnqueueBuffers(int, int[])
 	 */
 	@Override
@@ -715,8 +708,10 @@ public class LWJGLAudio implements AL {
 			if(!isBuffer(buffer))
 				throw new ALError("alSourceUnqueueBuffers", 
 						"One of the buffers is not a buffer");
-		
-		alSourceUnqueueBuffers(source, BufferUtils.toBuffer(buffers));
+
+		IntBuffer buff = BufferUtils.toBuffer(buffers);
+		alSourceUnqueueBuffers(source, buff);
+        buff.get(buffers);
 	}
 
 	/* (non-Javadoc)
@@ -726,7 +721,7 @@ public class LWJGLAudio implements AL {
 	public void buffer(int buffer, Buffer pname, float[] floats) {
 		if(!isBuffer(buffer))
 			throw new ALError("alBuffer", "Buffer is not a buffer");
-		
+
 		AL11.alBufferfv(buffer, pname.e, BufferUtils.toBuffer(floats));
 	}
 

@@ -1,7 +1,8 @@
 package org.melchor629.engine.al;
 
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioFormat;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -137,12 +138,12 @@ public interface AL {
     org.melchor629.engine.al.Listener getListener();
 
     /**
-     * Creates a Buffer using an {@link AudioContainer}
-     * @param ac audio container from the loader
+     * Creates a Buffer using an {@link AudioPCM}
+     * @param ac PCM audio from the loader
      * @return a new Buffer
      * @see org.melchor629.engine.al.Buffer
      */
-    org.melchor629.engine.al.Buffer createBuffer(AudioContainer ac);
+    org.melchor629.engine.al.Buffer createBuffer(AudioPCM ac);
 
     /**
      * Creates a Buffer with the data in a audio format and a determined sample
@@ -167,14 +168,14 @@ public interface AL {
     org.melchor629.engine.al.Buffer createBuffer(ShortBuffer data, Format f, int freq);
 
     /**
-     * Creates a new Audio Source from the given AudioContainer creating also
+     * Creates a new Audio Source from the given AudioPCM creating also
      * its {@link org.melchor629.engine.al.Buffer}
-     * @param ac audio container from the audio loader
+     * @param ac audio format from the audio loader
      * @return a new source
      * @see org.melchor629.engine.al.Source
      * @see org.melchor629.engine.al.StaticSource
      */
-    org.melchor629.engine.al.StaticSource createSource(AudioContainer ac);
+    org.melchor629.engine.al.StaticSource createSource(AudioPCM ac);
 
     /**
      * Creates a new Audio Source from the given {@link org.melchor629.engine.al.Buffer}
@@ -707,13 +708,6 @@ public interface AL {
      * @param sources array with l sources
      */
     void sourceStop(int[] sources);
-
-    /**
-     * Unqueues one buffer attached to a source.
-     * @param source Reference to the source
-     * @param buffer buffer to detach
-     */
-    void sourceUnqueueBuffers(int source, int buffer);
 
     /**
      * Unqueues a set of buffers attached to a source.

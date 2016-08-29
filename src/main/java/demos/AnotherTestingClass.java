@@ -9,8 +9,9 @@ import org.melchor629.engine.gl.LWJGLWindow;
 import org.melchor629.engine.gl.Window;
 import org.melchor629.engine.gl.ShaderProgram;
 import org.melchor629.engine.loaders.Collada;
-import org.melchor629.engine.loaders.audio.AudioContainer;
+import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
+import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.objects.Model;
 import org.melchor629.engine.utils.math.ModelMatrix;
@@ -76,21 +77,19 @@ public class AnotherTestingClass extends Game {
 
         new Thread(() -> {
             try {
-                AudioContainer sound;
+                AudioFormat sound;
 
                 synchronized (lock) {
                     AudioDecoder decoder = AudioDecoder.createDecoderForFile(new File(AudioTests.archivo));
                     decoder.readHeader();
-                    decoder.decode();
-                    sound = decoder.getAudioContainer();
+                    AudioPCM data = decoder.decodeAll();
+                    sound = decoder.getAudioFormat();
                     this.post(() -> {
-                        sound_source = al.createSource(al.createBuffer(sound));
+                        sound_source = al.createSource(al.createBuffer(data));
                         sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
                         sound_source.play();
                     });
                 }
-
-                sound.cleanUpNativeResources();
             } catch(Exception ignore) {ignore.printStackTrace();}
         }, "Canción de fondo").start();
 
