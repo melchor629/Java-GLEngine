@@ -1,14 +1,23 @@
 package org.melchor629.engine.loaders.audio;
 
 import com.sun.jna.Native;
+import org.melchor629.engine.utils.MemoryUtils;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.*;
 
 /**
- * Represents some audio in LPCM format
+ * Represents some audio in LPCM format.<br><br>
+ * Must call {@link #close()} when is not needed anymore.
+ * Can be used with a {@code try}-with-resources block like:<br>
+ * <pre>
+ * try(AudioPCM pcm = dec.decodeOne()) {
+ *     ...
+ * }
+ * </pre>
+ * Resources will be auto-freed when the block ends.
  */
-public class AudioPCM {
+public class AudioPCM implements AutoCloseable {
     private final AudioFormat format;
     private Buffer pcm;
     private long pcmAddress, pcmSize;
@@ -113,10 +122,23 @@ public class AudioPCM {
     }
 
     /**
-     * Clean up all native resources for encoding/decoding audio
+     * Clean up all native resources for audio
      */
     public void cleanUpNativeResources() {
         if(cleanUpFunction != null) cleanUpFunction.clean(this);
-        pcm = null;
+        if(pcm != null) {
+            MemoryUtils.free(pcm);
+            pcm = null;
+        }
+    }
+
+    /**
+     * Clean up all native resources associated to this block of audio.
+     * Can be used with a {@code try-with-resources} block.
+     * @see AutoCloseable
+     */
+    @Override
+    public void close() {
+        cleanUpNativeResources();
     }
 }

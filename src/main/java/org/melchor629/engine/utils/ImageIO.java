@@ -1,5 +1,7 @@
 package org.melchor629.engine.utils;
 
+import org.lwjgl.system.MemoryStack;
+
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -47,17 +49,19 @@ public class ImageIO {
 
     private static ImageData lwjgl_loadImage(final File path) {
         ImageData data = new ImageData();
-        IntBuffer x = BufferUtils.createIntBuffer(1),
-                  y = BufferUtils.createIntBuffer(1),
-               comp = BufferUtils.createIntBuffer(1);
-        data.data = org.lwjgl.stb.STBImage.stbi_load(path.getAbsolutePath(), x, y, comp, 4);
-        data.width = x.get();
-        data.height = y.get();
-        data.components = comp.get();
-        data.clear = o -> {
-            org.lwjgl.stb.STBImage.stbi_image_free(o.data);
-            return null;
-        };
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer x = stack.ints(0),
+                      y = stack.ints(0),
+                   comp = stack.ints(0);
+            data.data = org.lwjgl.stb.STBImage.stbi_load(path.getAbsolutePath(), x, y, comp, 4);
+            data.width = x.get();
+            data.height = y.get();
+            data.components = comp.get();
+            data.clear = o -> {
+                org.lwjgl.stb.STBImage.stbi_image_free(o.data);
+                return null;
+            };
+        }
         return data;
     }
 

@@ -6,7 +6,7 @@ import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.nativeBridge.LibFlac;
-import org.melchor629.engine.utils.BufferUtils;
+import org.melchor629.engine.utils.MemoryUtils;
 import org.melchor629.engine.utils.logger.Logger;
 
 import java.io.File;
@@ -38,7 +38,7 @@ public class FlacDecoder extends AudioDecoder {
             }
 
             if(buffer == null) {
-                buffer = BufferUtils.createShortBuffer(frame.header.blockSize * frame.header.channels);
+                buffer = MemoryUtils.createShortBuffer(frame.header.blockSize * frame.header.channels);
             }
 
             try {
@@ -73,7 +73,7 @@ public class FlacDecoder extends AudioDecoder {
     @Override
     public AudioPCM decodeAll() {
         if(decoder == null) return null;
-        buffer = BufferUtils.createShortBuffer(pcmSize / 2);
+        buffer = MemoryUtils.createShortBuffer(pcmSize / 2);
         if(!LibFlac.FLAC__stream_decoder_process_until_end_of_stream(decoder) && flacError != 0) {
             throw new AudioDecoderException("FLAC decoder failed: errno " + flacError);
         }

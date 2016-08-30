@@ -6,7 +6,7 @@ import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.nativeBridge.LibVorbisFile;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
-import org.melchor629.engine.utils.BufferUtils;
+import org.melchor629.engine.utils.MemoryUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,7 +48,7 @@ public class VorbisDecoder extends AudioDecoder {
     @Override
     public AudioPCM decodeAll() throws IOException {
         if(vf == null) return null;
-        ByteBuffer pcm = BufferUtils.createByteBuffer((int) format.getNumberOfSamples() * format.getChannels() * 2);
+        ByteBuffer pcm = MemoryUtils.createByteBuffer((int) format.getNumberOfSamples() * format.getChannels() * 2);
         synchronized (this) {
             boolean eof = false;
             byte[] buff = new byte[4096];
@@ -86,7 +86,7 @@ public class VorbisDecoder extends AudioDecoder {
             } else if(ret < 0) {
                 throw new AudioDecoderException("An error ocurred: " + ret);
             } else {
-                pcm = BufferUtils.createByteBuffer((int) ret);
+                pcm = MemoryUtils.createByteBuffer((int) ret);
                 pcm.put(buff, 0, (int) ret);
                 return new AudioPCM(format, pcm);
             }

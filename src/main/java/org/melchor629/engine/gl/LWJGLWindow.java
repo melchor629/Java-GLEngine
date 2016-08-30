@@ -4,12 +4,12 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
 import org.melchor629.engine.input.Mouse;
-import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -201,10 +201,12 @@ public class LWJGLWindow implements Window {
 
     @Override
     public double getDPI() {
-        IntBuffer width = BufferUtils.createIntBuffer(1), height = BufferUtils.createIntBuffer(1);
-        glfwGetMonitorPhysicalSize(glfwGetPrimaryMonitor(), width, height);
-        GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        return mode.width() / (width.get(0) / 25.4);
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.ints(0), height = stack.ints(0);
+            glfwGetMonitorPhysicalSize(glfwGetPrimaryMonitor(), width, height);
+            GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            return mode.width() / (width.get(0) / 25.4);
+        }
     }
 
     @Override
@@ -214,16 +216,20 @@ public class LWJGLWindow implements Window {
 
     @Override
     public Size getWindowSize() {
-        IntBuffer width = BufferUtils.createIntBuffer(1), height = BufferUtils.createIntBuffer(1);
-        glfwGetWindowSize(window, width, height);
-        return new Size(width.get(), height.get());
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.ints(0), height = stack.ints(0);
+            glfwGetWindowSize(window, width, height);
+            return new Size(width.get(), height.get());
+        }
     }
 
     @Override
     public Size getFramebufferSize() {
-        IntBuffer width = BufferUtils.createIntBuffer(1), height = BufferUtils.createIntBuffer(1);
-        glfwGetFramebufferSize(window, width, height);
-        return new Size(width.get(), height.get());
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.ints(0), height = stack.ints(0);
+            glfwGetFramebufferSize(window, width, height);
+            return new Size(width.get(), height.get());
+        }
     }
 
     @Override

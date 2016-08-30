@@ -6,7 +6,7 @@ import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
 import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.nativeBridge.LibOpusFile;
-import org.melchor629.engine.utils.BufferUtils;
+import org.melchor629.engine.utils.MemoryUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,7 +45,7 @@ public class OpusDecoder extends AudioDecoder {
         if(of == null) return null;
         boolean eof = false;
         short[] buff = new short[5760 * format.getChannels()];
-        ShortBuffer pcm = BufferUtils.createShortBuffer((int) format.getNumberOfSamples() * format.getChannels());
+        ShortBuffer pcm = MemoryUtils.createShortBuffer((int) format.getNumberOfSamples() * format.getChannels());
 
         while(!eof) {
             int r = LibOpusFile.op_read(of, buff, buff.length, null);
@@ -73,7 +73,7 @@ public class OpusDecoder extends AudioDecoder {
         } else if(r < 0) {
             throw new AudioDecoderException("Error while decoding opus: " + r);
         } else {
-            ShortBuffer pcm = BufferUtils.createShortBuffer(r * format.getChannels());
+            ShortBuffer pcm = MemoryUtils.createShortBuffer(r * format.getChannels());
             pcm.put(buff);
             return new AudioPCM(format, pcm);
         }

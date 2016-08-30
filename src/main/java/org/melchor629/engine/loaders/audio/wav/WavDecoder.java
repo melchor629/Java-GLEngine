@@ -4,7 +4,7 @@ import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioDecoderException;
 import org.melchor629.engine.loaders.audio.AudioPCM;
-import org.melchor629.engine.utils.BufferUtils;
+import org.melchor629.engine.utils.MemoryUtils;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -56,7 +56,7 @@ public class WavDecoder extends AudioDecoder {
     @Override
     public AudioPCM decodeAll() throws IOException {
         if(fis == null) return null;
-        ByteBuffer buff = BufferUtils.createByteBuffer((int) sizeOfWavData);
+        ByteBuffer buff = MemoryUtils.createByteBuffer((int) sizeOfWavData);
 
         int size = (int) sizeOfWavData;
         int read;
@@ -82,7 +82,7 @@ public class WavDecoder extends AudioDecoder {
         if(fis == null) return null;
         int bytesToRead = format.getSampleRate() / 10 * format.getChannels() * format.getBitDepth().bitDepth;
         if(fis.available() < bytesToRead) bytesToRead = fis.available();
-        ByteBuffer buff = BufferUtils.createByteBuffer(bytesToRead);
+        ByteBuffer buff = MemoryUtils.createByteBuffer(bytesToRead);
         byte[] tmp = new byte[bytesToRead];
 
         bytesToRead = fis.read(tmp);

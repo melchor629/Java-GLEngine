@@ -16,11 +16,11 @@ import java.io.File;
 public class AudioTests {
     private static final Logger log = Logger.getLogger(AudioTests.class);
 
-    public static final String archivo =
+    static final String archivo =
             //"/Volumes/OSX/Música/r4ndom/Nina Simone - Sinnerman (Felix da Housecat Heavenly House Mix).wav";
-            //"/Volumes/OSX/Música/Floating Points/J&W Beat/Floating Points - K&G Beat (Original Mix).flac";
+            "/Volumes/OSX/Música/Floating Points/J&W Beat/Floating Points - K&G Beat (Original Mix).flac";
             //"/Volumes/OSX/Música/lenzman - looking at the stars (the remixes)/01 - Paper Faces (Ivy Lab Remix) [feat. Martyna Baker].mp3";
-            "/Volumes/OSX/Música/r4ndom/Deadmau5 - Live at iTunes Festival 2014.ogg";
+            //"/Volumes/OSX/Música/r4ndom/Deadmau5 - Live at iTunes Festival 2014.ogg";
 
     public static void main(String[] args) throws Exception {
         Native.setProtected(true);
@@ -50,6 +50,7 @@ public class AudioTests {
                 c = System.in.read();
             } while (c != '\n');
 
+            data.cleanUpNativeResources();
             sd_source.stop();
         } else {
             decoder.readHeader();

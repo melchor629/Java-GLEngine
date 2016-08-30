@@ -17,6 +17,7 @@ import java.nio.ShortBuffer;
 public class Buffer implements Erasable {
 	protected int buffer;
 	private AL al;
+	private AudioPCM pcmData;
 	
 	Buffer(AL al, AudioPCM data) {
         this.al = al;
@@ -48,6 +49,7 @@ public class Buffer implements Erasable {
 		    al.bufferData(buffer, fformat, data.getDataAsShort(), format.getSampleRate());
         else
             al.bufferData(buffer, fformat, data.getDataAsByte(), format.getSampleRate());
+		pcmData = data;
         al.addErasable(this);
     }
 
@@ -80,6 +82,10 @@ public class Buffer implements Erasable {
 	public void delete() {
 	    if(buffer != 0)
 		    al.deleteBuffer(buffer);
+        if(pcmData != null) {
+            pcmData.close();
+            pcmData = null;
+        }
         buffer = 0;
 	}
 
