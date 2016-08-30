@@ -1,11 +1,8 @@
 package org.melchor629.engine.gl;
 
 import org.lwjgl.opengl.GLUtil;
-import org.lwjgl.system.Callback;
-import org.lwjgl.system.Configuration;
-import org.lwjgl.system.Platform;
+import org.lwjgl.system.*;
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.math.GLM;
 import org.melchor629.engine.utils.math.Matrix2;
 import org.melchor629.engine.utils.math.Matrix3;
@@ -28,6 +25,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL32.*;
 import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 //import static org.lwjgl.opengl.GL21.*;
 
@@ -144,10 +142,12 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void genBuffers(int[] buff) {
-        IntBuffer b = BufferUtils.createIntBuffer(buff.length);
-        b.compact();
-        glGenBuffers(b);
-        b.get(buff).clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.mallocInt(buff.length);
+            b.compact();
+            glGenBuffers(b);
+            b.get(buff);
+        }
     }
 
     /* (non-Javadoc)
@@ -163,10 +163,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void deleteBuffers(int[] ebo) {
-        IntBuffer b = BufferUtils.createIntBuffer(ebo.length);
-        b.put(ebo).compact();
-        glDeleteBuffers(b);
-        b.clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.ints(ebo);
+            glDeleteBuffers(b);
+        }
     }
 
     /* (non-Javadoc)
@@ -175,46 +175,6 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void bindBuffer(BufferTarget target, int bo) {
         glBindBuffer(target.e, bo);
-    }
-
-    @Override
-    public void bufferData(BufferTarget target, byte[] buff, BufferUsage usage) {
-        ByteBuffer data = BufferUtils.createByteBuffer(buff.length);
-        data.put(buff).compact();
-        glBufferData(target.e, data, usage.e);
-        data.clear();
-    }
-
-    @Override
-    public void bufferData(BufferTarget target, short[] buff, BufferUsage usage) {
-        ShortBuffer data = BufferUtils.createShortBuffer(buff.length);
-        data.put(buff).compact();
-        glBufferData(target.e, data, usage.e);
-        data.clear();
-    }
-
-    @Override
-    public void bufferData(BufferTarget target, int[] buff, BufferUsage usage) {
-        IntBuffer data = BufferUtils.createIntBuffer(buff.length);
-        data.put(buff).compact();
-        glBufferData(target.e, data, usage.e);
-        data.clear();
-    }
-
-    @Override
-    public void bufferData(BufferTarget target, float[] buff, BufferUsage usage) {
-        FloatBuffer data = BufferUtils.createFloatBuffer(buff.length);
-        data.put(buff).compact();
-        glBufferData(target.e, data, usage.e);
-        data.clear();
-    }
-
-    @Override
-    public void bufferData(BufferTarget target, double[] buff, BufferUsage usage) {
-        DoubleBuffer data = BufferUtils.createDoubleBuffer(buff.length);
-        data.put(buff).compact();
-        glBufferData(target.e, data, usage.e);
-        data.clear();
     }
 
     /* (non-Javadoc)
@@ -243,7 +203,7 @@ public class LWJGLGLContext implements GLContext {
         glDrawElementsInstanced(mode.e, length, type.e, offset, times);
     }
 
-    protected int shToInt(ShaderType type) {
+    private int shToInt(ShaderType type) {
         switch(type) {
             case VERTEX:
                 return GL_VERTEX_SHADER;
@@ -399,10 +359,11 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public String getActiveAttrib(int program, int pos, int strlen) {
-        IntBuffer size, type;
-        size = BufferUtils.createIntBuffer(1);
-        type = BufferUtils.createIntBuffer(1);
-        return glGetActiveAttrib(program, pos, strlen, size, type);
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer size = stack.ints(0);
+            IntBuffer type = stack.ints(0);
+            return glGetActiveAttrib(program, pos, strlen, size, type);
+        }
     }
 
     /* (non-Javadoc)
@@ -439,10 +400,12 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public String getActiveUniform(int program, int pos, int strlen) {
-        IntBuffer size, type;
-        size = BufferUtils.createIntBuffer(1);
-        type = BufferUtils.createIntBuffer(1);
-        return glGetActiveUniform(program, pos, strlen, size, type);
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer size, type;
+            size = stack.ints(0);
+            type = stack.ints(0);
+            return glGetActiveUniform(program, pos, strlen, size, type);
+        }
     }
 
     /* (non-Javadoc)
@@ -490,11 +453,12 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void genTextures(int[] texs) {
-        IntBuffer b = BufferUtils.createIntBuffer(texs.length);
-        b.compact();
-        glGenTextures(b);
-        b.get(texs);
-        b.clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.mallocInt(texs.length);
+            b.compact();
+            glGenTextures(b);
+            b.get(texs);
+        }
     }
 
     /* (non-Javadoc)
@@ -510,10 +474,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void deleteTextures(int[] texs) {
-        IntBuffer b = BufferUtils.createIntBuffer(texs.length);
-        b.put(texs).compact();
-        glDeleteTextures(b);
-        b.clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.ints(texs);
+            glDeleteTextures(b);
+        }
     }
 
     @Override
@@ -578,9 +542,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int border, TextureExternalFormat efmt, type t, byte[] b) {
-        ByteBuffer buff = BufferUtils.createByteBuffer(b.length).put(b).compact();
+        ByteBuffer buff = MemoryUtil.memAlloc(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -589,9 +553,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int border, TextureExternalFormat efmt, type t, short[] b) {
-        ShortBuffer buff = BufferUtils.createShortBuffer(b.length).put(b).compact();
+        ShortBuffer buff = MemoryUtil.memAllocShort(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -600,9 +564,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int border, TextureExternalFormat efmt, type t, int[] b) {
-        IntBuffer buff = BufferUtils.createIntBuffer(b.length).put(b).compact();
+        IntBuffer buff = MemoryUtil.memAllocInt(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -611,9 +575,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int border, TextureExternalFormat efmt, type t, float[] b) {
-        FloatBuffer buff = BufferUtils.createFloatBuffer(b.length).put(b).compact();
+        FloatBuffer buff = MemoryUtil.memAllocFloat(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -622,9 +586,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage1D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int border, TextureExternalFormat efmt, type t, double[] b) {
-        DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
+        DoubleBuffer buff = MemoryUtil.memAllocDouble(b.length).put(b).compact();
         glTexImage1D(target.e, level, ifmt.e, width, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
@@ -667,9 +631,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int border, TextureExternalFormat efmt, type t, byte[] b) {
-        ByteBuffer buff = BufferUtils.createByteBuffer(b.length).put(b).compact();
+        ByteBuffer buff = MemoryUtil.memAlloc(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -678,9 +642,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int border, TextureExternalFormat efmt, type t, short[] b) {
-        ShortBuffer buff = BufferUtils.createShortBuffer(b.length).put(b).compact();
+        ShortBuffer buff = MemoryUtil.memAllocShort(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -689,9 +653,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int border, TextureExternalFormat efmt, type t, int[] b) {
-        IntBuffer buff = BufferUtils.createIntBuffer(b.length).put(b).compact();
+        IntBuffer buff = MemoryUtil.memAllocInt(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -700,9 +664,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int border, TextureExternalFormat efmt, type t, float[] b) {
-        FloatBuffer buff = BufferUtils.createFloatBuffer(b.length).put(b).compact();
+        FloatBuffer buff = MemoryUtil.memAllocFloat(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     /* (non-Javadoc)
@@ -711,9 +675,9 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage2D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int border, TextureExternalFormat efmt, type t, double[] b) {
-        DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
+        DoubleBuffer buff = MemoryUtil.memAllocDouble(b.length).put(b).compact();
         glTexImage2D(target.e, level, ifmt.e, width, height, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
@@ -750,41 +714,41 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int depth, int border, TextureExternalFormat efmt, type t, byte[] b) {
-        ByteBuffer buff = BufferUtils.createByteBuffer(b.length).put(b).compact();
+        ByteBuffer buff = MemoryUtil.memAlloc(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int depth, int border, TextureExternalFormat efmt, type t, short[] b) {
-        ShortBuffer buff = BufferUtils.createShortBuffer(b.length).put(b).compact();
+        ShortBuffer buff = MemoryUtil.memAllocShort(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int depth, int border, TextureExternalFormat efmt, type t, int[] b) {
-        IntBuffer buff = BufferUtils.createIntBuffer(b.length).put(b).compact();
+        IntBuffer buff = MemoryUtil.memAllocInt(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int depth, int border, TextureExternalFormat efmt, type t, float[] b) {
-        FloatBuffer buff = BufferUtils.createFloatBuffer(b.length).put(b).compact();
+        FloatBuffer buff = MemoryUtil.memAllocFloat(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
     public void texImage3D(TextureTarget target, int level, TextureFormat ifmt, int width,
             int height, int depth, int border, TextureExternalFormat efmt, type t, double[] b) {
-        DoubleBuffer buff = BufferUtils.createDoubleBuffer(b.length).put(b).compact();
+        DoubleBuffer buff = MemoryUtil.memAllocDouble(b.length).put(b).compact();
         glTexImage3D(target.e, level, ifmt.e, width, height, depth, border, efmt.e, t.e, buff);
-        buff.clear();
+        MemoryUtil.memFree(buff);
     }
 
     @Override
@@ -845,9 +809,11 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void genFramebuffers(int[] fbs) {
-        IntBuffer b = BufferUtils.createIntBuffer(fbs.length).compact();
-        glGenFramebuffers(b);
-        b.get(fbs).clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.mallocInt(fbs.length);
+            glGenFramebuffers(b);
+            b.get(fbs);
+        }
     }
 
     /* (non-Javadoc)
@@ -863,9 +829,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void deleteFramebuffers(int[] fbs) {
-        IntBuffer b = BufferUtils.createIntBuffer(fbs.length).put(fbs).compact();
-        glDeleteFramebuffers(b);
-        b.clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.ints(fbs);
+            glDeleteFramebuffers(b);
+        }
     }
 
     /* (non-Javadoc)
@@ -881,9 +848,11 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void genRenderbuffers(int[] fbs) {
-        IntBuffer b = BufferUtils.createIntBuffer(fbs.length).compact();
-        glGenRenderbuffers(b);
-        b.get(fbs).clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.mallocInt(fbs.length);
+            glGenRenderbuffers(b);
+            b.get(fbs);
+        }
     }
 
     /* (non-Javadoc)
@@ -899,9 +868,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void deleteRendebuffers(int[] rbs) {
-        IntBuffer b = BufferUtils.createIntBuffer(rbs.length).put(rbs).compact();
-        glGenRenderbuffers(b);
-        b.clear();
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.ints(rbs);
+            glGenRenderbuffers(b);
+        }
     }
 
     /* (non-Javadoc)
@@ -1132,37 +1102,49 @@ public class LWJGLGLContext implements GLContext {
 
     @Override
     public void getBoolean(GLGet get, boolean[] v) {
-        ByteBuffer b = BufferUtils.createByteBuffer(v.length);
-        glGetBooleanv(get.e, b);
-        BufferUtils.fillArray(b, v);
+        try(MemoryStack stack = stackPush()) {
+            ByteBuffer b = stack.malloc(v.length);
+            glGetBooleanv(get.e, b);
+            for(int i = 0; i < v.length; i++) {
+                v[i] = b.get(i) != 0;
+            }
+        }
     }
 
     @Override
     public void getInt(GLGet get, int[] v) {
-        IntBuffer b = BufferUtils.createIntBuffer(v.length);
-        glGetIntegerv(get.e, b);
-        b.get(v);
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer b = stack.mallocInt(v.length);
+            glGetIntegerv(get.e, b);
+            b.get(v);
+        }
     }
 
     @Override
     public void getLong(GLGet get, long[] v) {
-        LongBuffer b = BufferUtils.createLongBuffer(v.length);
-        glGetInteger64v(get.e, b);
-        b.get(v);
+        try(MemoryStack stack = stackPush()) {
+            LongBuffer b = stack.mallocLong(v.length);
+            glGetInteger64v(get.e, b);
+            b.get(v);
+        }
     }
 
     @Override
     public void getFloat(GLGet get, float[] v) {
-        FloatBuffer b = BufferUtils.createFloatBuffer(v.length);
-        glGetFloatv(get.e, b);
-        b.get(v);
+        try(MemoryStack stack = stackPush()) {
+            FloatBuffer b = stack.mallocFloat(v.length);
+            glGetFloatv(get.e, b);
+            b.get(v);
+        }
     }
 
     @Override
     public void getDouble(GLGet get, double[] v) {
-        DoubleBuffer b = BufferUtils.createDoubleBuffer(v.length);
-        glGetDoublev(get.e, b);
-        b.get(v);
+        try(MemoryStack stack = stackPush()) {
+            DoubleBuffer b = stack.mallocDouble(v.length);
+            glGetDoublev(get.e, b);
+            b.get(v);
+        }
     }
 
     @Override
@@ -1244,9 +1226,10 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void uniformMatrix2(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 2 * 2) throw new BufferUnderflowException();
-        FloatBuffer buff = BufferUtils.createFloatBuffer(2 * 2).put(matrix).compact();
-        glUniformMatrix2fv(loc, trans, buff);
-        buff.clear();
+        try(MemoryStack stack = stackPush()) {
+            FloatBuffer buff = stack.floats(matrix);
+            glUniformMatrix2fv(loc, trans, buff);
+        }
     }
 
     @Override
@@ -1260,9 +1243,10 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void uniformMatrix3(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 3 * 3) throw new BufferUnderflowException();
-        FloatBuffer buff = BufferUtils.createFloatBuffer(3 * 3).put(matrix).compact();
-        glUniformMatrix3fv(loc, trans, buff);
-        buff.clear();
+        try(MemoryStack stack = stackPush()) {
+            FloatBuffer buff = stack.floats(matrix);
+            glUniformMatrix3fv(loc, trans, buff);
+        }
     }
 
     @Override
@@ -1276,9 +1260,10 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public void uniformMatrix4(int loc, boolean trans, float[] matrix) throws BufferUnderflowException {
         if(matrix.length != 4 * 4) throw new BufferUnderflowException();
-        FloatBuffer buff = BufferUtils.createFloatBuffer(4 * 4).put(matrix);buff.flip();
-        glUniformMatrix4fv(loc, trans, buff);
-        buff.clear();
+        try(MemoryStack stack = stackPush()) {
+            FloatBuffer buff = stack.floats(matrix);
+            glUniformMatrix4fv(loc, trans, buff);
+        }
     }
 
     @Override
@@ -1348,7 +1333,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, byte[] buff) {
-        bufferSubData(target, offset, BufferUtils.createByteBuffer(buff.length).put(buff).compact());
+        ByteBuffer buffer = MemoryUtil.memAlloc(buff.length);
+        buffer.put(buff);
+        bufferSubData(target, offset, buffer);
+        MemoryUtil.memFree(buffer);
     }
 
     /* (non-Javadoc)
@@ -1356,7 +1344,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, short[] buff) {
-        bufferSubData(target, offset, BufferUtils.createShortBuffer(buff.length).put(buff).compact());
+        ShortBuffer buffer = MemoryUtil.memAllocShort(buff.length);
+        buffer.put(buff);
+        bufferSubData(target, offset, buffer);
+        MemoryUtil.memFree(buffer);
     }
 
     /* (non-Javadoc)
@@ -1364,7 +1355,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, int[] buff) {
-        bufferSubData(target, offset, BufferUtils.createIntBuffer(buff.length).put(buff).compact());
+        IntBuffer buffer = MemoryUtil.memAllocInt(buff.length);
+        buffer.put(buff);
+        bufferSubData(target, offset, buffer);
+        MemoryUtil.memFree(buffer);
     }
 
     /* (non-Javadoc)
@@ -1372,7 +1366,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, float[] buff) {
-        bufferSubData(target, offset, BufferUtils.createFloatBuffer(buff.length).put(buff).compact());
+        FloatBuffer buffer = MemoryUtil.memAllocFloat(buff.length);
+        buffer.put(buff);
+        bufferSubData(target, offset, buffer);
+        MemoryUtil.memFree(buffer);
     }
 
     /* (non-Javadoc)
@@ -1380,7 +1377,10 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void bufferSubData(BufferTarget target, long offset, double[] buff) {
-        bufferSubData(target, offset, BufferUtils.createDoubleBuffer(buff.length).put(buff).compact());
+        DoubleBuffer buffer = MemoryUtil.memAllocDouble(buff.length);
+        buffer.put(buff);
+        bufferSubData(target, offset, buffer);
+        MemoryUtil.memFree(buffer);
     }
 
     /* (non-Javadoc)

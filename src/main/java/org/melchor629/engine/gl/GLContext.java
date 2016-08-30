@@ -980,11 +980,6 @@ public interface GLContext {
     void deleteBuffers(int[] ebo);
     void bindBuffer(BufferTarget target, int bo);
     void bufferData(BufferTarget target, int count, BufferUsage usage);
-    void bufferData(BufferTarget target, byte[] buff, BufferUsage usage);
-    void bufferData(BufferTarget target, short[] buff, BufferUsage usage);
-    void bufferData(BufferTarget target, int[] buff, BufferUsage usage);
-    void bufferData(BufferTarget target, float[] buff, BufferUsage usage);
-    void bufferData(BufferTarget target, double[] buff, BufferUsage usage);
     void bufferData(BufferTarget target, ByteBuffer buff, BufferUsage usage);
     void bufferData(BufferTarget target, ShortBuffer buff, BufferUsage usage);
     void bufferData(BufferTarget target, IntBuffer buff, BufferUsage usage);

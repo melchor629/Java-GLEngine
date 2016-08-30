@@ -4,16 +4,17 @@ import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.melchor629.engine.Erasable;
-import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioPCM;
-import org.melchor629.engine.utils.BufferUtils;
 
 import java.nio.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
  * @author melchor9000
@@ -109,8 +110,11 @@ public class LWJGLAudio implements AL {
 			throw new ALError("alBufferData", "Argument passed as buffer is not a buffer");
 		if(data == null || data.length == 0)
 			throw new ALError("alBufferData", "Data cannot be null or empty");
-		
-		alBufferData(buffer, format.e, BufferUtils.toBuffer(data), freq);
+
+        ByteBuffer sbuff = MemoryUtil.memAlloc(data.length);
+        sbuff.put(data);
+        alBufferData(buffer, format.e, sbuff, freq);
+        MemoryUtil.memFree(sbuff);
 	}
 
 	/* (non-Javadoc)
@@ -122,8 +126,11 @@ public class LWJGLAudio implements AL {
 			throw new ALError("alBufferData", "Argument passed as buffer is not a buffer");
 		if(data == null || data.length == 0)
 			throw new ALError("alBufferData", "Data cannot be null or empty");
-		
-		alBufferData(buffer, format.e, BufferUtils.toBuffer(data), freq);
+
+        ShortBuffer sbuff = MemoryUtil.memAllocShort(data.length);
+        sbuff.put(data);
+		alBufferData(buffer, format.e, sbuff, freq);
+        MemoryUtil.memFree(sbuff);
 	}
 
 	/* (non-Javadoc)
@@ -135,8 +142,11 @@ public class LWJGLAudio implements AL {
 			throw new ALError("alBufferData", "Argument passed as buffer is not a buffer");
 		if(data == null || data.length == 0)
 			throw new ALError("alBufferData", "Data cannot be null or empty");
-		
-		alBufferData(buffer, format.e, BufferUtils.toBuffer(data), freq);
+
+        IntBuffer sbuff = MemoryUtil.memAllocInt(data.length);
+        sbuff.put(data);
+        alBufferData(buffer, format.e, sbuff, freq);
+        MemoryUtil.memFree(sbuff);
 	}
 	
 	/* (non-Javadoc)
@@ -252,10 +262,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void genBuffers(int[] buffers) {
-		IntBuffer buff = BufferUtils.createIntBuffer(buffers.length);
-		alGenBuffers(buff);
-		buff.position(0);
-		buff.get(buffers);
+		try(MemoryStack stack = stackPush()) {
+		    IntBuffer buff = stack.mallocInt(buffers.length);
+            alGenBuffers(buff);
+            buff.position(0);
+            buff.get(buffers);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -271,10 +283,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void genSources(int[] sources) {
-		IntBuffer buff = BufferUtils.createIntBuffer(sources.length);
-		alGenSources(buff);
-		buff.position(0);
-		buff.get(sources);
+	    try(MemoryStack stack = stackPush()) {
+	        IntBuffer buff = stack.mallocInt(sources.length);
+            alGenSources(buff);
+            buff.position(0);
+            buff.get(sources);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -314,10 +328,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getDouble(Get cap, double[] doubles) {
-		DoubleBuffer buff = BufferUtils.createDoubleBuffer(doubles.length);
-		alGetDoublev(cap.e, buff);
-		buff.position(0);
-		buff.get(doubles);
+	    try(MemoryStack stack = stackPush()) {
+	        DoubleBuffer buff = stack.mallocDouble(doubles.length);
+            alGetDoublev(cap.e, buff);
+            buff.position(0);
+            buff.get(doubles);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -364,10 +380,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getFloat(Get pname, float[] floats) {
-		FloatBuffer fb = BufferUtils.createFloatBuffer(floats.length);
-		alGetFloatv(pname.e, fb);
-		fb.position(0);
-		fb.get(floats);
+	    try(MemoryStack stack = stackPush()) {
+	        FloatBuffer fb = stack.mallocFloat(floats.length);
+            alGetFloatv(pname.e, fb);
+            fb.position(0);
+            fb.get(floats);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -383,10 +401,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getInteger(Get pname, int[] integers) {
-		IntBuffer fb = BufferUtils.createIntBuffer(integers.length);
-		alGetIntegerv(pname.e, fb);
-		fb.position(0);
-		fb.get(integers);
+	    try(MemoryStack stack = stackPush()) {
+	        IntBuffer fb = stack.mallocInt(integers.length);
+            alGetIntegerv(pname.e, fb);
+            fb.position(0);
+            fb.get(integers);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -394,10 +414,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getListener(Get pname, float[] floats) {
-		FloatBuffer fb = BufferUtils.createFloatBuffer(floats.length);
-		alGetListenerfv(pname.e, fb);
-		fb.position(0);
-		fb.get(floats);
+        try(MemoryStack stack = stackPush()) {
+            FloatBuffer fb = stack.mallocFloat(floats.length);
+            alGetListenerfv(pname.e, fb);
+            fb.position(0);
+            fb.get(floats);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -405,10 +427,12 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getListener(Get pname, int[] ints) {
-		IntBuffer fb = BufferUtils.createIntBuffer(ints.length);
-		alGetListeneri(pname.e, fb);
-		fb.position(0);
-		fb.get(ints);
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer fb = stack.mallocInt(ints.length);
+            alGetListeneri(pname.e, fb);
+            fb.position(0);
+            fb.get(ints);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -432,19 +456,23 @@ public class LWJGLAudio implements AL {
 	 */
 	@Override
 	public void getSource(int source, Source pname, float[] floats) {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
-        alGetSourcefv(source, pname.e, buffer);
-        buffer.get(floats);
-	}
+	    try(MemoryStack stack = stackPush()) {
+	        FloatBuffer buffer = stack.mallocFloat(floats.length);
+            alGetSourcefv(source, pname.e, buffer);
+            buffer.get(floats);
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#getSource(int, org.melchor629.engine.al.AL.Source, int[])
 	 */
 	@Override
 	public void getSource(int source, Source pname, int[] integers) {
-        IntBuffer buffer = BufferUtils.createIntBuffer(3);
-        alGetSourceiv(source, pname.e, buffer);
-        buffer.get(integers);
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer buffer = stack.mallocInt(integers.length);
+            alGetSourceiv(source, pname.e, buffer);
+            buffer.get(integers);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -510,8 +538,10 @@ public class LWJGLAudio implements AL {
 	public void listener(Listener pname, float[] data) {
 		if(data == null || data.length == 0)
 			throw new ALError("alListener", "Data cannot be null or empty");
-		
-		alListenerfv(pname.e, BufferUtils.toBuffer(data));
+
+        try(MemoryStack stack = stackPush()) {
+            alListenerfv(pname.e, stack.floats(data));
+        }
 	}
 
 	/* (non-Javadoc)
@@ -521,7 +551,7 @@ public class LWJGLAudio implements AL {
 	public void listener(Listener pname, int[] data) {
 		if(data == null || data.length == 0)
 			throw new ALError("alListener", "Data cannot be null or empty");
-		
+
 		//TODO alListener(pname.e, BufferUtils.toBuffer(data));
 	}
 
@@ -558,8 +588,10 @@ public class LWJGLAudio implements AL {
 			throw new ALError("alSource", "Data cannot be null or empty");
 		if(!isSource(source))
 			throw new ALError("alSource", "Source is not a source");
-		
-		alSourcefv(source, pname.e, BufferUtils.toBuffer(data));
+
+        try(MemoryStack stack = stackPush()) {
+            alSourcefv(source, pname.e, stack.floats(data));
+        }
 	}
 
 	/* (non-Javadoc)
@@ -709,9 +741,11 @@ public class LWJGLAudio implements AL {
 				throw new ALError("alSourceUnqueueBuffers", 
 						"One of the buffers is not a buffer");
 
-		IntBuffer buff = BufferUtils.toBuffer(buffers);
-		alSourceUnqueueBuffers(source, buff);
-        buff.get(buffers);
+        try(MemoryStack stack = stackPush()) {
+            IntBuffer buff = stack.mallocInt(buffers.length);
+            alSourceUnqueueBuffers(source, buff);
+            buff.get(buffers);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -722,7 +756,9 @@ public class LWJGLAudio implements AL {
 		if(!isBuffer(buffer))
 			throw new ALError("alBuffer", "Buffer is not a buffer");
 
-		AL11.alBufferfv(buffer, pname.e, BufferUtils.toBuffer(floats));
+        try(MemoryStack stack = stackPush()) {
+            AL11.alBufferfv(buffer, pname.e, stack.floats(floats));
+        }
 	}
 
 	/* (non-Javadoc)
@@ -732,8 +768,10 @@ public class LWJGLAudio implements AL {
 	public void buffer(int buffer, Buffer pname, int[] integers) {
 		if(!isBuffer(buffer))
 			throw new ALError("alBuffer", "Buffer is not a buffer");
-		
-		AL11.alBufferiv(buffer, pname.e, BufferUtils.toBuffer(integers));
+
+        try(MemoryStack stack = stackPush()) {
+            AL11.alBufferiv(buffer, pname.e, stack.ints(integers));
+        }
 	}
 
 	/* (non-Javadoc)
@@ -815,8 +853,10 @@ public class LWJGLAudio implements AL {
 	public void source(int source, Source pname, int[] integers) {
 		if(!isSource(source))
 			throw new ALError("alSource", "Source is not a source");
-		
-		AL11.alSourceiv(source, pname.e, BufferUtils.toBuffer(integers));
+
+        try(MemoryStack stack = stackPush()) {
+            AL11.alSourceiv(source, pname.e, stack.ints(integers));
+        }
 	}
 
 	/* (non-Javadoc)

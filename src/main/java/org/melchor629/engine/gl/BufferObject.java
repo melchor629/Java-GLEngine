@@ -1,9 +1,9 @@
 package org.melchor629.engine.gl;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.*;
 
 import org.melchor629.engine.Erasable;
+import org.melchor629.engine.utils.BufferUtils;
 
 /**
  * Class for manage all types of *BO (<i>Buffer Objects</i>) like VBO
@@ -19,6 +19,7 @@ import org.melchor629.engine.Erasable;
 //TODO (Buffers and glBufferSubData)
 public class BufferObject implements Erasable {
     private int bo;
+    private Buffer buffData;
     private GLContext.BufferTarget target;
     private GLContext.BufferUsage usage;
     private final GLContext gl;
@@ -75,7 +76,8 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(byte[] buff) {
         bind();
-        gl.bufferData(target, buff, usage);
+        buffData = BufferUtils.toBuffer(buff);
+        gl.bufferData(target, (ByteBuffer) buffData, usage);
     }
 
     /**
@@ -85,7 +87,8 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(short[] buff) {
         bind();
-        gl.bufferData(target, buff, usage);
+        buffData = BufferUtils.toBuffer(buff);
+        gl.bufferData(target, (ShortBuffer) buffData, usage);
     }
 
     /**
@@ -95,7 +98,8 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(int[] buff) {
         bind();
-        gl.bufferData(target, buff, usage);
+        buffData = BufferUtils.toBuffer(buff);
+        gl.bufferData(target, (IntBuffer) buffData, usage);
     }
 
     /**
@@ -115,7 +119,8 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(float[] buff) {
         bind();
-        gl.bufferData(target, buff, usage);
+        buffData = BufferUtils.toBuffer(buff);
+        gl.bufferData(target, (FloatBuffer) buffData, usage);
     }
 
     /**
@@ -135,7 +140,8 @@ public class BufferObject implements Erasable {
      */
     public void fillBuffer(double[] buff) {
         bind();
-        gl.bufferData(target, buff, usage);
+        buffData = BufferUtils.toBuffer(buff);
+        gl.bufferData(target, (DoubleBuffer) buffData, usage);
     }
     
     public void initPartialFillBuffer(int count) {
@@ -166,7 +172,9 @@ public class BufferObject implements Erasable {
     }
 
     //TODO http://onrendering.blogspot.com.es/2011/10/buffer-object-streaming-in-opengl.html
-    public void clearData() {}
+    public void clearData() {
+        buffData = null;
+    }
 
     /**
      * Ask GPU to tell the size of this buffer object

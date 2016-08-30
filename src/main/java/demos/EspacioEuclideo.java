@@ -189,7 +189,7 @@ public class EspacioEuclideo extends Game {
         puntos_shader.setUniform("euclides", 0);
         puntos_shader.setUniform("opacity", 1.0f);
 
-        /**
+        /*
          * Post-processing effects
          */
         BufferObject screen_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STATIC_DRAW);
@@ -298,8 +298,11 @@ public class EspacioEuclideo extends Game {
 
         if(pasos++ % 5 == 0) {
             postInBackground(() -> {
-                cantidad = obtenerVisibles(puntos_buff, camera, puntos);
-                post(() -> puntos_vbo.fillBuffer(puntos_buff));
+                final int cantidad_ = obtenerVisibles(puntos_buff, camera, puntos);
+                post(() -> {
+                    puntos_vbo.fillBuffer(puntos_buff);
+                    cantidad = cantidad_;
+                });
             });
             pasos %= 5;
         }

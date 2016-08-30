@@ -11,6 +11,7 @@ import java.nio.ShortBuffer;
 /**
  * Some Buffer Utilities
  */
+@Deprecated
 public class BufferUtils {
 
     /**
