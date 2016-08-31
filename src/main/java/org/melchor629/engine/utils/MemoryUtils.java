@@ -1,5 +1,7 @@
 package org.melchor629.engine.utils;
 
+import org.lwjgl.system.MemoryUtil;
+
 import java.nio.*;
 
 import static org.lwjgl.system.MemoryUtil.*;
@@ -168,5 +170,192 @@ public class MemoryUtils {
     public static void free(Buffer buffer) {
         if(buffer == null) throw new NullPointerException("Cannot free null");
         memFree(buffer);
+    }
+
+    /**
+     * If {@code buffer} is {@code NULL}:
+     * <p>
+     *     Behaves like {@link #createByteBuffer(int)}
+     * </p>
+     * If {@code buffer} is not {@code NULL}:
+     * <p>
+     *     Changes the size of the memory block pointed by {@code buffer}
+     *     maintaining the old data the same, and if is larger than before,
+     *     the new part of memory contains undefined values. May move the
+     *     memory into another part, so don't use the old {@code buffer}
+     *     and use the returned one.
+     * </p>
+     * @param buffer memory block to resize
+     * @param newSize new size of the memory block
+     * @return a new buffer
+     */
+    public static ByteBuffer realloc(ByteBuffer buffer, int newSize) {
+        return MemoryUtil.memRealloc(buffer, newSize);
+    }
+    /**
+     * If {@code buffer} is {@code NULL}:
+     * <p>
+     *     Behaves like {@link #createShortBuffer(int)}
+     * </p>
+     * If {@code buffer} is not {@code NULL}:
+     * <p>
+     *     Changes the size of the memory block pointed by {@code buffer}
+     *     maintaining the old data the same, and if is larger than before,
+     *     the new part of memory contains undefined values. May move the
+     *     memory into another part, so don't use the old {@code buffer}
+     *     and use the returned one.
+     * </p>
+     * @param buffer memory block to resize
+     * @param newSize new size of the memory block
+     * @return a new buffer
+     */
+    public static ShortBuffer realloc(ShortBuffer buffer, int newSize) {
+        return MemoryUtil.memRealloc(buffer, newSize);
+    }
+    /**
+     * If {@code buffer} is {@code NULL}:
+     * <p>
+     *     Behaves like {@link #createIntBuffer(int)}
+     * </p>
+     * If {@code buffer} is not {@code NULL}:
+     * <p>
+     *     Changes the size of the memory block pointed by {@code buffer}
+     *     maintaining the old data the same, and if is larger than before,
+     *     the new part of memory contains undefined values. May move the
+     *     memory into another part, so don't use the old {@code buffer}
+     *     and use the returned one.
+     * </p>
+     * @param buffer memory block to resize
+     * @param newSize new size of the memory block
+     * @return a new buffer
+     */
+    public static IntBuffer realloc(IntBuffer buffer, int newSize) {
+        return MemoryUtil.memRealloc(buffer, newSize);
+    }
+    /**
+     * If {@code buffer} is {@code NULL}:
+     * <p>
+     *     Behaves like {@link #createLongBuffer(int)}
+     * </p>
+     * If {@code buffer} is not {@code NULL}:
+     * <p>
+     *     Changes the size of the memory block pointed by {@code buffer}
+     *     maintaining the old data the same, and if is larger than before,
+     *     the new part of memory contains undefined values. May move the
+     *     memory into another part, so don't use the old {@code buffer}
+     *     and use the returned one.
+     * </p>
+     * @param buffer memory block to resize
+     * @param newSize new size of the memory block
+     * @return a new buffer
+     */
+    public static LongBuffer realloc(LongBuffer buffer, int newSize) {
+        return MemoryUtil.memRealloc(buffer, newSize);
+    }
+    /**
+     * If {@code buffer} is {@code NULL}:
+     * <p>
+     *     Behaves like {@link #createFloatBuffer(int)}
+     * </p>
+     * If {@code buffer} is not {@code NULL}:
+     * <p>
+     *     Changes the size of the memory block pointed by {@code buffer}
+     *     maintaining the old data the same, and if is larger than before,
+     *     the new part of memory contains undefined values. May move the
+     *     memory into another part, so don't use the old {@code buffer}
+     *     and use the returned one.
+     * </p>
+     * @param buffer memory block to resize
+     * @param newSize new size of the memory block
+     * @return a new buffer
+     */
+    public static FloatBuffer realloc(FloatBuffer buffer, int newSize) {
+        return MemoryUtil.memRealloc(buffer, newSize);
+    }
+    /**
+     * If {@code buffer} is {@code NULL}:
+     * <p>
+     *     Behaves like {@link #createDoubleBuffer(int)}
+     * </p>
+     * If {@code buffer} is not {@code NULL}:
+     * <p>
+     *     Changes the size of the memory block pointed by {@code buffer}
+     *     maintaining the old data the same, and if is larger than before,
+     *     the new part of memory contains undefined values. May move the
+     *     memory into another part, so don't use the old {@code buffer}
+     *     and use the returned one.
+     * </p>
+     * @param buffer memory block to resize
+     * @param newSize new size of the memory block
+     * @return a new buffer
+     */
+    public static DoubleBuffer realloc(DoubleBuffer buffer, int newSize) {
+        return MemoryUtil.memRealloc(buffer, newSize);
+    }
+
+    /**
+     * Copies {@code bytes} bytes from {@code in} buffer starting at its current
+     * position into {@code out} buffer starting at its current position.
+     * @param in buffer from the data will come from
+     * @param out buffer where the data will be copied to
+     * @param bytes number of bytes to copy
+     */
+    public static void copy(ByteBuffer in, ByteBuffer out, int bytes) {
+        MemoryUtil.memCopy(MemoryUtil.memAddress(in), MemoryUtil.memAddress(out), bytes);
+    }
+
+    /**
+     * Copies {@code n} elements from {@code in} buffer starting at its current
+     * position into {@code out} buffer starting at its current position.
+     * @param in buffer from the data will come from
+     * @param out buffer where the data will be copied to
+     * @param n number of elements to copy
+     */
+    public static void copy(ShortBuffer in, ShortBuffer out, int n) {
+        MemoryUtil.memCopy(MemoryUtil.memAddress(in), MemoryUtil.memAddress(out), n << 1);
+    }
+
+    /**
+     * Copies {@code n} elements from {@code in} buffer starting at its current
+     * position into {@code out} buffer starting at its current position.
+     * @param in buffer from the data will come from
+     * @param out buffer where the data will be copied to
+     * @param n number of elements to copy
+     */
+    public static void copy(IntBuffer in, IntBuffer out, int n) {
+        MemoryUtil.memCopy(MemoryUtil.memAddress(in), MemoryUtil.memAddress(out), n << 2);
+    }
+
+    /**
+     * Copies {@code n} elements from {@code in} buffer starting at its current
+     * position into {@code out} buffer starting at its current position.
+     * @param in buffer from the data will come from
+     * @param out buffer where the data will be copied to
+     * @param n number of elements to copy
+     */
+    public static void copy(FloatBuffer in, FloatBuffer out, int n) {
+        MemoryUtil.memCopy(MemoryUtil.memAddress(in), MemoryUtil.memAddress(out), n << 2);
+    }
+
+    /**
+     * Copies {@code n} elements from {@code in} buffer starting at its current
+     * position into {@code out} buffer starting at its current position.
+     * @param in buffer from the data will come from
+     * @param out buffer where the data will be copied to
+     * @param n number of elements to copy
+     */
+    public static void copy(LongBuffer in, LongBuffer out, int n) {
+        MemoryUtil.memCopy(MemoryUtil.memAddress(in), MemoryUtil.memAddress(out), n << 3);
+    }
+
+    /**
+     * Copies {@code n} elements from {@code in} buffer starting at its current
+     * position into {@code out} buffer starting at its current position.
+     * @param in buffer from the data will come from
+     * @param out buffer where the data will be copied to
+     * @param n number of elements to copy
+     */
+    public static void copy(DoubleBuffer in, DoubleBuffer out, int n) {
+        MemoryUtil.memCopy(MemoryUtil.memAddress(in), MemoryUtil.memAddress(out), n << 3);
     }
 }

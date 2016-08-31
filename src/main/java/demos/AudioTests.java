@@ -31,7 +31,7 @@ public class AudioTests {
         AudioFormat format;
         AudioPCM data = null;
 
-        if(args.length == 1 && args[0].equals("full")) {
+        if(args.length >= 1 && args[0].equals("full")) {
             long timeDecode = System.currentTimeMillis();
             format = decoder.readHeader();
             data = decoder.decodeAll();
