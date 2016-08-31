@@ -18,9 +18,10 @@ public class LibOpusFile implements Library {
     }
 
     public static class OggOpusFile extends Structure implements Structure.ByReference {
+        public NativeLong ptr;
         @Override
         protected List getFieldOrder() {
-            return Collections.singletonList("");
+            return Collections.singletonList("ptr");
         }
     }
 

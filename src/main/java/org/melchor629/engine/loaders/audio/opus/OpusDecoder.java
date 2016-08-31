@@ -54,7 +54,7 @@ public class OpusDecoder extends AudioDecoder {
             } else if(r < 0) {
                 throw new AudioDecoderException("Error while decoding opus: " + r);
             } else {
-                pcm.put(buff, 0, r);
+                pcm.put(buff, 0, r * format.getChannels());
             }
         }
 
@@ -65,7 +65,7 @@ public class OpusDecoder extends AudioDecoder {
     @Override
     public AudioPCM decodeOne() throws IOException {
         if(of == null) return null;
-        short[] buff = new short[480 * format.getChannels()];
+        short[] buff = new short[5760 * format.getChannels()];
         int r = LibOpusFile.op_read(of, buff, buff.length, null);
         if(r == 0) {
             delete();
@@ -74,7 +74,7 @@ public class OpusDecoder extends AudioDecoder {
             throw new AudioDecoderException("Error while decoding opus: " + r);
         } else {
             ShortBuffer pcm = MemoryUtils.createShortBuffer(r * format.getChannels());
-            pcm.put(buff);
+            pcm.put(buff, 0, r * format.getChannels());
             return new AudioPCM(format, pcm);
         }
     }
