@@ -1,4 +1,4 @@
-package org.melchor629.engine.loaders.audio.lame;
+package org.melchor629.engine.loaders.audio.mp3;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.ptr.IntByReference;
