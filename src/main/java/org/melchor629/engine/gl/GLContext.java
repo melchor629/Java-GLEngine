@@ -6,6 +6,7 @@ import org.melchor629.engine.utils.math.Matrix3;
 import org.melchor629.engine.utils.math.Matrix4;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -169,6 +170,7 @@ public interface GLContext {
         PROXY_TEXTURE_1D_ARRAY (0x8C19),
         TEXTURE_RECTANGLE (0x84F5),
         PROXY_TEXTURE_RECTANGLE (0x84F7),
+        TEXTURE_CUBE_MAP (0x8513),
         TEXTURE_CUBE_MAP_POSITIVE_X (0x8515),
         TEXTURE_CUBE_MAP_NEGATIVE_X (0x8516),
         TEXTURE_CUBE_MAP_POSITIVE_Y (0x8517),
@@ -509,6 +511,7 @@ public interface GLContext {
         DEBUG_GROUP_STACK_DEPTH (0x826D),
         CONTEXT_FLAGS (0x821E),
         CULL_FACE (0xB44),
+        CULL_FACE_MODE (0xB45),
         CURRENT_PROGRAM (0x8B8D),
         DEPTH_CLEAR_VALUE (0xB73),
         DEPTH_FUNC (0xB74),
@@ -855,9 +858,47 @@ public interface GLContext {
         BlendEquation(int t) { e = t; }
     }
 
+    enum DepthFunction {
+        NEVER (0x200),
+        LESS (0x201),
+        EQUAL (0x202),
+        LEQUAL (0x203),
+        GREATER (0x204),
+        NOTEQUAL (0x205),
+        GEQUAL (0x206),
+        ALWAYS (0x207);
+
+        final int e;
+        DepthFunction(int t) { e = t; }
+    }
+
     int COLOR_CLEAR_BIT = 0x4000;
     int DEPTH_BUFFER_BIT = 0x100;
     int STENCIL_BUFFER_BIT = 0x400;
+
+    /**
+     * Searches the {@link Enum} value of Class {@code T} associated
+     * to {@code i} value, or return null. Only works for enums from
+     * {@link GLContext}.
+     * @param en Class of the enum to search
+     * @param i value to convert to
+     * @param <T> type of the enum
+     * @return the enum value or null
+     */
+    static <T extends Enum<T>> T valueOf(Class<T> en, int i) {
+        try {
+            for(java.lang.reflect.Field f : en.getDeclaredFields()) {
+                Object o = f.get(null);
+                if(o.getClass().equals(en)) {
+                    @SuppressWarnings("unchecked") T d = (T) o;
+                    int v = (Integer) en.getDeclaredField("e").get(d);
+                    if (v == i)
+                        return d;
+                }
+            }
+        } catch(Exception ignore) {ignore.printStackTrace();}
+        return null;
+    }
 
     /**
      * Destroys the current context. Any OpenGL api won't
@@ -959,6 +1000,36 @@ public interface GLContext {
     ShaderProgram createShader(String vertex, String fragment);
     ShaderProgram createShader(File vertex, File fragment, File geometry) throws IOException;
     ShaderProgram createShader(File vertex, File fragment) throws IOException;
+
+    /**
+     * Creates a blank Cubemap with the parameters given
+     * @param format format of the pixel internal storage
+     * @param width width of one texture side
+     * @param height height of one texture side
+     * @param eformat format of the pixel for exports
+     * @return a new cubemap texture
+     * @see CubemapTexture
+     */
+    CubemapTexture createCubemap(TextureFormat format, int width, int height, TextureExternalFormat eformat);
+
+    /**
+     * Create a Cubemap loading from files from disk. Files are loaded from
+     * {@code path} with files named:
+     * <ul>
+     *     <li>right.{@code ext}</li>
+     *     <li>left.{@code ext}</li>
+     *     <li>top.{@code ext}</li>
+     *     <li>bottom.{@code ext}</li>
+     *     <li>back.{@code ext}</li>
+     *     <li>front.{@code ext}</li>
+     * </ul>
+     * @param format format of the pixel internal storage
+     * @param path path to the folder containing the 6 images
+     * @param ext extension of the images
+     * @return a new cubemap texture
+     * @throws FileNotFoundException If one file don't exist or cannot be read
+     */
+    CubemapTexture createCubemap(TextureFormat format, File path, String ext) throws FileNotFoundException;
 
     /**
      * Adds an erasable object to be deleted before this GLContext is destroyed
@@ -1130,6 +1201,7 @@ public interface GLContext {
 
     //General utils and stuff
     void depthMask(boolean a);
+    void depthFunc(DepthFunction func);
     void clear(int mask);
     void clearColor(float r, float g, float b, float a);
     void viewport(int x, int y, int width, int height);

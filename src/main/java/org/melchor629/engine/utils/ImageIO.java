@@ -23,6 +23,12 @@ public class ImageIO {
             this.height = height;
             this.components = components;
         }
+
+        public void delete() {
+            if(clear != null) {
+                clear.apply(this);
+            }
+        }
     }
 
     public static ImageData loadImage(final File path) {
@@ -53,7 +59,7 @@ public class ImageIO {
             IntBuffer x = stack.ints(0),
                       y = stack.ints(0),
                    comp = stack.ints(0);
-            data.data = org.lwjgl.stb.STBImage.stbi_load(path.getAbsolutePath(), x, y, comp, 4);
+            data.data = org.lwjgl.stb.STBImage.stbi_load(path.getAbsolutePath(), x, y, comp, 0);
             data.width = x.get();
             data.height = y.get();
             data.components = comp.get();

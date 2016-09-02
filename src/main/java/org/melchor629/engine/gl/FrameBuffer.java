@@ -21,7 +21,7 @@ import org.melchor629.engine.Erasable;
  * @author melchor9000
  */
 public class FrameBuffer implements Erasable {
-    private int fb = -1;
+    private int fb = -1, lastFb;
     private boolean checked;
     private final GLContext gl;
     private RenderBuffer depthRB, stencilRB;
@@ -189,6 +189,7 @@ public class FrameBuffer implements Erasable {
      */
     public void bind() {
         if(fb == -1) throw new GLError("glBindFramebuffer", "Cannot bind a deleted framebuffer");
+        lastFb = gl.getInt(GLContext.GLGet.DRAW_FRAMEBUFFER_BINDING);
         gl.bindFramebuffer(fb);
         checkForErrors();
     }
@@ -197,7 +198,7 @@ public class FrameBuffer implements Erasable {
      * Unbinds this framebuffer
      */
     public void unbind() {
-        gl.bindFramebuffer(0);
+        gl.bindFramebuffer(lastFb);
     }
 
     /**

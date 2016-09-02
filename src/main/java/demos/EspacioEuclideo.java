@@ -4,7 +4,7 @@ import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.*;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.objects.Camera;
-import org.melchor629.engine.utils.BufferUtils;
+import org.melchor629.engine.utils.MemoryUtils;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.ImageIO;
 import org.melchor629.engine.utils.math.Vector3;
@@ -29,12 +29,11 @@ public class EspacioEuclideo extends Game {
     }
 
     private static TreeSet<Vector3> generarEspacioEuclídeo() {
-        FloatBuffer puntos = BufferUtils.createFloatBuffer(10000 * 3);
         TreeSet<Vector3> puntos_lista = new TreeSet<>((o1, o2) ->
                 Math.round((o2.module() - o1.module()) * 1000.f)
         );
 
-        for(int i = 0; i < puntos.capacity() / 3; i++) {
+        for(int i = 0; i < 10000; i++) {
             Vector3 punto = generarPunto((WIDTH + HEIGHT), WIDTH / 20.f, HEIGHT / 20.f);
             while(!esVálido(punto) || !puntos_lista.add(punto))
                 punto = generarPunto((WIDTH + HEIGHT), WIDTH / 20.f, HEIGHT / 20.f);
@@ -119,6 +118,7 @@ public class EspacioEuclideo extends Game {
         System.out.printf("%s %s %f\n", window.getWindowSize(), window.getFramebufferSize(), window.getPixelScaleFactor());
 
         camera = new Camera(this);
+        camera = new Camera(this, new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1));
         camera.setAspectRation(glWIDTH, glHEIGHT);
         camera.setClipPanes(0.1, 100);
         camera.setMovementMultiplier(0);
@@ -129,7 +129,7 @@ public class EspacioEuclideo extends Game {
         puntos_vbo = gl.createBufferObject(GLContext.BufferTarget.ARRAY_BUFFER, GLContext.BufferUsage.STREAM_DRAW);
 
         puntos = generarEspacioEuclídeo();
-        puntos_buff = BufferUtils.createFloatBuffer(puntos.size() * 3);
+        puntos_buff = MemoryUtils.createFloatBuffer(puntos.size() * 3);
         listaABuffer(puntos, (FloatBuffer) puntos_buff.flip());
         plano_vbo.fillBuffer(new float[] {
                 0,  1, -1, 0, 0,
@@ -243,12 +243,13 @@ public class EspacioEuclideo extends Game {
             }
             if("P".equals(self.getStringRepresentation(key))) {
                 post(() -> {
-                    ByteBuffer data = BufferUtils.createByteBuffer(glWIDTH * glHEIGHT * 3);
+                    ByteBuffer data = MemoryUtils.createByteBuffer(glWIDTH * glHEIGHT * 3);
                     gl.readBuffer(GLContext.CullFaceMode.FRONT);
                     gl.readPixels(0, 0, glWIDTH, glHEIGHT, GLContext.TextureFormat.RGB, GLContext.type.UNSIGNED_BYTE, data.asIntBuffer());
                     new Thread(() -> {
                         ImageIO.ImageData d = new ImageIO.ImageData(glWIDTH, glHEIGHT, 3, data);
                         ImageIO.writeImage(new File("/Users/melchor9000/Desktop/mae.png"), d);
+                        MemoryUtils.free(data);
                     }, "Screenshot saver").start();
                 });
             }
@@ -352,5 +353,8 @@ public class EspacioEuclideo extends Game {
     @Override
     public void closing() {
 
+    @Override
+    public void closing() {
+        MemoryUtils.free(puntos_buff);
     }
 }

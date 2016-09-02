@@ -9,6 +9,7 @@ import org.melchor629.engine.utils.math.Matrix3;
 import org.melchor629.engine.utils.math.Matrix4;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.*;
 import java.util.ArrayList;
@@ -993,6 +994,11 @@ public class LWJGLGLContext implements GLContext {
         glDepthMask(a);
     }
 
+    @Override
+    public void depthFunc(DepthFunction func) {
+        glDepthFunc(func.e);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#clear(int)
      */
@@ -1508,6 +1514,16 @@ public class LWJGLGLContext implements GLContext {
     @Override
     public ShaderProgram createShader(File vertex, File fragment) throws IOException {
         return new ShaderProgram(this, vertex, fragment);
+    }
+
+    @Override
+    public CubemapTexture createCubemap(TextureFormat format, int width, int height, TextureExternalFormat eformat) {
+        return new CubemapTexture(this, format, width, height, eformat);
+    }
+
+    @Override
+    public CubemapTexture createCubemap(TextureFormat format, File path, String ext) throws FileNotFoundException {
+        return new CubemapTexture(this, format, path, ext);
     }
 
     @Override

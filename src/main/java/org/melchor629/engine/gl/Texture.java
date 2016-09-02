@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 import org.melchor629.engine.Erasable;
 import org.melchor629.engine.gl.GLContext.TextureExternalFormat;
@@ -12,7 +11,6 @@ import org.melchor629.engine.gl.GLContext.TextureFilter;
 import org.melchor629.engine.gl.GLContext.TextureFormat;
 import org.melchor629.engine.gl.GLContext.TextureParameter;
 import org.melchor629.engine.gl.GLContext.TextureWrap;
-import org.melchor629.engine.utils.BufferUtils;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.ImageIO;
 

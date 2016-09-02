@@ -14,10 +14,12 @@ import org.melchor629.engine.loaders.audio.AudioDecoder;
 import org.melchor629.engine.loaders.audio.AudioPCM;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.objects.Model;
+import org.melchor629.engine.objects.SkyBox;
 import org.melchor629.engine.utils.math.ModelMatrix;
 import org.melchor629.engine.utils.math.Vector3;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class AnotherTestingClass extends Game {
     
@@ -55,6 +57,7 @@ public class AnotherTestingClass extends Game {
     private Camera camera;
     private Cube cube;
     private ModelMatrix cubeModel;
+    private SkyBox skybox;
     
     public static void main(String[] args) {
         new AnotherTestingClass().startEngine();
@@ -87,7 +90,8 @@ public class AnotherTestingClass extends Game {
                     this.post(() -> {
                         sound_source = al.createSource(al.createBuffer(data));
                         sound_source.setPosition(new Vector3(7.5f, 0.f, 0.f));
-                        sound_source.play();
+                        //sound_source.play();
+                        data.close();
                     });
                 }
             } catch(Exception ignore) {ignore.printStackTrace();}
@@ -123,6 +127,12 @@ public class AnotherTestingClass extends Game {
         s.setUniformMatrix("project", camera.getProjectionMatrix());
         s.setUniformMatrix("model", model.getModelMatrix());
 
+        try {
+            skybox = new SkyBox(gl, new File("/Users/melchor9000/Downloads/skybox"), "jpg");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         gl.enable(GLEnable.DEPTH_TEST);
         gl.enable(GLEnable.CULL_FACE);
         gl.clearColor(1, 1, 1, 1);
@@ -140,6 +150,7 @@ public class AnotherTestingClass extends Game {
         cube.draw();
 
         cs.render(camera);
+        skybox.render(camera);
 
         camera.updateIfNeeded();
         al.getListener().setPosition(camera.getPosition());
