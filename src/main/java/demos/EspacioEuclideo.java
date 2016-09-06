@@ -1,7 +1,10 @@
 package demos;
 
+import org.lwjgl.nanovg.NVGColor;
+import org.lwjgl.nanovg.NanoVG;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.*;
+import org.melchor629.engine.gui.GUIDrawUtils;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.utils.MemoryUtils;
@@ -10,6 +13,7 @@ import org.melchor629.engine.utils.ImageIO;
 import org.melchor629.engine.utils.math.Vector3;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -86,6 +90,7 @@ public class EspacioEuclideo extends Game {
         width = 1280;
         height = 720;
         title = "Espacio Euclídeo";
+        enableGui = true;
         startEngine();
     }
 
@@ -117,7 +122,6 @@ public class EspacioEuclideo extends Game {
         glHEIGHT = window.getFramebufferSize().height;
         System.out.printf("%s %s %f\n", window.getWindowSize(), window.getFramebufferSize(), window.getPixelScaleFactor());
 
-        camera = new Camera(this);
         camera = new Camera(this, new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1));
         camera.setAspectRation(glWIDTH, glHEIGHT);
         camera.setClipPanes(0.1, 100);
@@ -270,6 +274,9 @@ public class EspacioEuclideo extends Game {
                 current = andres_tex;
             if("8".equals(self.getStringRepresentation(key)))
                 current = amgela_tex;
+
+            if("F1".equals(self.getStringRepresentation(key)))
+                gui.toggleShow();
         });
 
         window.addResizeEventListener((width, height) -> {
@@ -282,6 +289,12 @@ public class EspacioEuclideo extends Game {
             });
             camera.setAspectRation(width, height);
         });
+
+        try {
+            gui.loadFont("Ubuntu", new File("/Users/melchor9000/Library/Fonts/Ubuntu-R.ttf"));
+        } catch (FileNotFoundException ignore) {}
+        gui.setFont("Ubuntu", 20);
+        gui.hide();
 
         window.showWindow();
     }
@@ -351,7 +364,21 @@ public class EspacioEuclideo extends Game {
     }
 
     @Override
-    public void closing() {
+    public void gui(long nvgCtx) {
+        NVGColor c = NVGColor.calloc();
+        NanoVG.nvgFillColor(nvgCtx, NanoVG.nvgRGBAf(0f, 0f, 0f, 0.65f, c));
+        GUIDrawUtils.drawRoundedRectangle(0, 0, 205, 145, 0, 0, 0, 5);
+        NanoVG.nvgFillColor(nvgCtx, NanoVG.nvgRGBA((byte) 255, (byte) 192, (byte) 0, (byte) 255, c));
+        gui.setFontSize(20);
+        int i = 0;
+        gui.drawText(10, 30 + 20*(i++), "==== Debug info ====");
+        gui.drawText(10, 30 + 20*(i++), "%d FPS (%.2f)", this.t.fps, 1/this.t.frameTime);
+        gui.drawText(10, 30 + 20*(i++), "%d visible points", cantidad);
+        gui.drawText(10, 30 + 20*(i++), "%sabled drugs", phosphorEffectEnabler ? "En" : "Dis");
+        gui.drawText(10, 30 + 20*(i++), "%.0f u of X position", camera.getPosition().x());
+        gui.drawText(10, 30 + 20 * i, "==================");
+        c.free();
+    }
 
     @Override
     public void closing() {

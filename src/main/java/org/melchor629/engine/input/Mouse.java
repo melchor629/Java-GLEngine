@@ -54,13 +54,19 @@ public abstract class Mouse {
      * Another array with more listeners
      */
     private final ArrayList<OnButtonPressedEvent> listeners3;
-    
+
+    /**
+     * And another array with even more listeners
+     */
+    private final ArrayList<OnWheelMoveEvent> listeners4;
+
 
     public Mouse() {
         mousePressed = new boolean[20];
         listeners = new ArrayList<>();
         listeners2 = new ArrayList<>();
         listeners3 = new ArrayList<>();
+        listeners4 = new ArrayList<>();
         sensibility = 1.f;
         pos = new Vector2();
         dPos = new Vector2();
@@ -90,6 +96,14 @@ public abstract class Mouse {
     public void addListener(OnButtonPressedEvent e) {
         listeners3.add(e);
     }
+
+    /**
+     * Adds a listener for the event {@link Mouse.OnWheelMoveEvent}
+     * @param e Event listener
+     */
+    public void addListener(OnWheelMoveEvent e) {
+        listeners4.add(e);
+    }
     
     /**
      * Fire all listeners for the event {@link Mouse.OnMouseClickEvent}.
@@ -110,10 +124,20 @@ public abstract class Mouse {
         if(wheel.x() != 0 || wheel.y() != 0 || dPos.x() != 0 || dPos.y() != 0) {
             for(OnMouseMoveEvent e : listeners2)
                 e.invoke(this, delta);
-            wheel.x(0.f);
-            wheel.y(0.f);
             dPos.x(0.f);
             dPos.y(0.f);
+        }
+    }
+
+    /**
+     * Fire all listeners for the event {@link Mouse.OnWheelMoveEvent}.
+     */
+    protected void fireWheelMove() {
+        if(wheel.x() != 0 || wheel.y() != 0) {
+            for(OnWheelMoveEvent e : listeners4)
+                e.invoke(this);
+            wheel.x(0.f);
+            wheel.y(0.f);
         }
     }
 
@@ -244,5 +268,13 @@ public abstract class Mouse {
      */
     public interface OnButtonPressedEvent {
         void invoke(Mouse self, double delta);
+    }
+
+    /**
+     * {@code OnWheelMoveEvent} interface. This event is called when
+     * the mouse wheel is moved.
+     */
+    public interface OnWheelMoveEvent {
+        void invoke(Mouse self);
     }
 }

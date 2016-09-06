@@ -28,6 +28,7 @@ public abstract class Keyboard {
     protected final ArrayList<OnKeyboardEvent> listeners;
     protected final ArrayList<OnPressKeyEvent> listeners2;
     protected final ArrayList<OnReleaseKeyEvent> listeners3;
+    protected final ArrayList<OnCharacterEvent> listeners4;
     
     public Keyboard() {
         keysPressed = new boolean[1024];
@@ -35,6 +36,7 @@ public abstract class Keyboard {
         listeners = new ArrayList<>();
         listeners2 = new ArrayList<>();
         listeners3 = new ArrayList<>();
+        listeners4 = new ArrayList<>();
     }
     
     /**
@@ -61,6 +63,16 @@ public abstract class Keyboard {
      */
     public final void addListener(OnReleaseKeyEvent l) {
         listeners3.add(l);
+    }
+
+    /**
+     * Ads a listener for the {@code OnCharacterEvent}.
+     * This event is fired every time a key with character
+     * representation is pressed.
+     * @param l Listener
+     */
+    public final void addListener(OnCharacterEvent l) {
+        listeners4.add(l);
     }
     
     /**
@@ -123,6 +135,10 @@ public abstract class Keyboard {
     protected final void fireReleaseEvent(int key) {
         listeners3.forEach((l) -> l.invoke(this, key));
     }
+
+    protected final void fireCharacterEvent(String rep) {
+        listeners4.forEach(l -> l.invoke(this, rep));
+    }
     
     /**
      * {@code OnKeyboardEvent} interface. This Event is fired
@@ -147,5 +163,15 @@ public abstract class Keyboard {
      */
     public interface OnReleaseKeyEvent {
         void invoke(Keyboard self, int key);
+    }
+
+    /**
+     * {@code OnCharacterEvent} interface. Event fired
+     * every time a key with a character representation
+     * (<i>like O or 1</i>) is pressed. Useful for input
+     * text.
+     */
+    public interface OnCharacterEvent {
+        void invoke(Keyboard self, String character);
     }
 }

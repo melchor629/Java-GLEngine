@@ -3,6 +3,7 @@ package org.melchor629.engine;
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.Window;
+import org.melchor629.engine.gui.GUI;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.utils.ShaderManager;
@@ -24,7 +25,7 @@ public abstract class Game {
     private static final Logger LOG = Logger.getLogger(Game.class);
 
     protected short width, height;
-    protected boolean fullscreen, resizable, vsync;
+    protected boolean fullscreen, resizable, vsync, enableGui = false;
     protected String title;
     protected Timing t;
     protected Queue<Runnable> events;
@@ -33,6 +34,7 @@ public abstract class Game {
     protected AL al;
     protected TextureManager textureManager;
     protected ShaderManager shaderManager;
+    protected GUI gui;
 
     private final Lock lock = new ReentrantLock(true);
     private final Condition waitClosing;
@@ -58,8 +60,10 @@ public abstract class Game {
     private void makeGame() {
         Thread renderLoop = new Thread(this::wrapRenderLoop, "RenderLoop");
         renderLoop.setName("Render Loop");
+        renderLoop.setPriority(Thread.MAX_PRIORITY);
         renderLoop.start();
 
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         while(!window.windowShouldClose()) {
             window.waitEvents();
         }
@@ -89,6 +93,10 @@ public abstract class Game {
         textureManager = new TextureManager(gl);
         shaderManager = new ShaderManager(gl);
 
+        if(enableGui) {
+            gui = new GUI(gl, window);
+        }
+
         init();
 
         window.getKeyboardController().addListener((Keyboard.OnPressKeyEvent) (self, key) -> {
@@ -98,7 +106,14 @@ public abstract class Game {
 
         t = Timing.getGameTiming();
         while(!destroyed) {
-            render();
+            if(enableGui) {
+                gui.render(this::render);
+                t.split("render");
+                gui.gui(this::gui);
+                t.split("gui");
+            } else {
+                render();
+            }
 
             lock.lock();
             if(!destroyed) {
@@ -114,6 +129,7 @@ public abstract class Game {
         lock.lock();
         window.hideWindow();
         closing();
+        if(enableGui) gui.delete();
         gl.destroyContext();
         waitClosing.signal();
         lock.unlock();
@@ -154,6 +170,8 @@ public abstract class Game {
     public abstract void render();
 
     public abstract void closing();
+
+    public void gui(long nvCtx) {}
 
     public final Mouse getMouse() {
         return window.getMouseController();

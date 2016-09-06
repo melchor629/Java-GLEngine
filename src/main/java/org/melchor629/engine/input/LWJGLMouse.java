@@ -58,8 +58,7 @@ public class LWJGLMouse extends Mouse {
             public void invoke(long window, double xoffset, double yoffset) {
                 LWJGLMouse.this.wheel.x((float) xoffset);
                 LWJGLMouse.this.wheel.y((float) yoffset);
-
-                LWJGLMouse.this.fireMouseMove(Timing.getGameTiming().frameTime);
+                LWJGLMouse.this.fireWheelMove();
             }
         });
     }

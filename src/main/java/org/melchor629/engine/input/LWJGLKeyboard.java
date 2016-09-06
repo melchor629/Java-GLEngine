@@ -5,6 +5,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import java.lang.reflect.Field;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCharModsCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.melchor629.engine.gl.LWJGLWindow;
 
@@ -19,7 +20,8 @@ import org.melchor629.engine.gl.LWJGLWindow;
  * @author melchor9000
  */
 public class LWJGLKeyboard extends Keyboard {
-    private static GLFWKeyCallback kCbk;
+    private GLFWKeyCallback kCbk;
+    private GLFWCharModsCallback kkCbk;
 
     public LWJGLKeyboard(LWJGLWindow window) {
         super();
@@ -39,6 +41,14 @@ public class LWJGLKeyboard extends Keyboard {
                 LWJGLKeyboard.this.controlPressed = (mods & GLFW_MOD_CONTROL) == GLFW_MOD_CONTROL;
                 LWJGLKeyboard.this.altPressed = (mods & GLFW_MOD_ALT) == GLFW_MOD_ALT;
                 LWJGLKeyboard.this.superPressed = (mods & GLFW_MOD_SUPER) == GLFW_MOD_SUPER;
+            }
+        });
+
+        glfwSetCharModsCallback(window.window, kkCbk = new GLFWCharModsCallback() {
+            @Override
+            public void invoke(long window, int codepoint, int mods) {
+                String rep = String.valueOf(Character.toChars(codepoint));
+                LWJGLKeyboard.this.fireCharacterEvent(rep);
             }
         });
     }
@@ -85,6 +95,7 @@ public class LWJGLKeyboard extends Keyboard {
     @Override
     public void release() {
         kCbk.free();
+        kkCbk.free();
     }
 
 }
