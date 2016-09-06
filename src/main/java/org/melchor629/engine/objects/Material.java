@@ -143,7 +143,7 @@ public class Material {
 
         //TODO Eliminar
         //phongShader.setUniform("light.pos", 4.076245f, 1.005454f, 5.903862f);
-        phongShader.setUniform("light.pos", camera.pos.x(), camera.pos.y(), camera.pos.z());
+        phongShader.setUniform("light.pos", camera.getPosition().x(), camera.getPosition().y(), camera.getPosition().z());
         phongShader.setUniform("light.dir", camera.getLookingAtDirection().x(), camera.getLookingAtDirection().y(),
                 camera.getLookingAtDirection().z());
         phongShader.setUniform("light.cutOff", (float) Math.toRadians(12.5));
