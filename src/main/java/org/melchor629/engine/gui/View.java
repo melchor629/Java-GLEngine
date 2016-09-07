@@ -4,10 +4,7 @@ import org.melchor629.engine.gui.eventListeners.*;
 import org.melchor629.engine.input.Keyboard;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.lwjgl.nanovg.NanoVG.*;
 
@@ -41,60 +38,81 @@ public abstract class View {
     private List<OnMouseExit> mouseExitListeners = new ArrayList<>();
     private List<OnMouseMove> mouseMoveListeners = new ArrayList<>();
     private List<OnMouseUp> mouseUpListeners = new ArrayList<>();
-    private List<OnPropertyChange> propertyChangeListeners = new ArrayList<>();
+    private Map<String, List<OnPropertyChange>> propertyChangeListeners = new TreeMap<>();
 
     boolean hover = false;
     boolean clicked = false;
     boolean focus = false;
+    boolean dirty = true;
 
     View() {
         ctx = GUI.gui.nvgCtx;
     }
 
     public void x(float x) {
+        opc("x", this.x, x);
         this.x = x;
         frame = null;
     }
 
     public void y(float y) {
+        opc("y", this.y, y);
         this.y = y;
         frame = null;
     }
 
     public void width(Float width) {
+        opc("width", this.width, width);
         this.width = width;
         frame = null;
     }
 
     public void height(Float height) {
+        opc("height", this.height, height);
         this.height = height;
         frame = null;
     }
 
     public void position(float x, float y) {
+        opc("x", this.x, x);
+        opc("y", this.y, y);
         this.x = x;
         this.y = y;
         frame = null;
     }
 
     public void size(Float width, Float height) {
+        opc("width", this.width, width);
+        opc("height", this.height, height);
         this.width = width;
         this.height = height;
         frame = null;
     }
 
     public void padding(float padding) {
+        opc("paddingLeft", this.paddingLeft, padding);
+        opc("paddingRight", this.paddingRight, padding);
+        opc("paddingTop", this.paddingTop, padding);
+        opc("paddingBottom", this.paddingBottom, padding);
         paddingLeft = paddingRight = paddingTop = paddingBottom = padding;
         frame = null;
     }
 
     public void padding(float topBotPadding, float leftRightPadding) {
+        opc("paddingLeft", this.paddingLeft, leftRightPadding);
+        opc("paddingRight", this.paddingRight, leftRightPadding);
+        opc("paddingTop", this.paddingTop, topBotPadding);
+        opc("paddingBottom", this.paddingBottom, topBotPadding);
         paddingLeft = paddingRight = leftRightPadding;
         paddingTop = paddingBottom = topBotPadding;
         frame = null;
     }
 
     public void padding(float topPadding, float leftRightPadding, float botPadding) {
+        opc("paddingLeft", this.paddingLeft, leftRightPadding);
+        opc("paddingRight", this.paddingRight, leftRightPadding);
+        opc("paddingTop", this.paddingTop, topPadding);
+        opc("paddingBottom", this.paddingBottom, botPadding);
         paddingLeft = paddingRight = leftRightPadding;
         paddingTop = topPadding;
         paddingBottom = botPadding;
@@ -102,6 +120,10 @@ public abstract class View {
     }
 
     public void padding(float topPadding, float rightPadding, float botPadding, float leftPadding) {
+        opc("paddingLeft", this.paddingLeft, leftPadding);
+        opc("paddingRight", this.paddingRight, rightPadding);
+        opc("paddingTop", this.paddingTop, topPadding);
+        opc("paddingBottom", this.paddingBottom, botPadding);
         paddingLeft = leftPadding;
         paddingRight = rightPadding;
         paddingTop = topPadding;
@@ -110,42 +132,62 @@ public abstract class View {
     }
 
     public void paddingLeft(float padding) {
+        opc("paddingLeft", this.paddingLeft, padding);
         paddingLeft = padding;
         frame = null;
     }
 
     public void paddingRight(float padding) {
+        opc("paddingRight", this.paddingRight, padding);
         paddingRight = padding;
         frame = null;
     }
 
     public void paddingTop(float padding) {
+        opc("paddingTop", this.paddingTop, padding);
         paddingTop = padding;
         frame = null;
     }
 
     public void paddingBottom(float padding) {
+        opc("paddingBottom", this.paddingBottom, padding);
         paddingBottom = padding;
         frame = null;
     }
 
     public void borderRadius(float borderRadius) {
+        opc("borderRadiusTopLeft", this.borderRadiusTopLeft, borderRadius);
+        opc("borderRadiusTopRight", this.borderRadiusTopRight, borderRadius);
+        opc("borderRadiusBottomLeft", this.borderRadiusBottomLeft, borderRadius);
+        opc("borderRadiusBottomRight", this.borderRadiusBottomRight, borderRadius);
         borderRadiusTopLeft = borderRadiusTopRight = borderRadiusBottomLeft = borderRadiusBottomRight = borderRadius;
         frame = null;
     }
 
     public void borderRadius(float a, float b) {
+        opc("borderRadiusTopLeft", this.borderRadiusTopLeft, a);
+        opc("borderRadiusTopRight", this.borderRadiusTopRight, b);
+        opc("borderRadiusBottomLeft", this.borderRadiusBottomLeft, b);
+        opc("borderRadiusBottomRight", this.borderRadiusBottomRight, a);
         borderRadiusTopLeft = borderRadiusBottomRight = a;
         borderRadiusTopRight = borderRadiusBottomLeft = b;
     }
 
     public void borderRadius(float topLeft, float b, float bottomRight) {
+        opc("borderRadiusTopLeft", this.borderRadiusTopLeft, topLeft);
+        opc("borderRadiusTopRight", this.borderRadiusTopRight, b);
+        opc("borderRadiusBottomLeft", this.borderRadiusBottomLeft, b);
+        opc("borderRadiusBottomRight", this.borderRadiusBottomRight, bottomRight);
         borderRadiusTopLeft = topLeft;
         borderRadiusBottomRight = bottomRight;
         borderRadiusTopRight = borderRadiusBottomLeft = b;
     }
 
     public void borderRadius(float topLeft, float topRight, float bottomRight, float bottomLeft) {
+        opc("borderRadiusTopLeft", this.borderRadiusTopLeft, topLeft);
+        opc("borderRadiusTopRight", this.borderRadiusTopRight, topRight);
+        opc("borderRadiusBottomLeft", this.borderRadiusBottomLeft, bottomLeft);
+        opc("borderRadiusBottomRight", this.borderRadiusBottomRight, bottomRight);
         borderRadiusTopLeft = topLeft;
         borderRadiusBottomRight = bottomRight;
         borderRadiusTopRight = topRight;
@@ -153,48 +195,58 @@ public abstract class View {
     }
 
     public void borderRadiusTopLeft(float borderRadius) {
+        opc("borderRadiusTopLeft", this.borderRadiusTopLeft, borderRadius);
         borderRadiusTopLeft = borderRadius;
         frame = null;
     }
 
     public void borderRadiusTopRight(float borderRadius) {
+        opc("borderRadiusTopRight", this.borderRadiusTopRight, borderRadius);
         borderRadiusTopRight = borderRadius;
         frame = null;
     }
 
     public void borderRadiusBottomLeft(float borderRadius) {
+        opc("borderRadiusBottomLeft", this.borderRadiusBottomLeft, borderRadius);
         borderRadiusBottomLeft = borderRadius;
         frame = null;
     }
 
     public void borderRadiusBottomRight(float borderRadius) {
+        opc("borderRadiusBottomRight", this.borderRadiusBottomRight, borderRadius);
         borderRadiusBottomRight = borderRadius;
         frame = null;
     }
 
     public void opacity(float opacity) {
+        opc("opacity", this.opacity, opacity);
         this.opacity = opacity;
     }
 
     public void backgroundColor(Color bgcolor) {
+        opc("backgroundColor", this.backgroundColor, backgroundColor);
         backgroundColor = bgcolor;
     }
 
     public void color(Color color) {
+        opc("color", this.color, color);
         this.color = color;
     }
 
     public void backgroundImage(Image image) {
+        opc("backgroundImage", this.backgroundImage, backgroundImage);
         this.backgroundImage = image;
         this.backgroundGradient = null;
     }
 
     public void backgroundImage(Gradient gradient) {
+        opc("backgroundImage", this.backgroundImage, backgroundImage);
         this.backgroundImage = null;
         this.backgroundGradient = gradient;
     }
 
     public void visible(boolean visible) {
+        opc("visible", this.visible, visible);
         this.visible = visible;
     }
 
@@ -238,8 +290,12 @@ public abstract class View {
         mouseUpListeners.add(listener);
     }
 
-    public void addEventListener(OnPropertyChange listener) {
-        propertyChangeListeners.add(listener);
+    public void addPropertyObserver(String name, OnPropertyChange listener) {
+        getProperty(name);
+        if(!propertyChangeListeners.containsKey(name)) {
+            propertyChangeListeners.put(name, new ArrayList<>());
+        }
+        propertyChangeListeners.get(name).add(listener);
     }
 
     public boolean removeEventListener(OnBlur listener) {
@@ -282,8 +338,9 @@ public abstract class View {
         return mouseUpListeners.remove(listener);
     }
 
-    public boolean removeEventListener(OnPropertyChange listener) {
-        return propertyChangeListeners.remove(listener);
+    public boolean removePropertyObserver(String name, OnPropertyChange listener) {
+        getProperty(name);
+        return propertyChangeListeners.containsKey(name) && propertyChangeListeners.get(name).remove(listener);
     }
 
     public void setHoverAnimation(StateAnimation anim) {
@@ -311,6 +368,7 @@ public abstract class View {
             paint();
             nvgGlobalAlpha(ctx, 1);
         }
+        dirty = false;
     }
 
     /**
@@ -321,16 +379,24 @@ public abstract class View {
      */
     public final <T> void setProperty(String name, T property) {
         Class<?> clazz = this.getClass();
-        while(!clazz.equals(Object.class)) {
+        boolean doneSetting = false;
+        while(!clazz.equals(Object.class) && !doneSetting) {
             try {
-                clazz.getDeclaredField(name).set(this, property);
-            } catch (IllegalAccessException | NoSuchFieldException ignore) {
+                Object old = clazz.getDeclaredMethod(name).invoke(this);
+                clazz.getDeclaredMethod(name, property.getClass()).invoke(this, property);
+                doneSetting = true;
+                opc(name, old, property);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | NullPointerException ignore2) {
                 try {
-                    clazz.getDeclaredMethod(name, property.getClass()).invoke(this, property);
-                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | NullPointerException ignore2) { }
+                    Object old = clazz.getDeclaredField(name).get(this);
+                    clazz.getDeclaredField(name).set(this, property);
+                    doneSetting = true;
+                    opc(name, old, property);
+                } catch (IllegalAccessException | NoSuchFieldException ignore) { }
             }
             clazz = clazz.getSuperclass();
         }
+        if(!doneSetting) throw new NoSuchFieldError("No property called '" + name + "'");
     }
 
     /**
@@ -352,7 +418,7 @@ public abstract class View {
             }
             clazz = clazz.getSuperclass();
         }
-        return null;
+        throw new NoSuchFieldError("No property called '" + name + "'");
     }
 
     protected abstract void paint();
@@ -372,6 +438,12 @@ public abstract class View {
         GUIDrawUtils.drawRoundedRectangle(0, 0, frame.width, frame.height, borderRadiusTopLeft, borderRadiusTopRight, borderRadiusBottomLeft, borderRadiusBottomRight);
         nvgFill(ctx);
         nvgRestore(ctx);
+    }
+
+    protected void opc(String name, Object old, Object new_) {
+        if(propertyChangeListeners.containsKey(name))
+            propertyChangeListeners.get(name).forEach(p -> p.propertyChanged(name, old, new_));
+        dirty = true;
     }
 
     protected void onMouseDown(MouseEvent e) {

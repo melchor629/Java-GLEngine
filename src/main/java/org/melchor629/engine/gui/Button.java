@@ -21,13 +21,8 @@ public class Button extends TextLabel {
                 new Animation.Property<Object>("color", Color.rgb(0.1, 0.1, 0.1))));
     }
 
-    public void label(String label) {
-        this.label = label;
-        frame = null;
-        effectiveFrame();
-    }
-
     public void disabled(boolean disabled) {
+        opc("disabled", this.disabled, disabled);
         this.disabled = disabled;
     }
 

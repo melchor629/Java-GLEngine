@@ -9,10 +9,10 @@ import static org.lwjgl.nanovg.NanoVG.*;
  */
 public class TextLabel extends View {
     protected String label;
-    protected VerticalAlign align = VerticalAlign.LEFT;
-    protected HorizontalAlign align2 = HorizontalAlign.CENTER;
+    protected VerticalAlign textAlign = VerticalAlign.LEFT;
+    protected HorizontalAlign textAlign2 = HorizontalAlign.CENTER;
     protected float fontSize = 14;
-    protected String fontName;
+    protected String font;
 
     public TextLabel(String label) {
         this.label = label;
@@ -20,26 +20,39 @@ public class TextLabel extends View {
         backgroundColor = Color.transparent();
     }
 
+    public void label(String label) {
+        opc("label", this.label, label);
+        this.label = label;
+        frame = null;
+        effectiveFrame();
+    }
+
     public void textAlign(VerticalAlign align) {
-        this.align = align;
+        opc("textAlign", this.textAlign, align);
+        this.textAlign = align;
     }
 
     public void textAlign(HorizontalAlign align) {
-        this.align2 = align;
+        opc("textAlign", this.textAlign2, align);
+        this.textAlign2 = align;
     }
 
     public void textAlign(VerticalAlign va, HorizontalAlign ha) {
-        align = va;
-        align2 = ha;
+        opc("textAlign", this.textAlign, va);
+        opc("textAlign", this.textAlign2, ha);
+        textAlign = va;
+        textAlign2 = ha;
     }
 
     public void fontSize(float fontSize) {
+        opc("fontSize", this.fontSize, fontSize);
         this.fontSize = fontSize;
     }
 
     public void font(String font) {
         if(!GUI.gui.isFontLoaded(font)) throw new NoSuchElementException("Font named " + font + " is not loaded");
-        fontName = font;
+        opc("font", this.font, font);
+        this.font = font;
     }
 
     @Override
@@ -55,29 +68,29 @@ public class TextLabel extends View {
 
         int alignHor = NVG_ALIGN_TOP, alignVert = NVG_ALIGN_LEFT;
         float fx = 0, fy = 0;
-        if(align == VerticalAlign.LEFT || width == null) {
+        if(textAlign == VerticalAlign.LEFT || width == null) {
             alignVert = NVG_ALIGN_LEFT;
             fx = 0;
-        } else if(align == VerticalAlign.CENTER) {
+        } else if(textAlign == VerticalAlign.CENTER) {
             alignVert = NVG_ALIGN_CENTER;
             fx = width / 2;
-        } else if(align == VerticalAlign.RIGHT) {
+        } else if(textAlign == VerticalAlign.RIGHT) {
             alignVert = NVG_ALIGN_RIGHT;
             fx = width;
         }
 
-        if(align2 == HorizontalAlign.TOP || height == null) {
+        if(textAlign2 == HorizontalAlign.TOP || height == null) {
             alignHor = NVG_ALIGN_TOP;
             fy = 0;
-        } else if(align2 == HorizontalAlign.CENTER) {
+        } else if(textAlign2 == HorizontalAlign.CENTER) {
             alignHor = NVG_ALIGN_MIDDLE;
             fy = height / 2;
-        } else if(align2 == HorizontalAlign.BOTTOM) {
+        } else if(textAlign2 == HorizontalAlign.BOTTOM) {
             alignHor = NVG_ALIGN_BOTTOM;
             fy = height;
         }
 
-        if(fontName != null) GUI.gui.setFont(fontName, fontSize);
+        if(font != null) GUI.gui.setFont(font, fontSize);
         nvgTextAlign(ctx, alignHor | alignVert);
         nvgText(ctx, x + fx, y + fy, label, 0);
     }

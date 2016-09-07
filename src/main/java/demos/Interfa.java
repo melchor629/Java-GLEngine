@@ -122,12 +122,11 @@ public class Interfa extends Game {
         //new Animation(raulgolfo, 10, new Animation.Property<>("opacity", 1f)).setDelay(1).setEasing(QuadEasing.easing, Easing.Type.IN).startAnimation();
 
         gl.clearColor(1, 1, 1, 1);
-        gl.clear(GLContext.COLOR_CLEAR_BIT);
     }
 
     @Override
     public void render() {
-
+        gl.clear(GLContext.COLOR_CLEAR_BIT);
     }
 
     @Override

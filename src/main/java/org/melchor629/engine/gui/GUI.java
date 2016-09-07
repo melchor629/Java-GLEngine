@@ -159,7 +159,6 @@ public class GUI implements Erasable {
         hidegui = hideguic;
         if(!hidegui) {
             renderFBO.bind();
-            gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT | GLContext.STENCIL_BUFFER_BIT);
             render.render();
             renderFBO.unbind();
         } else {
@@ -197,7 +196,7 @@ public class GUI implements Erasable {
             //Render GUI
             NanoVGGL3.nvgluBindFramebuffer(nvgCtx, nvgFB);
             gl.clearColor(0, 0, 0, 0);
-            gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT | GLContext.STENCIL_BUFFER_BIT);
+            gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.STENCIL_BUFFER_BIT);
             NanoVG.nvgBeginFrame(nvgCtx, width, height, scaleFactor);
             isRenderingGUI = true;
 
