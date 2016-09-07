@@ -1,7 +1,5 @@
 package org.melchor629.engine.gui;
 
-import org.lwjgl.nanovg.NVGColor;
-
 import java.util.NoSuchElementException;
 
 import static org.lwjgl.nanovg.NanoVG.*;
@@ -46,16 +44,13 @@ public class TextLabel extends View {
 
     @Override
     protected void paint() {
-        NVGColor color = NVGColor.malloc();
-        backgroundColor.convert(color);
+        backgroundColor.setAsFillColor();
 
         nvgBeginPath(ctx);
-        nvgFillColor(ctx, color);
         GUIDrawUtils.drawRoundedRectangle(frame.x, frame.y, frame.width, frame.height, borderRadiusTopLeft, borderRadiusTopRight, borderRadiusBottomLeft, borderRadiusBottomRight);
 
-        this.color.convert(color);
+        this.color.setAsFillColor();
         if(width != null || height != null) nvgIntersectScissor(ctx, frame.x, frame.y, frame.width, frame.height);
-        nvgFillColor(ctx, color);
         nvgFontSize(ctx, fontSize);
 
         int alignHor = NVG_ALIGN_TOP, alignVert = NVG_ALIGN_LEFT;
@@ -85,8 +80,6 @@ public class TextLabel extends View {
         if(fontName != null) GUI.gui.setFont(fontName, fontSize);
         nvgTextAlign(ctx, alignHor | alignVert);
         nvgText(ctx, x + fx, y + fy, label, 0);
-
-        color.free();
     }
 
     @Override

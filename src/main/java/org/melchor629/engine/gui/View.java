@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.nanovg.NanoVG.nvgGlobalAlpha;
+import static org.lwjgl.nanovg.NanoVG.*;
 
 /**
  * Base class for any object renderable for the GUI
@@ -24,6 +24,8 @@ public abstract class View {
     protected Float width, height;
     protected Color backgroundColor = Color.transparent();
     protected Color color = Color.black();
+    protected Image backgroundImage = null;
+    protected Gradient backgroundGradient = null;
     protected boolean visible = true;
 
     private StateAnimation hoverState, clickedState, focusState;
@@ -182,6 +184,16 @@ public abstract class View {
         this.color = color;
     }
 
+    public void backgroundImage(Image image) {
+        this.backgroundImage = image;
+        this.backgroundGradient = null;
+    }
+
+    public void backgroundImage(Gradient gradient) {
+        this.backgroundImage = null;
+        this.backgroundGradient = gradient;
+    }
+
     public void visible(boolean visible) {
         this.visible = visible;
     }
@@ -295,6 +307,7 @@ public abstract class View {
         if(frame == null) effectiveFrame();
         if(visible) {
             nvgGlobalAlpha(ctx, opacity);
+            paintBackground();
             paint();
             nvgGlobalAlpha(ctx, 1);
         }
@@ -345,6 +358,21 @@ public abstract class View {
     protected abstract void paint();
 
     public abstract Frame effectiveFrame();
+
+    private void paintBackground() {
+        nvgSave(ctx);
+        nvgTranslate(ctx, frame.x, frame.y);
+        if(backgroundImage != null) {
+            backgroundImage.setAsFillPaint();
+        } else if(backgroundGradient != null) {
+            backgroundGradient.setAsFillPaint();
+        } else {
+            backgroundColor.setAsFillColor();
+        }
+        GUIDrawUtils.drawRoundedRectangle(0, 0, frame.width, frame.height, borderRadiusTopLeft, borderRadiusTopRight, borderRadiusBottomLeft, borderRadiusBottomRight);
+        nvgFill(ctx);
+        nvgRestore(ctx);
+    }
 
     protected void onMouseDown(MouseEvent e) {
         clicked = true;

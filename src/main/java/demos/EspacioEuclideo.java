@@ -83,13 +83,12 @@ public class EspacioEuclideo extends Game {
     }
 
     private EspacioEuclideo() {
-        super(new LWJGLWindow(), null);
-        window.setResizable(false);
-        window.setVisible(false);
-        window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
-        width = 1280;
-        height = 720;
-        title = "Espacio Euclídeo";
+        super(new LWJGLWindow.Builder()
+                .setResizable(false)
+                .setVisible(false)
+                .setOpenGLContextVersion(WindowBuilder.OpenGLContextVersion.GL_33)
+                .setTitle("Espacio Euclídeo")
+                .create(1280, 720), null);
         enableGui = true;
         startEngine();
     }

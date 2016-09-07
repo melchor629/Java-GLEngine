@@ -24,9 +24,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Game {
     private static final Logger LOG = Logger.getLogger(Game.class);
 
-    protected short width, height;
-    protected boolean fullscreen, resizable, vsync, enableGui = false;
-    protected String title;
+    protected int width, height;
+    protected boolean enableGui = false;
     protected Timing t;
     protected Queue<Runnable> events;
     protected Window window;
@@ -44,17 +43,12 @@ public abstract class Game {
      * Default constructor for test games
      */
     protected Game(Window window, AL audio) {
-        width = 1280;
-        height = 720;
-        fullscreen = false;
-        resizable = false;
-        vsync = true;
-        title = "";
-
         events = new ConcurrentLinkedQueue<>();
         waitClosing = lock.newCondition();
         this.window = window;
         this.al = audio;
+        width = window.getWindowSize().width;
+        height = window.getWindowSize().height;
     }
 
     private void makeGame() {
@@ -85,7 +79,7 @@ public abstract class Game {
     }
 
     private void wrapRenderLoop() {
-        gl = window.createContext();
+        gl = window.makeContextOnCurrentThread();
         if(al != null) {
             al.createContext();
         }
@@ -94,7 +88,7 @@ public abstract class Game {
         shaderManager = new ShaderManager(gl);
 
         if(enableGui) {
-            gui = new GUI(gl, window);
+            gui = new GUI(this, gl, window);
         }
 
         init();
@@ -106,6 +100,7 @@ public abstract class Game {
 
         t = Timing.getGameTiming();
         while(!destroyed) {
+                while(!events.isEmpty()) events.poll().run();
             if(enableGui) {
                 gui.render(this::render);
                 t.split("render");
@@ -121,7 +116,6 @@ public abstract class Game {
                 t.update();
                 window.getKeyboardController().fireEvent(t.frameTime);
                 window.getMouseController().update(t.frameTime);
-                while(!events.isEmpty()) events.poll().run();
             }
             lock.unlock();
         }
@@ -140,28 +134,20 @@ public abstract class Game {
     }
 
     protected final void startEngine() {
-        if(fullscreen) {
-            window.createFullscreenWindow(width, height, title);
-            LOG.debug("Created fullscreen window %dx%d with title %s", width, height, title);
-        } else {
-            window.createWindow(width, height, title);
-            LOG.debug("Created window %dx%d with title %s", width, height, title);
-        }
-
         window.addResizeEventListener((newWidth, newHeight) -> {
-            this.width = (short) newWidth;
-            this.height = (short) newHeight;
+            this.width = newWidth;
+            this.height = newHeight;
             post(() -> gl.viewport(0, 0, window.getFramebufferSize().width, window.getFramebufferSize().height));
         });
 
         makeGame();
     }
 
-    protected final void post(Runnable r) {
+    public final void post(Runnable r) {
         events.add(r);
     }
 
-    protected final void postInBackground(Runnable r) {
+    public final void postInBackground(Runnable r) {
         window.postEvent(r);
     }
 

@@ -3,6 +3,8 @@ package org.melchor629.engine.utils;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.function.Function;
@@ -31,35 +33,66 @@ public class ImageIO {
         }
     }
 
+    /**
+     * Loads an image from a file. Supported formats are
+     * <ul>
+     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
+     * <li>TGA (not sure what subset, if a subset)</li>
+     * <li>BMP non-1bpp, non-RLE</li>
+     * <li>PSD (composited view only, no extra channels, 8/16 bit-per-channel)</li>
+     * <li>GIF (*comp always reports as 4-channel)</li>
+     * <li>HDR (radiance rgbE format)</li>
+     * <li>PIC (Softimage PIC)</li>
+     * <li>PNM (PPM and PGM binary only)</li>
+     * </ul>
+     * @param path path to the file
+     * @return {@link ImageData} with info about the image
+     * @see org.lwjgl.stb.STBImage STBImage, image decoder
+     */
     public static ImageData loadImage(final File path) {
-        if(hasLWJGL()) {
-            return lwjgl_loadImage(path);
-        }
-
-        return null;
-    }
-
-    public static void writeImage(final File path, final ImageData imageData) {
-        if(hasLWJGL() && lwjgl_canWrite(path))
-            lwjgl_writeImage(path, imageData);
-    }
-
-    private static boolean hasLWJGL() {
-        try {
-            Class.forName("org.lwjgl.system.Platform");
-            return true;
-        } catch(ClassNotFoundException ignore) {
-            return false;
-        }
-    }
-
-    private static ImageData lwjgl_loadImage(final File path) {
         ImageData data = new ImageData();
         try(MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer x = stack.ints(0),
                       y = stack.ints(0),
                    comp = stack.ints(0);
             data.data = org.lwjgl.stb.STBImage.stbi_load(path.getAbsolutePath(), x, y, comp, 0);
+            if(data.data == null) throw new RuntimeException(org.lwjgl.stb.STBImage.stbi_failure_reason());
+            data.width = x.get();
+            data.height = y.get();
+            data.components = comp.get();
+            data.clear = o -> {
+                org.lwjgl.stb.STBImage.stbi_image_free(o.data);
+                return null;
+            };
+        }
+        return data;
+    }
+    /**
+     * Loads an image from a chunk of memory. Supported formats are
+     * <ul>
+     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
+     * <li>TGA (not sure what subset, if a subset)</li>
+     * <li>BMP non-1bpp, non-RLE</li>
+     * <li>PSD (composited view only, no extra channels, 8/16 bit-per-channel)</li>
+     * <li>GIF (*comp always reports as 4-channel)</li>
+     * <li>HDR (radiance rgbE format)</li>
+     * <li>PIC (Softimage PIC)</li>
+     * <li>PNM (PPM and PGM binary only)</li>
+     * </ul>
+     * @param buff the chunk of memory
+     * @return {@link ImageData} with info about the image
+     * @see org.lwjgl.stb.STBImage STBImage, image decoder
+     */
+    public static ImageData loadImageFromMemory(final ByteBuffer buff) {
+        ImageData data = new ImageData();
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer x = stack.ints(0),
+                      y = stack.ints(0),
+                   comp = stack.ints(0);
+            data.data = org.lwjgl.stb.STBImage.stbi_load_from_memory(buff, x, y, comp, 0);
+            if(data.data == null) throw new RuntimeException(org.lwjgl.stb.STBImage.stbi_failure_reason());
             data.width = x.get();
             data.height = y.get();
             data.components = comp.get();
@@ -71,12 +104,54 @@ public class ImageIO {
         return data;
     }
 
-    private static boolean lwjgl_canWrite(final File path) {
-        String ext = path.getAbsolutePath().substring(path.getAbsolutePath().lastIndexOf(".") + 1);
-        return ext.equalsIgnoreCase("bmp") || ext.equalsIgnoreCase("png") || ext.equalsIgnoreCase("tga");
+    /**
+     * Loads an image from resources folder. Supported formats are
+     * <ul>
+     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
+     * <li>TGA (not sure what subset, if a subset)</li>
+     * <li>BMP non-1bpp, non-RLE</li>
+     * <li>PSD (composited view only, no extra channels, 8/16 bit-per-channel)</li>
+     * <li>GIF (*comp always reports as 4-channel)</li>
+     * <li>HDR (radiance rgbE format)</li>
+     * <li>PIC (Softimage PIC)</li>
+     * <li>PNM (PPM and PGM binary only)</li>
+     * </ul>
+     * @param file path to the resource
+     * @return {@link ImageData} with info about the image
+     * @see org.lwjgl.stb.STBImage STBImage, image decoder
+     */
+    public static ImageData loadImageFromResource(String file) throws IOException {
+        ByteBuffer buff = IOUtils.readInputStream(IOUtils.getResourceAsStream(file));
+        try {
+            return loadImageFromMemory(buff);
+        } finally {
+            MemoryUtils.free(buff);
+        }
     }
 
-    private static void lwjgl_writeImage(final File path, final ImageData imageData) {
+    /**
+     * Loads an image from a {@link URL}. Supported formats are
+     * <ul>
+     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
+     * <li>TGA (not sure what subset, if a subset)</li>
+     * <li>BMP non-1bpp, non-RLE</li>
+     * <li>PSD (composited view only, no extra channels, 8/16 bit-per-channel)</li>
+     * <li>GIF (*comp always reports as 4-channel)</li>
+     * <li>HDR (radiance rgbE format)</li>
+     * <li>PIC (Softimage PIC)</li>
+     * <li>PNM (PPM and PGM binary only)</li>
+     * </ul>
+     * @param url {@link URL} to the resource
+     * @return {@link ImageData} with info about the image
+     * @see org.lwjgl.stb.STBImage STBImage, image decoder
+     */
+    public static ImageData loadImage(final URL url) throws IOException {
+        return loadImageFromMemory(IOUtils.readUrl(url));
+    }
+
+    public static void writeImage(final File path, final ImageData imageData) {
         if(path.getAbsolutePath().endsWith("bmp"))
             org.lwjgl.stb.STBImageWrite.stbi_write_bmp(path.getAbsolutePath(), imageData.width, imageData.height,
                     imageData.components, imageData.data);

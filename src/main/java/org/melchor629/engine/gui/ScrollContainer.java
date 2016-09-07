@@ -1,6 +1,5 @@
 package org.melchor629.engine.gui;
 
-import org.lwjgl.nanovg.NVGColor;
 import org.melchor629.engine.gui.eventListeners.OnMouseDown;
 import org.melchor629.engine.gui.eventListeners.OnMouseUp;
 import org.melchor629.engine.input.Keyboard;
@@ -84,38 +83,32 @@ public class ScrollContainer extends Container {
     protected void paint() {
         super.paint();
 
-        NVGColor c = NVGColor.malloc();
         nvgTranslate(ctx, x, y);
         if(verticalScroll.visible) {
-            Color.hex("#808080B2").convert(c);
-            nvgFillColor(ctx, c);
+            Color.hex("#808080B2").setAsFillColor();
             GUIDrawUtils.drawRectangle(width - 15, 15, 15, height - 45);
 
             float yque = height / maxHeight;
             float yquo = scrollTop / (maxHeight - height) * (height - 45) * (1 - yque);
-            Color.lightGrey().convert(c);
-            nvgFillColor(ctx, c);
+            Color.lightGrey().setAsFillColor();
             GUIDrawUtils.drawRectangle(width - 15, 15 + yquo, 15, (height - 45) * yque);
 
             verticalScroll.draw();
         }
 
         if(horizontalScroll.visible) {
-            Color.hex("#808080B2").convert(c);
-            nvgFillColor(ctx, c);
+            Color.hex("#808080B2").setAsFillColor();
             GUIDrawUtils.drawRectangle(15, height - 15, width - 45, 15);
 
             float xque = width / maxWidth;
             float xquo = scrollLeft / (maxWidth - width) * (width - 45) * (1 - xque);
-            Color.lightGrey().convert(c);
-            nvgFillColor(ctx, c);
+            Color.lightGrey().setAsFillColor();
             GUIDrawUtils.drawRectangle(15 + xquo, height - 15, (width - 45) * xque, 15);
 
             horizontalScroll.draw();
         }
 
         checkScrolls();
-        c.free();
     }
 
     @Override

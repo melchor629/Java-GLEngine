@@ -2,6 +2,7 @@ package org.melchor629.engine.gui;
 
 import org.lwjgl.nanovg.NVGColor;
 import org.lwjgl.nanovg.NanoVG;
+import org.lwjgl.system.MemoryStack;
 
 public class Color implements Cloneable {
 
@@ -177,6 +178,25 @@ public class Color implements Cloneable {
 
     NVGColor convert(NVGColor color) {
         return NanoVG.nvgRGBAf(r, g, b, a, color);
+    }
+
+    /**
+     * Sets the current fill color to this color
+     */
+    public void setAsFillColor() {
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            NVGColor c = NVGColor.mallocStack(stack);
+            NanoVG.nvgFillColor(GUI.gui.nvgCtx, convert(c));
+        }
+    }
+    /**
+     * Sets the current stroke color to this color
+     */
+    public void setAsStrokeColor() {
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            NVGColor c = NVGColor.mallocStack(stack);
+            NanoVG.nvgStrokeColor(GUI.gui.nvgCtx, convert(c));
+        }
     }
 
     @Override

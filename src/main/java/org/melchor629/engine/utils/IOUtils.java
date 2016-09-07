@@ -3,6 +3,8 @@ package org.melchor629.engine.utils;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 /**
@@ -95,7 +97,7 @@ public class IOUtils {
      * @return Contents of the URL
      * @throws IOException If an error occurs while reading the connexion
      */
-    public static String readUrl(URL url) throws IOException {
+    public static String readUrlAsString(URL url) throws IOException {
         StringBuilder sb = new StringBuilder();
 
         URLConnection con = url.openConnection();
@@ -116,6 +118,67 @@ public class IOUtils {
         br.close();
 
         return sb.toString();
+    }
+
+    /**
+     * Read the contents of a {@link URL} into a {@link ByteBuffer}. Buffer
+     * must be freed because uses native heap allocation.
+     * @param url url to read from
+     * @return buffer containing the read data, must be freed calling
+     *         {@link MemoryUtils#free(Buffer)}
+     * @throws IOException if an error occurs while reading
+     */
+    public static ByteBuffer readUrl(URL url) throws IOException {
+        URLConnection c = url.openConnection();
+        int estimatedLength = c.getContentLength();
+        InputStream is = c.getInputStream();
+        return readInputStream(is, estimatedLength);
+    }
+
+    /**
+     * Read the {@link InputStream} into a {@link ByteBuffer}.
+     * The buffer must be freed because uses native heap allocation.
+     * @param is {@link InputStream} to read
+     * @return buffer containing the read data, must be freed calling
+     *         {@link MemoryUtils#free(Buffer)}
+     * @throws IOException if an error occurrs while reading
+     */
+    public static ByteBuffer readInputStream(InputStream is) throws IOException {
+        return readInputStream(is, -1);
+    }
+
+    /**
+     * Read the {@link InputStream} into a {@link ByteBuffer}, and
+     * telling an estimated value of the length of the stream.
+     * The buffer must be freed because uses native heap allocation.
+     * @param is {@link InputStream} to read
+     * @param estimatedLength estimated length of the stream. -1 to ignore this value
+     * @return buffer containing the read data, must be freed calling
+     *         {@link MemoryUtils#free(Buffer)}
+     * @throws IOException if an error occurrs while reading
+     */
+    public static ByteBuffer readInputStream(InputStream is, int estimatedLength) throws IOException {
+        ByteBuffer img = null;
+        try {
+            img = MemoryUtils.createByteBuffer(estimatedLength != -1 ? estimatedLength : is.available());
+            byte[] tmp = new byte[1 << 12]; // 4KiB
+            int read;
+            while((read = is.read(tmp)) > 0) {
+                if(img.remaining() < read) {
+                    int totalRead = img.capacity() - img.remaining();
+                    img = MemoryUtils.realloc(img, totalRead + is.available() + read);
+                }
+
+                img.put(tmp, 0, read);
+            }
+            img.position(0);
+
+            is.close();
+            return img;
+        } catch(IOException i) {
+            if(img != null) MemoryUtils.free(img);
+            throw i;
+        }
     }
 
     /**

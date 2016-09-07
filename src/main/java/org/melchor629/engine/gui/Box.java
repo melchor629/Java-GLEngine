@@ -16,15 +16,6 @@ public class Box extends View {
 
     @Override
     protected void paint() {
-        NVGColor cc = NVGColor.calloc();
-        backgroundColor.convert(cc);
-
-        nvgFillColor(ctx, cc);
-        nvgBeginPath(ctx);
-        nvgRect(ctx, frame.x, frame.y, frame.width, frame.height);
-        nvgFill(ctx);
-
-        cc.free();
     }
 
     @Override

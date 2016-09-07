@@ -3,11 +3,8 @@ package demos;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.al.LWJGLAudio;
 import org.melchor629.engine.al.Source;
-import org.melchor629.engine.gl.GLContext;
+import org.melchor629.engine.gl.*;
 import org.melchor629.engine.gl.GLContext.GLEnable;
-import org.melchor629.engine.gl.LWJGLWindow;
-import org.melchor629.engine.gl.Window;
-import org.melchor629.engine.gl.ShaderProgram;
 import org.melchor629.engine.loaders.Collada;
 import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioDecoder;
@@ -64,12 +61,11 @@ public class AnotherTestingClass extends Game {
     }
 
     private AnotherTestingClass() {
-        super(new LWJGLWindow(), new LWJGLAudio());
-        window.setResizable(true);
-        window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
-        title = "Eso...";
-        width = 1280;
-        height = 720;
+        super(new LWJGLWindow.Builder()
+                .setResizable(true)
+                .setOpenGLContextVersion(WindowBuilder.OpenGLContextVersion.GL_33)
+                .setTitle("Eso...")
+                .create(1280, 720), new LWJGLAudio());
     }
 
     @Override

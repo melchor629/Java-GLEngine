@@ -4,6 +4,7 @@ import org.lwjgl.nanovg.NVGLUFramebuffer;
 import org.lwjgl.nanovg.NanoVG;
 import org.lwjgl.nanovg.NanoVGGL3;
 import org.melchor629.engine.Erasable;
+import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.*;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;
@@ -29,7 +30,7 @@ public class GUI implements Erasable {
     private final ShaderProgram guiShader;
     private final VertexArrayObject guiVao;
     private final GLContext gl;
-    private final NVGLUFramebuffer nvgFB;
+    private NVGLUFramebuffer nvgFB;
 
     private int width, height;
     private float scaleFactor;
@@ -46,7 +47,7 @@ public class GUI implements Erasable {
 
     private boolean clicked = false;
 
-    public GUI(GLContext gl, Window window) {
+    public GUI(Game game, GLContext gl, Window window) {
         if(gui != null) throw new IllegalStateException("Cannot create more than one GUI");
         gui = this;
         this.gl = gl;
@@ -134,6 +135,18 @@ public class GUI implements Erasable {
         window.getKeyboardController().addListener((Keyboard.OnReleaseKeyEvent) rootView::onKeyUp);
         window.getKeyboardController().addListener(rootView::onCharKey);
 
+        //Listen for resize event
+        window.addResizeEventListener((newWidth, newHeight) ->
+            game.post(() -> {
+                width = window.getFramebufferSize().width;
+                height = window.getFramebufferSize().height;
+                renderTexture.resize(width, height);
+                stencilDepthRenderBuffer.resize(width, height);
+                NanoVGGL3.nvgluDeleteFramebuffer(nvgCtx, nvgFB);
+                nvgFB = NanoVGGL3.nvgluCreateFramebuffer(nvgCtx, width, height, 0);
+            })
+        );
+
         fontsMap = new TreeMap<>();
         onDrawOnceCallableFunctions = new ArrayList<>();
     }
@@ -200,11 +213,11 @@ public class GUI implements Erasable {
             NanoVGGL3.nvgluBindFramebuffer(nvgCtx, null);
 
             //Ready to render the mix
-            gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
             gl.enable(GLContext.GLEnable.BLEND);
             gl.enable(GLContext.GLEnable.CULL_FACE);
             gl.blendFunc(GLContext.BlendOption.SRC_ALPHA, GLContext.BlendOption.ONE_MINUS_SRC_ALPHA);
             gl.disable(GLContext.GLEnable.DEPTH_TEST);
+            gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
             gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
 
             guiVao.bind();

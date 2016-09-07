@@ -12,57 +12,6 @@ import org.melchor629.engine.input.Mouse;
 public interface Window {
 
     /**
-     * Determines a version and profile of a OpenGL Context
-     */
-    enum OpenGLContextVersion {
-        GL_10(1, 0, OpenGLContext.OPENGL_COMPAT),
-        GL_11(1, 1, OpenGLContext.OPENGL_COMPAT),
-        GL_12(1, 2, OpenGLContext.OPENGL_COMPAT),
-        GL_13(1, 3, OpenGLContext.OPENGL_COMPAT),
-        GL_14(1, 4, OpenGLContext.OPENGL_COMPAT),
-        GL_15(1, 5, OpenGLContext.OPENGL_COMPAT),
-        GL_20(2, 0, OpenGLContext.OPENGL_COMPAT),
-        GL_21(2, 1, OpenGLContext.OPENGL_COMPAT),
-        GL_30_COMPAT(3, 0, OpenGLContext.OPENGL_COMPAT),
-        GL_31_COMPAT(3, 1, OpenGLContext.OPENGL_COMPAT),
-        GL_32_COMPAT(3, 2, OpenGLContext.OPENGL_COMPAT),
-
-        GL_30(3, 0, OpenGLContext.OPENGL_CORE),
-        GL_31(3, 1, OpenGLContext.OPENGL_CORE),
-        GL_32(3, 2, OpenGLContext.OPENGL_CORE),
-        GL_33(3, 3, OpenGLContext.OPENGL_CORE),
-        GL_40(4, 0, OpenGLContext.OPENGL_CORE),
-        GL_41(4, 1, OpenGLContext.OPENGL_CORE),
-        GL_42(4, 2, OpenGLContext.OPENGL_CORE),
-        GL_43(4, 3, OpenGLContext.OPENGL_CORE),
-        GL_44(4, 4, OpenGLContext.OPENGL_CORE),
-        GL_45(4, 5, OpenGLContext.OPENGL_CORE),
-
-        GLES_10(1, 0, OpenGLContext.OPENGL_ES),
-        GLES_11(1, 1, OpenGLContext.OPENGL_ES),
-        GLES_20(2, 0, OpenGLContext.OPENGL_ES),
-        GLES_30(3, 0, OpenGLContext.OPENGL_ES),
-        GLES_31(3, 1, OpenGLContext.OPENGL_ES);
-
-        int major, minor;
-        OpenGLContext type;
-        OpenGLContextVersion(int major, int minor, OpenGLContext type) {
-            this.major = major;
-            this.minor = minor;
-            this.type = type;
-        }
-    }
-
-    /**
-     * Enum with posible context profiles
-     */
-    enum OpenGLContext {
-        OPENGL_COMPAT,
-        OPENGL_CORE,
-        OPENGL_ES
-    }
-
-    /**
      * Interface for {@code OnWindowResizeEvent}. This event is
      * called when the window is resized. The parameters are
      * the new width and height.
@@ -102,90 +51,6 @@ public interface Window {
             return String.format("(%d, %d)", width, height);
         }
     }
-
-    /**
-     * Specifies whether the window will be resizable or not by the user.
-     * Ignored for fullscreen games
-     * @param resizable enable or disable resizable window
-     */
-    void setResizable(boolean resizable);
-
-    /**
-     * Specifies the initial visibility state of the window. Ignored for
-     * fullscreen games
-     * @param visible set visible or not a window
-     */
-    default void setVisible(boolean visible) {
-        throw new UnsupportedOperationException("Unimplemented setVisible(boolean)");
-    }
-
-    /**
-     * Specifies whether to show borders and window buttons (close, minimize, etc)
-     * or not. Undecorated windows are still windows. Ignored for fullscreen games.
-     * @param decorated set decorated or undecorated window
-     */
-    default void setDecorated(boolean decorated) {
-        throw new UnsupportedOperationException("Unimplemented setDecorated(boolean)");
-    }
-
-    /**
-     * Specifies if the window will be focused or not when is created. Ignored
-     * for fullscreen games and hidden windows.
-     * @param focused initial focus status
-     */
-    default void setFocused(boolean focused) {
-        throw new UnsupportedOperationException("Unimplemented setFocused(boolean)");
-    }
-
-    /**
-     * Enable multisampling for the window.
-     * @param multisample enable or disable multisampling
-     * @param samples number of samples
-     */
-    default void setMultisample(boolean multisample, int samples) {
-        throw new UnsupportedOperationException("Unimplemented setMultisample(boolean, int)");
-    }
-
-    /**
-     * Specifies whether the main framebuffer should be Double Buffered.
-     * @param doublebuffered true to activate it
-     */
-    default void setDoublebuffered(boolean doublebuffered) {
-        throw new UnsupportedOperationException("Unimplemented setDoublebuffered(boolean)");
-    }
-
-    /**
-     * Specifies the Client API (OpenGL or OpenGL ES), its profile and its major and minus
-     * version for the context. Also on OS X, activates the {@code OPENGL_FORWAD_COMPAT}.
-     * @param version version, profile and client API
-     */
-    void setContextProfileAndVersion(OpenGLContextVersion version);
-
-    /**
-     * Creates a Windowed display with the given width, height and title.
-     * Also creates OpenGL context.
-     * @param width width of the window
-     * @param height height of the window
-     * @param title title of the window
-     */
-    void createWindow(int width, int height, String title);
-
-    /**
-     * Creates a Fullscreen display with the given width, height and title.
-     * Also creates OpenGL context.
-     * @param width width of the window
-     * @param height height of the window
-     * @param title title of the window
-     */
-    void createFullscreenWindow(int width, int height, String title);
-
-    /**
-     * Creates a Fullscreen display with the given title. The width and
-     * height will be the same as monitor's
-     * Also creates OpenGL context.
-     * @param title title of the window
-     */
-    void createFullscreenWindow(String title);
 
     /**
      * Determines if the window should close in the future or not
@@ -242,12 +107,6 @@ public interface Window {
      * Synchronices drawing. Have to be called after every frame is drawn.
      */
     void syncGPU();
-
-    /**
-     * Creates the OpenGL context and sets this context to this Window
-     * @return the context created from the window
-     */
-    GLContext createContext();
 
     /**
      * If is applicable, poll events from window event loop
@@ -328,4 +187,40 @@ public interface Window {
      * @return keyboard controller associated to this window
      */
     Keyboard getKeyboardController();
+
+    /**
+     * @return the OpenGL context associated to this window
+     */
+    GLContext getGLContext();
+
+    /**
+     * Creates the OpenGL context on the current thread. Can be
+     * called in any thread, but that thread will have the OpenGL
+     * context and no other thread could have it.
+     */
+    GLContext makeContextOnCurrentThread();
+
+    /**
+     * Limits the window size to this limits, or deletes limits. The
+     * minimum size of the window is {@code min}. The maximum size of
+     * the window is {@code max}. If one (or both) values are {@code null},
+     * then no limit is applied. Only works for non fullscreen windows and
+     * resizable ones.
+     * @param min minimum size limit or null to disable limit
+     * @param max maximum size limit or null to disable limit
+     */
+    default void setWindowSizeLimit(Size min, Size max) {
+        throw new UnsupportedOperationException("Cannot limit window size in this implementation");
+    }
+
+    /**
+     * Limits the resize to fulfill the aspect ratio defined. Only works
+     * for non fullscreen windows and resizable ones. To disable, pass
+     * -1 on both arguments.
+     * @param a number
+     * @param b denom
+     */
+    default void setWindowSizeAspectRatio(int a, int b) {
+        throw new UnsupportedOperationException("Cannot limit the resize to an aspect ratio in this implementation");
+    }
 }

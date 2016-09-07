@@ -3,11 +3,15 @@ package demos;
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.gl.LWJGLWindow;
-import org.melchor629.engine.gl.Window;
+import org.melchor629.engine.gl.WindowBuilder;
 import org.melchor629.engine.gui.*;
 import org.melchor629.engine.gui.easing.*;
+import org.melchor629.engine.utils.IOUtils;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
 /**
  * pruebas de interfá
@@ -19,19 +23,19 @@ public class Interfa extends Game {
     }
 
     private Interfa() {
-        super(new LWJGLWindow(), null);
-        window.setResizable(false);
-        title = "Pruebas de GUI";
-        window.setContextProfileAndVersion(Window.OpenGLContextVersion.GL_33);
-        width = 1280;
-        height = 720;
+        super(new LWJGLWindow.Builder()
+                .setResizable(true)
+                .setTitle("Pruebas de GUI")
+                .setOpenGLContextVersion(WindowBuilder.OpenGLContextVersion.GL_33)
+                .setDoubleBuffered(true)
+                .setVisible(false)
+                .create(1280, 720), null);
         enableGui = true;
         startEngine();
     }
 
     @Override
     public void init() {
-        window.hideWindow();
         window.setVsync(true);
         try {
             gui.loadSystemFont("Ubuntu", "Ubuntu-R");
@@ -62,7 +66,7 @@ public class Interfa extends Game {
         TextLabel label = new TextLabel("Paco :)");
         label.position(590, 0);
         label.size(100f, 100f);
-        label.color(Color.white());
+        label.color(Color.grey());
         label.textAlign(TextLabel.VerticalAlign.CENTER);
         label.textAlign(TextLabel.HorizontalAlign.CENTER);
         label.backgroundColor(Color.rgba(0.6, 1, 1, 0.65));
@@ -87,6 +91,19 @@ public class Interfa extends Game {
         box2.size(100f, 100f);
         box2.backgroundColor(Color.rgb(0.1, 1, 0.1));
         scroll.addSubview(box2);
+
+
+            new Thread(() -> {
+                try {
+                    ByteBuffer b = IOUtils.readUrl(new URL("http://www.patosolidario.org/wp-content/uploads/2015/09/pato_solidario.jpg"));
+                    post(() -> {
+                        Image i = Image.fromMemory(b, 0);
+                        i.position(0, 0);
+                        i.size(100, 100);
+                        box2.backgroundImage(i);
+                    });
+                } catch (IOException ignore) {}
+            }).start();
 
         container.addSubview(box);
         container.addSubview(button);

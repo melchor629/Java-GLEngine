@@ -34,11 +34,6 @@ public class Container extends View {
     @Override
     protected void paint() {
         NVGColor c = NVGColor.calloc();
-        NanoVG.nvgBeginPath(ctx);
-        NanoVG.nvgRect(ctx, frame.x, frame.y, frame.width, frame.height);
-        backgroundColor.convert(c);
-        NanoVG.nvgFillColor(ctx, c);
-        NanoVG.nvgFill(ctx);
 
         NanoVG.nvgSave(ctx);
         NanoVG.nvgIntersectScissor(ctx, frame.x, frame.y, frame.width, frame.height);

@@ -1,7 +1,5 @@
 package org.melchor629.engine.gui;
 
-import org.lwjgl.nanovg.NVGColor;
-
 import java.util.Formatter;
 
 import static org.lwjgl.nanovg.NanoVG.*;
@@ -19,7 +17,6 @@ public class GUIDrawUtils {
      * @param y y coord of the top left corner
      * @param width width of the rectangle
      * @param height height of the rectangle
-     * @see #setFillColor(Color) How to change fill color
      */
     public static void drawRectangle(float x, float y, float width, float height) {
         nvgBeginPath(gui.nvgCtx);
@@ -36,8 +33,6 @@ public class GUIDrawUtils {
      * @param width width of the rectangle
      * @param height height of the rectangle
      * @param borderSize border/stroke width
-     * @see #setFillColor(Color) How to change fill color
-     * @see #setStrokeColor(Color) How to change stroke color
      */
     public static void drawRectangle(float x, float y, float width, float height, float borderSize) {
         nvgStrokeWidth(gui.nvgCtx, borderSize);
@@ -56,7 +51,6 @@ public class GUIDrawUtils {
      * @param width width of the rectangle
      * @param height height of the rectangle
      * @param borderRadius border radius
-     * @see #setFillColor(Color) How to change fill color
      * @see <a href="http://www.w3schools.com/cssref/css3_pr_border-radius.asp">Understanding border-radius (through CSS)</a>
      */
     public static void drawRoundedRectangle(float x, float y, float width, float height, float borderRadius) {
@@ -78,7 +72,6 @@ public class GUIDrawUtils {
      * @param brTopRight border radius of the top right corner
      * @param brBottomLeft border radius of the bottom left corner
      * @param brBottomRight border radius of the bottom right corner
-     * @see #setFillColor(Color) How to change fill color
      * @see <a href="http://www.w3schools.com/cssref/css3_pr_border-radius.asp">Understanding border-radius (through CSS)</a>
      */
     public static void drawRoundedRectangle(float x, float y, float width, float height, float brTopLeft, float brTopRight, float brBottomLeft, float brBottomRight) {
@@ -114,28 +107,6 @@ public class GUIDrawUtils {
      */
     public static void drawCircle(float x, float y, float radius) {
         drawRoundedRectangle(x - radius, y - radius, radius * 2, radius * 2, radius);
-    }
-
-    /**
-     * Changes the current fill color for drawing things
-     * @param color new color to set
-     */
-    public static void setFillColor(Color color) {
-        NVGColor c = NVGColor.malloc();
-        color.convert(c);
-        nvgFillColor(gui.nvgCtx, c);
-        c.free();
-    }
-
-    /**
-     * Changes the current stroke color for bordering things
-     * @param color new color to set
-     */
-    public static void setStrokeColor(Color color) {
-        NVGColor c = NVGColor.malloc();
-        color.convert(c);
-        nvgStrokeColor(gui.nvgCtx, c);
-        c.free();
     }
 
     /**

@@ -10,6 +10,8 @@ import org.melchor629.engine.input.Keyboard;
  */
 public class TextInput extends TextLabel {
     private float cursorPosition;
+    private long backspacePressedTime = System.currentTimeMillis();
+    private boolean backspacePressed, firstBackspaceDone;
 
     public TextInput() {
         super("");
@@ -25,13 +27,23 @@ public class TextInput extends TextLabel {
         super.paint();
 
         if(focus && (System.currentTimeMillis() / 500) % 2 == 1) {
-            NVGColor c = NVGColor.malloc();
-            color.convert(c);
-            nvgFillColor(ctx, c);
+            color.setAsFillColor();
             nvgBeginPath(ctx);
             GUIDrawUtils.drawRectangle(x + cursorPosition, y, 2, frame.height - paddingTop - paddingBottom);
             nvgFill(ctx);
-            c.free();
+        }
+
+        if(!label.isEmpty() && backspacePressed) {
+            if(!firstBackspaceDone && System.currentTimeMillis() - backspacePressedTime >= 750) {
+                label = label.substring(0, label.length() - 1);
+                checkSizeOfText();
+                firstBackspaceDone = true;
+                backspacePressedTime = System.currentTimeMillis();
+            } else if(firstBackspaceDone && System.currentTimeMillis() - backspacePressedTime >= 75) {
+                label = label.substring(0, label.length() - 1);
+                checkSizeOfText();
+                backspacePressedTime = System.currentTimeMillis();
+            }
         }
     }
 
@@ -47,7 +59,7 @@ public class TextInput extends TextLabel {
         float[] bounds = new float[4];
         nvgTextAlign(ctx, NVG_ALIGN_TOP | NVG_ALIGN_LEFT);
         nvgFontSize(ctx, fontSize);
-        nvgTextBounds(ctx, x, y, label, 0, bounds);
+        cursorPosition = nvgTextBounds(ctx, x, y, label, 0, bounds);
         nvgRestore(ctx);
 
         if(bounds[2] - bounds[0] > width) {
@@ -55,7 +67,6 @@ public class TextInput extends TextLabel {
             cursorPosition = width;
         } else {
             textAlign(VerticalAlign.LEFT);
-            cursorPosition = bounds[2] - bounds[0];
         }
     }
 
@@ -71,8 +82,19 @@ public class TextInput extends TextLabel {
         if(rep.equals("BACKSPACE") && !label.isEmpty()) {
             label = label.substring(0, label.length() - 1);
             checkSizeOfText();
+            backspacePressed = true;
+            firstBackspaceDone = false;
+            backspacePressedTime = System.currentTimeMillis();
         } else if(rep.equals("ENTER")) {
             System.out.println(label);
+        }
+    }
+
+    @Override
+    public void onKeyUp(Keyboard keyboard, int key) {
+        String rep = keyboard.getStringRepresentation(key);
+        if(rep.equals("BACKSPACE")) {
+            backspacePressed = false;
         }
     }
 
