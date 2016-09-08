@@ -36,8 +36,8 @@ public abstract class Game {
     protected GUI gui;
 
     private final Lock lock = new ReentrantLock(true);
-    private final Condition waitClosing;
-    private boolean destroyed = false;
+    private final Condition waitClosing, waitFocus;
+    private volatile boolean destroyed = false, focused = true;
     
     /**
      * Default constructor for test games
@@ -47,6 +47,7 @@ public abstract class Game {
     protected Game(Window window, AL audio) {
         events = new ConcurrentLinkedQueue<>();
         waitClosing = lock.newCondition();
+        waitFocus = lock.newCondition();
         this.window = window;
         this.al = audio;
         width = window.getWindowSize().width;
@@ -102,24 +103,31 @@ public abstract class Game {
 
         t = Timing.getGameTiming();
         while(!destroyed) {
-                while(!events.isEmpty()) events.poll().run();
-            if(enableGui) {
-                gui.render(this::render);
-                t.split("render");
-                gui.gui(this::gui);
-                t.split("gui");
-            } else {
-                render();
-            }
+            while(!events.isEmpty()) events.poll().run();
+            if(focused) {
+                if (enableGui) {
+                    gui.render(this::render);
+                    t.split("render");
+                    gui.gui(this::gui);
+                    t.split("gui");
+                } else {
+                    render();
+                }
 
-            lock.lock();
-            if(!destroyed) {
-                window.syncGPU();
+                lock.lock();
+                if(!destroyed) {
+                    window.syncGPU();
+                    t.update();
+                    window.getKeyboardController().fireEvent(t.frameTime);
+                    window.getMouseController().update(t.frameTime);
+                }
+                lock.unlock();
+            } else {
+                lock.lock();
+                try { waitFocus.await(); } catch(Exception ignore) {}
+                lock.unlock();
                 t.update();
-                window.getKeyboardController().fireEvent(t.frameTime);
-                window.getMouseController().update(t.frameTime);
             }
-            lock.unlock();
         }
 
         lock.lock();
@@ -142,11 +150,25 @@ public abstract class Game {
             post(() -> gl.viewport(0, 0, window.getFramebufferSize().width, window.getFramebufferSize().height));
         });
 
+        window.setOnFocusEventListener(() -> {
+            focused = true;
+            lock.lock();
+            waitFocus.signal();
+            lock.unlock();
+        });
+
+        window.setOnBlurEventListener(() -> {
+            focused = false;
+        });
+
         makeGame();
     }
 
     public final void post(Runnable r) {
         events.add(r);
+        lock.lock();
+        waitFocus.signal();
+        lock.unlock();
     }
 
     public final void postInBackground(Runnable r) {

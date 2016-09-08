@@ -441,9 +441,16 @@ public abstract class View {
     }
 
     protected void opc(String name, Object old, Object new_) {
-        if(propertyChangeListeners.containsKey(name))
-            propertyChangeListeners.get(name).forEach(p -> p.propertyChanged(name, old, new_));
+        if(old != null && old != new_ && !old.equals(new_)) {
+            if(propertyChangeListeners.containsKey(name))
+                propertyChangeListeners.get(name).forEach(p -> p.propertyChanged(name, old, new_));
+            markDirty();
+        }
+    }
+
+    protected void markDirty() {
         dirty = true;
+        GUI.gui.dirty = true;
     }
 
     protected void onMouseDown(MouseEvent e) {

@@ -124,6 +124,12 @@ public class ScrollContainer extends Container {
     }
 
     @Override
+    public void addSubview(View subview) {
+        super.addSubview(subview);
+        checkScrolls();
+    }
+
+    @Override
     public boolean removeSubview(View subview) {
         boolean in = super.removeSubview(subview);
 
@@ -176,12 +182,12 @@ public class ScrollContainer extends Container {
         super.onMouseDown(e);
         if(verticalScroll.visible && verticalScroll.isInside(e.getX(), e.getY())) {
             verticalScroll.onMouseDown(new MouseEvent(e, e.getX() - verticalScroll.effectiveFrame().x, e.getY() - verticalScroll.effectiveFrame().y));
-            verticalScrollGrabbed = true;
+            if(e.getY() >= 15 && e.getY() <= height - 30) verticalScrollGrabbed = true;
         }
 
         if(horizontalScroll.visible && horizontalScroll.isInside(e.getX(), e.getY())) {
             horizontalScroll.onMouseDown(new MouseEvent(e, e.getX() - horizontalScroll.effectiveFrame().x, e.getY() - horizontalScroll.effectiveFrame().y));
-            horizontalScrollGrabbed = true;
+            if(e.getX() >= 15 && e.getX() <= width - 30) horizontalScrollGrabbed = true;
         }
     }
 
@@ -224,19 +230,28 @@ public class ScrollContainer extends Container {
 
     private void checkScrolls() {
         maxWidth = maxHeight = 0;
-        horizontalScroll.visible(false);
-        verticalScroll.visible(false);
+        boolean hv = horizontalScroll.visible, vv = verticalScroll.visible;
+        horizontalScroll.visible = false;
+        verticalScroll.visible = true;
         subViews.forEach(subView -> {
             Frame subFrame = subView.effectiveFrame();
             if(subFrame.x + subFrame.width > width && showHorizontalScroll) {
-                horizontalScroll.visible(true);
+                horizontalScroll.visible = true;
                 maxWidth = Math.max(maxWidth, subFrame.x + subFrame.width);
             }
             if(subFrame.y + subFrame.height > height && showVerticalScroll) {
-                verticalScroll.visible(true);
+                verticalScroll.visible = true;
                 maxHeight = Math.max(maxHeight, subFrame.y + subFrame.height);
             }
         });
+
+        if(hv != horizontalScroll.visible) {
+            horizontalScroll.opc("visible", hv, horizontalScroll.visible);
+        }
+
+        if(vv != verticalScroll.visible) {
+            verticalScroll.opc("visible", vv, verticalScroll.visible);
+        }
 
         if(horizontalScroll.visible) {
             maxHeight += 15;
@@ -244,14 +259,6 @@ public class ScrollContainer extends Container {
 
         if(verticalScroll.visible) {
             maxWidth += 15;
-        }
-
-        if(System.currentTimeMillis() - pressedButton >= 500 && (System.currentTimeMillis() / 200) % 2 == 0) {
-            if(scrollLeftDesp != 0) {
-                scrollLeft(scrollLeft + scrollLeftDesp);
-            } else if(scrollTopDesp != 0) {
-                scrollTop(scrollTop + scrollTopDesp);
-            }
         }
 
         if(scrollTop + height > maxHeight) {
@@ -293,37 +300,54 @@ public class ScrollContainer extends Container {
         scrollLeft(Math.max(0, scrollLeft - 5));
         scrollLeftDesp = -5;
         pressedButton = System.currentTimeMillis();
+        GUI.gui.executeOnce(this::scroll);
     }
 
     private void rightButtonDown(MouseEvent e) {
         scrollLeft(Math.min(maxWidth - width, scrollLeft + 5));
         scrollLeftDesp = +5;
         pressedButton = System.currentTimeMillis();
+        GUI.gui.executeOnce(this::scroll);
     }
 
     private void bottomButtonDown(MouseEvent e) {
         scrollTop(Math.min(maxHeight - height, scrollTop + 5));
         scrollTopDesp = +5;
         pressedButton = System.currentTimeMillis();
+        GUI.gui.executeOnce(this::scroll);
     }
 
     private void topButtonDown(MouseEvent e) {
         scrollTop(Math.max(0, scrollTop - 5));
         scrollTopDesp = -5;
         pressedButton = System.currentTimeMillis();
+        GUI.gui.executeOnce(this::scroll);
     }
 
     private void somethingUp(MouseEvent e) {
         scrollTopDesp = scrollLeftDesp = 0;
     }
 
+    private void scroll() {
+        if(System.currentTimeMillis() - pressedButton >= 500 && (System.currentTimeMillis() / 200) % 2 == 0) {
+            if(scrollLeftDesp != 0) {
+                scrollLeft(scrollLeft + scrollLeftDesp);
+            } else if(scrollTopDesp != 0) {
+                scrollTop(scrollTop + scrollTopDesp);
+            }
+        }
+        if(scrollTop != 0 || scrollLeftDesp != 0) GUI.gui.executeOnce(this::scroll);
+    }
+
     private void scrollTop(float s) {
-        scrollTop = s;
+        scrollTop = Math.min(Math.max(0, s), maxHeight - height);
+        if(-paddingTop != scrollTop) markDirty();
         paddingTop = -scrollTop;
     }
 
     private void scrollLeft(float s) {
-        scrollLeft = s;
+        scrollLeft = Math.min(Math.max(0, s), maxWidth - width);
+        if(-paddingLeft != scrollLeft) markDirty();
         paddingLeft = -scrollLeft;
     }
 }

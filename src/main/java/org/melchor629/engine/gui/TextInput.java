@@ -2,7 +2,6 @@ package org.melchor629.engine.gui;
 
 import static org.lwjgl.nanovg.NanoVG.*;
 
-import org.lwjgl.nanovg.NVGColor;
 import org.melchor629.engine.input.Keyboard;
 
 /**
@@ -10,8 +9,7 @@ import org.melchor629.engine.input.Keyboard;
  */
 public class TextInput extends TextLabel {
     private float cursorPosition;
-    private long backspacePressedTime = System.currentTimeMillis();
-    private boolean backspacePressed, firstBackspaceDone;
+    private boolean backspacePressed;
 
     public TextInput() {
         super("");
@@ -20,6 +18,8 @@ public class TextInput extends TextLabel {
         borderRadius(5);
         padding(3);
         width = 100f;
+
+        GUI.gui.executeOnceDelayed(500 - System.currentTimeMillis() + System.currentTimeMillis() / 500 * 500, this::repeat);
     }
 
     @Override
@@ -31,19 +31,6 @@ public class TextInput extends TextLabel {
             nvgBeginPath(ctx);
             GUIDrawUtils.drawRectangle(x + cursorPosition, y, 2, frame.height - paddingTop - paddingBottom);
             nvgFill(ctx);
-        }
-
-        if(!label.isEmpty() && backspacePressed) {
-            if(!firstBackspaceDone && System.currentTimeMillis() - backspacePressedTime >= 750) {
-                label = label.substring(0, label.length() - 1);
-                checkSizeOfText();
-                firstBackspaceDone = true;
-                backspacePressedTime = System.currentTimeMillis();
-            } else if(firstBackspaceDone && System.currentTimeMillis() - backspacePressedTime >= 75) {
-                label = label.substring(0, label.length() - 1);
-                checkSizeOfText();
-                backspacePressedTime = System.currentTimeMillis();
-            }
         }
     }
 
@@ -68,6 +55,7 @@ public class TextInput extends TextLabel {
         } else {
             textAlign(VerticalAlign.LEFT);
         }
+        markDirty();
     }
 
     @Override
@@ -83,8 +71,7 @@ public class TextInput extends TextLabel {
             label = label.substring(0, label.length() - 1);
             checkSizeOfText();
             backspacePressed = true;
-            firstBackspaceDone = false;
-            backspacePressedTime = System.currentTimeMillis();
+            GUI.gui.executeOnceDelayed(750, this::deleteMaintained);
         } else if(rep.equals("ENTER")) {
             System.out.println(label);
         }
@@ -102,5 +89,18 @@ public class TextInput extends TextLabel {
     public void onCharKey(Keyboard keyboard, String rep) {
         label += rep;
         checkSizeOfText();
+    }
+
+    private void repeat() {
+        if(focus) markDirty();
+        GUI.gui.executeOnceDelayed(500 - System.currentTimeMillis() + System.currentTimeMillis() / 500 * 500, this::repeat);
+    }
+
+    private void deleteMaintained() {
+        if(backspacePressed && !label.isEmpty()) {
+            label = label.substring(0, label.length() - 1);
+            checkSizeOfText();
+            GUI.gui.executeOnceDelayed(75, this::deleteMaintained);
+        }
     }
 }

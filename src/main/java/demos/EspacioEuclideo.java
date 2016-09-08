@@ -364,6 +364,7 @@ public class EspacioEuclideo extends Game {
 
     @Override
     public void gui(long nvgCtx) {
+        gui.markForRedraw();
         NVGColor c = NVGColor.calloc();
         NanoVG.nvgFillColor(nvgCtx, NanoVG.nvgRGBAf(0f, 0f, 0f, 0.65f, c));
         GUIDrawUtils.drawRoundedRectangle(0, 0, 205, 145, 0, 0, 0, 5);

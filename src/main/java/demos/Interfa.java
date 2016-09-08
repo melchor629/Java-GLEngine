@@ -124,9 +124,13 @@ public class Interfa extends Game {
         gl.clearColor(1, 1, 1, 1);
     }
 
+    private boolean doneFirstRender = false;
     @Override
     public void render() {
-        gl.clear(GLContext.COLOR_CLEAR_BIT);
+        if(!doneFirstRender) {
+            gl.clear(GLContext.COLOR_CLEAR_BIT);
+            doneFirstRender = true;
+        }
     }
 
     @Override

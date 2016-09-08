@@ -218,7 +218,7 @@ public class LWJGLWindow implements Window {
 
         glfwSetWindowFocusCallback(window, focusCallback = new GLFWWindowFocusCallback() {
             public void invoke(long window, boolean focused) {
-                if(focused)
+                if(!focused)
                     blurListeners.forEach(OnBlurEvent::invoke);
                 else
                     focusListeners.forEach(OnFocusEvent::invoke);

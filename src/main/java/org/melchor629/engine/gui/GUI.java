@@ -39,9 +39,10 @@ public class GUI implements Erasable {
     private String defaultFont;
     private Map<String, Integer> fontsMap;
     private List<CodeBlock> onDrawOnceCallableFunctions;
+    private Map<Long, CodeBlock> onDrawTimeoutFunctions;
 
     final long nvgCtx;
-    boolean isRenderingGUI = false;
+    boolean isRenderingGUI = false, dirty = true;
 
     public final Container rootView;
 
@@ -144,11 +145,13 @@ public class GUI implements Erasable {
                 stencilDepthRenderBuffer.resize(width, height);
                 NanoVGGL3.nvgluDeleteFramebuffer(nvgCtx, nvgFB);
                 nvgFB = NanoVGGL3.nvgluCreateFramebuffer(nvgCtx, width, height, 0);
+                dirty = true;
             })
         );
 
         fontsMap = new TreeMap<>();
         onDrawOnceCallableFunctions = new ArrayList<>();
+        onDrawTimeoutFunctions = new TreeMap<>();
     }
 
     /**
@@ -196,22 +199,32 @@ public class GUI implements Erasable {
             boolean stencilTestEnabled = gl.isEnabled(GLContext.GLEnable.STENCIL_TEST);
 
             //Render GUI
-            NanoVGGL3.nvgluBindFramebuffer(nvgCtx, nvgFB);
-            gl.clearColor(0, 0, 0, 0);
-            gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.STENCIL_BUFFER_BIT);
-            NanoVG.nvgBeginFrame(nvgCtx, width, height, scaleFactor);
-            isRenderingGUI = true;
-
             List<CodeBlock> list = new ArrayList<>(onDrawOnceCallableFunctions);
             onDrawOnceCallableFunctions.clear();
             list.forEach(CodeBlock::invoke);
 
-            rootView.draw();
-            renderFunction.accept(nvgCtx);
+            new TreeSet<>(onDrawTimeoutFunctions.keySet()).stream()
+                    .filter(time -> time <= System.currentTimeMillis())
+                    .forEach(time -> {
+                        onDrawTimeoutFunctions.get(time).invoke();
+                        onDrawTimeoutFunctions.remove(time);
+                    });
 
-            isRenderingGUI = false;
-            NanoVG.nvgEndFrame(nvgCtx);
-            NanoVGGL3.nvgluBindFramebuffer(nvgCtx, null);
+            if(dirty) {
+                NanoVGGL3.nvgluBindFramebuffer(nvgCtx, nvgFB);
+                gl.clearColor(0, 0, 0, 0);
+                gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.STENCIL_BUFFER_BIT);
+                NanoVG.nvgBeginFrame(nvgCtx, width, height, scaleFactor);
+                isRenderingGUI = true;
+
+                rootView.draw();
+                dirty = false;
+                renderFunction.accept(nvgCtx);
+
+                isRenderingGUI = false;
+                NanoVG.nvgEndFrame(nvgCtx);
+                NanoVGGL3.nvgluBindFramebuffer(nvgCtx, null);
+            }
 
             //Ready to render the mix
             gl.enable(GLContext.GLEnable.BLEND);
@@ -219,7 +232,7 @@ public class GUI implements Erasable {
             gl.blendFunc(GLContext.BlendOption.SRC_ALPHA, GLContext.BlendOption.ONE_MINUS_SRC_ALPHA);
             gl.disable(GLContext.GLEnable.DEPTH_TEST);
             gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-            gl.clear(GLContext.COLOR_CLEAR_BIT | GLContext.DEPTH_BUFFER_BIT);
+            gl.clear(GLContext.COLOR_CLEAR_BIT);
 
             guiVao.bind();
             guiShader.bind();
@@ -421,6 +434,10 @@ public class GUI implements Erasable {
         drawText(x, y, String.format(fmt, objects));
     }
 
+    public void markForRedraw() {
+        dirty = true;
+    }
+
     @Override
     public void delete() {
         NanoVGGL3.nvgluDeleteFramebuffer(nvgCtx, nvgFB);
@@ -429,6 +446,10 @@ public class GUI implements Erasable {
 
     void executeOnce(CodeBlock block) {
         onDrawOnceCallableFunctions.add(block);
+    }
+
+    void executeOnceDelayed(long milliseconds, CodeBlock block) {
+        onDrawTimeoutFunctions.put(System.currentTimeMillis() + milliseconds, block);
     }
 
     private void throwIfNoGui() {

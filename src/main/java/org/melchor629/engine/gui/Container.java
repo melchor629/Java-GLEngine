@@ -68,10 +68,13 @@ public class Container extends View {
 
     public void addSubview(View subview) {
         subViews.add(subview);
+        markDirty();
     }
 
     public boolean removeSubview(View subView) {
-        return subViews.remove(subView);
+        boolean d = subViews.remove(subView);
+        if(d) markDirty();
+        return d;
     }
 
     public View getSubview(int i) {
