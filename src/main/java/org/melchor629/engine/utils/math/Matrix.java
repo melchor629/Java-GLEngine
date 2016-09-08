@@ -458,6 +458,8 @@ public class Matrix<T extends Number> implements Cloneable {
     /**
      * Sets the column {@code col} with the values of the {@link Vector}
      * @param col number of a column
+     * @param vector column vector to set
+     * @return this matrix
      * @throws IndexOutOfBoundsException if the column is not valid
      * @throws IllegalArgumentException if the vector has a different number of
      *      coordinates than the number of rows of this matrix
@@ -477,6 +479,8 @@ public class Matrix<T extends Number> implements Cloneable {
     /**
      * Sets the row {@code row} with the values of the {@link Vector}
      * @param row number of a row
+     * @param vector row vector to set
+     * @return this matrix
      * @throws IndexOutOfBoundsException if the row is not valid
      * @throws IllegalArgumentException if the vector has a different number of
      *      coordinates than the number of columns of this matrix

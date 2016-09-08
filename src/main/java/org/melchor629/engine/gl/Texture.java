@@ -218,6 +218,7 @@ public class Texture implements Erasable {
         /**
          * Set a file for load a texture
          * @param file the file to set
+         * @return itself
          */
         public Builder setFile(File file) {
             this.file = file;
@@ -248,6 +249,7 @@ public class Texture implements Erasable {
         /**
          * Sets the magnifier filter for the texture
          * @param mag the filter to set
+         * @return itself
          */
         public Builder setMag(GLContext.TextureFilter mag) {
             this.mag = mag;
@@ -257,6 +259,7 @@ public class Texture implements Erasable {
         /**
          * Set the minifier filter for the texture
          * @param min the filter to set
+         * @return itself
          */
         public Builder setMin(GLContext.TextureFilter min) {
             this.min = min;
@@ -267,6 +270,7 @@ public class Texture implements Erasable {
          * Set how the texture will be wrapped on the left and
          * right borders.
          * @param wrap_s the wrap method to set
+         * @return itself
          */
         public Builder setWrap_s(GLContext.TextureWrap wrap_s) {
             this.wrap_s = wrap_s;
@@ -277,6 +281,7 @@ public class Texture implements Erasable {
          * Set how the texture will be wrapped on the top and
          * bottom borders.
          * @param wrap_t the wrap method to set
+         * @return itself
          */
         public Builder setWrap_t(GLContext.TextureWrap wrap_t) {
             this.wrap_t = wrap_t;
@@ -296,6 +301,7 @@ public class Texture implements Erasable {
         /**
          * Set the format of the image internally.
          * @param ifmt the format to set
+         * @return itself
          */
         public Builder setIfmt(GLContext.TextureFormat ifmt) {
             this.ifmt = ifmt;
@@ -306,6 +312,7 @@ public class Texture implements Erasable {
          * Set the format of the external image. Is not needed to call
          * this function if you load a texture from disk.
          * @param efmt the format to set
+         * @return itself
          */
         public Builder setEfmt(GLContext.TextureExternalFormat efmt) {
             this.efmt = efmt;
@@ -315,6 +322,7 @@ public class Texture implements Erasable {
         /**
          * Set whether the GPU will generate MipMaps or not.
          * @param mipmap the mipmap to set
+         * @return itself
          */
         public Builder setMipmap(boolean mipmap) {
             this.mipmap = mipmap;
@@ -324,6 +332,7 @@ public class Texture implements Erasable {
         /**
          * The width of the image, not needed for texture loading.
          * @param width the width to set
+         * @return itself
          */
         public Builder setWidth(int width) {
             this.width = width;
@@ -333,17 +342,28 @@ public class Texture implements Erasable {
         /**
          * The height of the image, not needed for texture loading.
          * @param height the height to set
+         * @return itself
          */
         public Builder setHeight(int height) {
             this.height = height;
             return this;
         }
 
+        /**
+         * Sets the OpenGL Texture target for this texture
+         * @param target Texture Target
+         * @return this
+         */
         public Builder setTarget(GLContext.TextureTarget target) {
             this.target = target;
             return this;
         }
 
+        /**
+         * Creates a {@link Texture} for the options given in the Builder
+         * @return the Texture
+         * @throws IOException if there's an error while reading the texture from a file
+         */
         public Texture build() throws IOException {
             if(file != null)
                 return new Texture(gl, file, mag, min, wrap_s, wrap_t, ifmt, efmt, target, mipmap, width, height);

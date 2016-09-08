@@ -31,6 +31,7 @@ public class Model implements Erasable {
 
     /**
      * Load all models from a Collada document
+     * @param gl OpenGL Context object
      * @param c Collada document
      */
     public static void loadModels(GLContext gl, Collada c) {

@@ -65,8 +65,8 @@ public class ScriptEngineManager {
      * evaluating the code.
      * @param ext Filename extension for the code
      * @param src The code to be evaluated
-     * @throws NullPointerException
-     * @throws ScriptError
+     * @throws NullPointerException if no engine exists for the file extension
+     * @throws ScriptError if the script contains errors
      */
     public static void executeCode(String ext, String src) throws NullPointerException, ScriptError {
         ScriptEngine engine = findEngineByExtension(ext);

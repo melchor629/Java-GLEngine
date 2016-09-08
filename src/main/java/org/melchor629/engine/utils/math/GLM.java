@@ -59,6 +59,7 @@ public class GLM {
     /**
      * Sums all vectors.
      * @param vec Variable length of vectors
+     * @param <T> Numeric type of the vector
      * @return vector sum of all vectors
      */
     @SafeVarargs
@@ -71,8 +72,9 @@ public class GLM {
     }
 
     /**
-     * Substract all vectors.
-     * @param v Variable length of vectors
+     * Substract the vectors.
+     * @param u First vector
+     * @param v Second vector
      * @return vector substraction of all vectors
      */
     public static Vector3 sub(Vector3 u, Vector3 v) {
@@ -81,7 +83,8 @@ public class GLM {
 
     /**
      * Substract all vectors.
-     * @param v Variable length of vectors
+     * @param u First vector
+     * @param v Second vector
      * @return vector substraction of all vectors
      */
     public static Vector4 sub(Vector4 u, Vector4 v) {
@@ -91,6 +94,7 @@ public class GLM {
     /**
      * Substract all vectors.
      * @param vec Variable length of vectors
+     * @param <T> Number type
      * @return vector substraction of all vectors
      */
     @SafeVarargs
@@ -167,6 +171,7 @@ public class GLM {
     /**
      * Negates the vector (is like: (-1) * v)
      * @param v Vector
+     * @param <T> Number type
      * @return Vector negated
      */
     @SuppressWarnings("unchecked")
@@ -299,7 +304,8 @@ public class GLM {
     }
 
     /**
-     * Create a rotation matrix with the angle and the axis on which rotate
+     * Rotate a matrix with the angle and the axis on which rotate
+     * @param m original matrix
      * @param angle rotate angle (in radians)
      * @param v axis vector
      * @return matrix with rotation transformation
@@ -393,7 +399,8 @@ public class GLM {
     }
 
     /**
-     * Create a scale matrix with the scale vector
+     * Scale a matrix with the scale vector
+     * @param mat Original matrix
      * @param scale vector
      * @return Scale matrix
      */
@@ -616,8 +623,9 @@ public class GLM {
      * @param value Value to check
      * @param min minimum number of the inverval
      * @param max maximum number of the interval
+     * @return true if value is between min and max
      **/
-    public static boolean belongsToInterval(float value, float min, float max) {
+    public static boolean between(float value, float min, float max) {
         return min < value && value < max;
     }
     
@@ -627,8 +635,9 @@ public class GLM {
      * @param value Value to check
      * @param min minimum number of the inverval
      * @param max maximum number of the interval
+     * @return true if value is between min and max
      **/
-    public static boolean belongsToInterval(double value, double min, double max) {
+    public static boolean between(double value, double min, double max) {
         return min < value && value < max;
     }
     
@@ -639,6 +648,7 @@ public class GLM {
      * @param a first float
      * @param b second float
      * @param eps epsilon, acceptable error value
+     * @return true if a and b are equals with an error margin of eps
      **/
     public static boolean floatEquals(float a, float b, float eps) {
         float err = Math.abs(a - b);
@@ -652,6 +662,7 @@ public class GLM {
      * @param a first float
      * @param b second float
      * @param eps epsilon, acceptable error value
+     * @return true if a and b are equals with an error margin of eps
      **/
     public static boolean floatEquals(double a, double b, double eps) {
         double err = Math.abs(a - b);

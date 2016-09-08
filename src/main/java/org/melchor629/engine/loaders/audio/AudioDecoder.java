@@ -39,6 +39,7 @@ public abstract class AudioDecoder {
     /**
      * Opens the file and reads basic information from the file. When is called, {@link #format} is already created
      * and should be filled with this bit depth, samplerate, number of channels and number of samples.
+     * @return the {@link AudioFormat} of the file
      * @throws IOException if the file cannot be read
      * @throws AudioDecoderException if there's some other troubles
      */

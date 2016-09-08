@@ -36,7 +36,7 @@ public class ImageIO {
     /**
      * Loads an image from a file. Supported formats are
      * <ul>
-     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>JPEG baseline &amp; progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
      * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
      * <li>TGA (not sure what subset, if a subset)</li>
      * <li>BMP non-1bpp, non-RLE</li>
@@ -71,7 +71,7 @@ public class ImageIO {
     /**
      * Loads an image from a chunk of memory. Supported formats are
      * <ul>
-     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>JPEG baseline &amp; progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
      * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
      * <li>TGA (not sure what subset, if a subset)</li>
      * <li>BMP non-1bpp, non-RLE</li>
@@ -107,7 +107,7 @@ public class ImageIO {
     /**
      * Loads an image from resources folder. Supported formats are
      * <ul>
-     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>JPEG baseline &amp; progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
      * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
      * <li>TGA (not sure what subset, if a subset)</li>
      * <li>BMP non-1bpp, non-RLE</li>
@@ -119,6 +119,7 @@ public class ImageIO {
      * </ul>
      * @param file path to the resource
      * @return {@link ImageData} with info about the image
+     * @throws IOException if an error occurs while reading the resource
      * @see org.lwjgl.stb.STBImage STBImage, image decoder
      */
     public static ImageData loadImageFromResource(String file) throws IOException {
@@ -133,7 +134,7 @@ public class ImageIO {
     /**
      * Loads an image from a {@link URL}. Supported formats are
      * <ul>
-     * <li>JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
+     * <li>JPEG baseline &amp; progressive (12 bpc/arithmetic not supported, same as stock IJG lib</li>
      * <li>PNG 1/2/4/8-bit-per-channel (16 bpc not supported)</li>
      * <li>TGA (not sure what subset, if a subset)</li>
      * <li>BMP non-1bpp, non-RLE</li>
@@ -145,6 +146,7 @@ public class ImageIO {
      * </ul>
      * @param url {@link URL} to the resource
      * @return {@link ImageData} with info about the image
+     * @throws IOException if an error occurs while reading the {@link URL}
      * @see org.lwjgl.stb.STBImage STBImage, image decoder
      */
     public static ImageData loadImage(final URL url) throws IOException {

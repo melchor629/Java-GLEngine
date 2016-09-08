@@ -41,6 +41,8 @@ public abstract class Game {
     
     /**
      * Default constructor for test games
+     * @param window The Window created with your chosen implementation
+     * @param audio The Audio context created with your chosen implementation
      */
     protected Game(Window window, AL audio) {
         events = new ConcurrentLinkedQueue<>();

@@ -4,8 +4,31 @@ import org.lwjgl.nanovg.NVGColor;
 import org.lwjgl.nanovg.NanoVG;
 import org.lwjgl.system.MemoryStack;
 
+/**
+ * <p>
+ * Stores a Color created with {@link #rgb(double, double, double)},
+ * {@link #rgba(double, double, double, double)}, {@link #hex(String)},
+ * {@link #hsl(float, float, float)} or {@link #hsla(double, double, double, float)}.
+ * </p>
+ * <p>
+ * The color can be used to set properties in a {@link View} or to change the
+ * fill and stroke color when painting.
+ * </p>
+ * <p>
+ * A color can be cloned safely, will represent the same color but will be
+ * different objects.
+ * </p>
+ * <p>
+ * You can use <a href="http://html-color-codes.info/#HTML_Color_Picker">HTML Color Picker</a>
+ * to choose colors, all formats supported in this picker are supported in this
+ * class.
+ * </p>
+ */
 public class Color implements Cloneable {
 
+    /**
+     * Color component in RGBA format
+     */
     private float r, g, b, a;
 
     public Color(float r, float g, float b, float a) {
@@ -27,86 +50,172 @@ public class Color implements Cloneable {
         this((float) r / 255f, (float) g / 255f, (float) b / 255f, 1f);
     }
 
+    /**
+     * The red component value in a float value between 0 and 1,
+     * both included. 0 represents no red and 1, full red.
+     * @return the red component value
+     */
     public float r() {
         return r;
     }
 
+    /**
+     * The green component value in a float value between 0 and 1,
+     * both included. 0 represents no green and 1, full green.
+     * @return the green component value
+     */
     public float g() {
         return g;
     }
 
+    /**
+     * The blue component value in a float value between 0 and 1,
+     * both included. 0 represents no blue and 1, full blue.
+     * @return the blue component value
+     */
     public float b() {
         return b;
     }
 
+    /**
+     * The alpha component value in a float value between 0 and 1,
+     * both included. 0 represents fully transparent and 1, full opaque.
+     * @return the alpha/opacity component value
+     */
     public float alpha() {
         return a;
     }
 
+    /**
+     * Changes the red component value. This value is represented between
+     * 0 and 1, both included. 0 represents no red and 1, full red.
+     * @param v new red component value
+     * @return this
+     */
     public Color r(float v) {
         r = v;
         return this;
     }
 
+    /**
+     * Changes the green component value. This value is represented between
+     * 0 and 1, both included. 0 represents no green and 1, full green.
+     * @param v new green component value
+     * @return this
+     */
     public Color g(float v) {
         g = v;
         return this;
     }
 
+    /**
+     * Changes the blue component value. This value is represented between
+     * 0 and 1, both included. 0 represents no blue and 1, full blue.
+     * @param v new blue component value
+     * @return this
+     */
     public Color b(float v) {
         b = v;
         return this;
     }
 
+    /**
+     * Changes the alpha/opacity component value. This value is represented between
+     * 0 and 1, both included. 0 represents fully transparent and 1,
+     * fully opaque.
+     * @param v new alpha/opacity component value
+     * @return this
+     */
     public Color alpha(float v) {
         a = v;
         return this;
     }
 
+    /**
+     * @return White color
+     */
     public static Color white() {
         return new Color(1f, 1, 1);
     }
 
+    /**
+     * @return Black color
+     */
     public static Color black() {
         return new Color(0f, 0, 0);
     }
 
+    /**
+     * @return Red color
+     */
     public static Color red() {
         return new Color(1f, 0, 0, 1);
     }
 
+    /**
+     * @return Yellow color
+     */
     public static Color yellow() {
         return new Color(1f, 1, 0, 1);
     }
 
+    /**
+     * @return Green color
+     */
     public static Color green() {
         return new Color(0, 1f, 0, 1);
     }
 
+    /**
+     * @return Cyan color
+     */
     public static Color cyan() {
         return new Color (0, 1f, 1, 1);
     }
 
+    /**
+     * @return Blue color
+     */
     public static Color blue() {
         return new Color(0, 0, 1f, 1);
     }
 
+    /**
+     * @return Magenta color
+     */
     public static Color magenta() {
         return new Color(1f, 0, 1, 1);
     }
 
+    /**
+     * @return Grey color
+     */
     public static Color grey() {
         return hex("#808080");
     }
 
+    /**
+     * @return Light gray color
+     */
     public static Color lightGrey() {
         return hex("#D3D3D3");
     }
 
+    /**
+     * @return Black transparent color
+     */
     public static Color transparent() {
         return new Color(0, 0, 0, 0);
     }
 
+    /**
+     * Creates a {@link Color} from the HLSA value
+     * @param h Hue value
+     * @param s Saturation value
+     * @param l Lightness value
+     * @param a Alpha/Opacity value
+     * @return A {@link Color} that represents the one in HSLA format
+     */
     public static Color hsla(double h, double s, double l, float a) {
         //http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
         double r, g, b;
@@ -124,18 +233,51 @@ public class Color implements Cloneable {
         return rgba(r, g, b, a);
     }
 
+    /**
+     * Creates a opaque {@link Color} from the HSL value
+     * @param h Hue value
+     * @param s Saturation value
+     * @param l Lightness value
+     * @return A {@link Color} that represents the one in HSL format
+     */
     public static Color hsl(float h, float s, float l) {
         return hsla(h, s, l, 1);
     }
 
+    /**
+     * Creates a opaque {@link Color} from the RGB value
+     * @param r Red component value
+     * @param g Green component value
+     * @param b Blue component value
+     * @return A {@link Color} that represents the one in RGB format
+     */
     public static Color rgb(double r, double g, double b) {
         return new Color((float) r, (float) g, (float) b);
     }
 
+    /**
+     * Creates a {@link Color} from the RGBA value
+     * @param r Red component value
+     * @param g Green component value
+     * @param b Blue component value
+     * @param a Alpha/Opacity value
+     * @return A {@link Color} that represents the one in RGBA format
+     */
     public static Color rgba(double r, double g, double b, double a) {
         return new Color((float) r, (float) g, (float) b, (float) a);
     }
 
+    /**
+     * Creates a {@link Color} from the hex value. Supported formats
+     * are {@code #RGB}, {@code #RGBA}, {@code #RRGGBB} and
+     * {@code #RRGGBBAA}.
+     * @param hex hex {@link String} that stores a {@link Color}
+     * @return A {@link Color} that represents the hex {@link String}
+     * @throws IllegalArgumentException if the string don't represent
+     * a hex {@link String}
+     * @throws NumberFormatException if the string contain non numeric
+     * values
+     */
     public static Color hex(String hex) {
         if(hex.startsWith("#")) {
             if(hex.length() == 7 || hex.length() == 9) {
@@ -176,6 +318,12 @@ public class Color implements Cloneable {
         return p;
     }
 
+    /**
+     * Sets the value of the {@link NVGColor} struct to the
+     * one stored in this {@link Color} instance.
+     * @param color allocated {@link NVGColor} struct
+     * @return the same {@code color} {@link NVGColor} struct
+     */
     NVGColor convert(NVGColor color) {
         return NanoVG.nvgRGBAf(r, g, b, a, color);
     }

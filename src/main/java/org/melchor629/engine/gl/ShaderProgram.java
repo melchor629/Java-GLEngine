@@ -439,6 +439,7 @@ public class ShaderProgram implements Erasable {
 
     /**
      * Check for errors. If there is an error, then will throw an GLError
+     * @param type type of the shader to check
      * @param shader shader to check
      * @throws GLError If COMPILE_STATUS is not GL_TRUE (an error occurred
      *                 while compiling)

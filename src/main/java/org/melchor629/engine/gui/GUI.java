@@ -154,6 +154,7 @@ public class GUI implements Erasable {
     /**
      * Wraps the code block for rendering all 3D objects to mix with the
      * GUI after both are rendered.
+     * @param render Render code block to call
      */
     public void render(RenderBlock render) {
         hidegui = hideguic;
@@ -181,6 +182,7 @@ public class GUI implements Erasable {
      *     <li>glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)</li>
      *     <li>glStencilFunc(GL_ALWAYS, 0, 0xffffffff)</li>
      * </ul>
+     * @param renderFunction extra GUI rendering code block
      */
     public void gui(Consumer<Long> renderFunction) {
         if(!hidegui) {

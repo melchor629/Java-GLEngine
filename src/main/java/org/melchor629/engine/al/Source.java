@@ -164,7 +164,7 @@ public abstract class Source implements Erasable {
     }
     
     public void setConeOuterGain(float gain) {
-        assert(GLM.belongsToInterval(gain, 0.f, 1.f));
+        assert(GLM.between(gain, 0.f, 1.f));
         cone_outer_gain = gain;
         al.sourcef(source, AL.Source.CONE_OUTER_GAIN, cone_outer_gain);
     }
@@ -198,7 +198,7 @@ public abstract class Source implements Erasable {
     }
 
     public void setMinimumGain(float min) {
-        if(GLM.belongsToInterval(min, 0.f, 1.f)) {
+        if(GLM.between(min, 0.f, 1.f)) {
             min_gain = min;
             al.sourcef(source, AL.Source.MIN_GAIN, min_gain);
         }
@@ -209,7 +209,7 @@ public abstract class Source implements Erasable {
     }
 
     public void setMaximumGain(float min) {
-        if(GLM.belongsToInterval(min, 0.f, 1.f)) {
+        if(GLM.between(min, 0.f, 1.f)) {
             max_gain = min;
             al.sourcef(source, AL.Source.MAX_GAIN, min_gain);
         }

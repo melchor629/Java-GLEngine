@@ -94,6 +94,7 @@ public interface Window {
 
     /**
      * Sets if the context will run on Vertical Synchronization
+     * @param vsync true to activate, false otherwise
      */
     void setVsync(boolean vsync);
 
@@ -197,6 +198,7 @@ public interface Window {
      * Creates the OpenGL context on the current thread. Can be
      * called in any thread, but that thread will have the OpenGL
      * context and no other thread could have it.
+     * @return the {@code GLContext} for this Window
      */
     GLContext makeContextOnCurrentThread();
 

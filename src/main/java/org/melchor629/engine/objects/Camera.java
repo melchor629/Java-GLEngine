@@ -33,6 +33,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * Creates a camera with position (0, 0, 0) &amp; rotation 0º &amp; 0º,
      * a FOV of 45º, an aspect ratio of 16:9, and a near distance of
      * 1 and far 10.
+     * @param game Game object
      */
     public Camera(Game game) {
         pos = new Vector3();
@@ -53,6 +54,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * Creates a camera with position {@code pos} &amp; rotation defined
      * by {@code rot} in degrees. A FOV of 45º, an aspect ratio of 16:9,
      * and a near distance of 1 and far 10.
+     * @param game Game object
      * @param pos Initial position
      * @param rot Initial rotation of yaw (x), pitch (y) and roll (z)
      */
@@ -79,6 +81,7 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
      * {@code dir} and with the head looking at {@code up}, like
      * {@code GLM::lookAt(vec3, vec3, vec3)}. A FOV of 45º, an
      * aspect ratio of 16:9, and a near distance of 1 and far 10.
+     * @param game Game object
      * @param pos Initial position
      * @param dir Direction to look at
      * @param up Where the head points at
