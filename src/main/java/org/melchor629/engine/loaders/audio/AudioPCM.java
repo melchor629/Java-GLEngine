@@ -2,7 +2,7 @@ package org.melchor629.engine.loaders.audio;
 
 import com.sun.jna.Native;
 import org.melchor629.engine.utils.MemoryUtils;
-import sun.nio.ch.DirectBuffer;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.*;
 
@@ -86,7 +86,7 @@ public class AudioPCM implements AutoCloseable {
      */
     public void setBuffer(Buffer buffer) {
         if(!buffer.isDirect()) throw new RuntimeException("Buffer is not direct allocated");
-        pcmAddress = ((DirectBuffer) buffer).address();
+        pcmAddress = MemoryUtil.memAddress0(buffer);
         pcmSize = buffer.capacity();
         pcm = buffer;
 
