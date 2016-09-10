@@ -224,7 +224,7 @@ public abstract class View {
     }
 
     public void backgroundColor(Color bgcolor) {
-        opc("backgroundColor", this.backgroundColor, backgroundColor);
+        opc("backgroundColor", this.backgroundColor, bgcolor);
         backgroundColor = bgcolor;
     }
 
@@ -234,13 +234,13 @@ public abstract class View {
     }
 
     public void backgroundImage(Image image) {
-        opc("backgroundImage", this.backgroundImage, backgroundImage);
+        opc("backgroundImage", this.backgroundImage, image);
         this.backgroundImage = image;
         this.backgroundGradient = null;
     }
 
     public void backgroundImage(Gradient gradient) {
-        opc("backgroundImage", this.backgroundImage, backgroundImage);
+        opc("backgroundImage", this.backgroundImage, gradient);
         this.backgroundImage = null;
         this.backgroundGradient = gradient;
     }
