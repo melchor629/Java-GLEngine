@@ -29,7 +29,7 @@ public class TextInput extends TextLabel {
         if(focus && (System.currentTimeMillis() / 500) % 2 == 1) {
             color.setAsFillColor();
             nvgBeginPath(ctx);
-            GUIDrawUtils.drawRectangle(x + cursorPosition, y, 2, frame.height - paddingTop - paddingBottom);
+            GUIDrawUtils.drawRectangle(x + cursorPosition + paddingLeft, y + paddingTop, 2, frame.height - paddingTop - paddingBottom);
             nvgFill(ctx);
         }
     }
@@ -52,10 +52,11 @@ public class TextInput extends TextLabel {
         if(bounds[2] - bounds[0] > width) {
             textAlign(VerticalAlign.RIGHT);
             cursorPosition = width;
-        } else {
+            markDirty();
+        } else if(textAlign != VerticalAlign.LEFT) {
             textAlign(VerticalAlign.LEFT);
+            markDirty();
         }
-        markDirty();
     }
 
     @Override
@@ -70,6 +71,7 @@ public class TextInput extends TextLabel {
         if(rep.equals("BACKSPACE") && !label.isEmpty()) {
             label = label.substring(0, label.length() - 1);
             checkSizeOfText();
+            markDirty();
             backspacePressed = true;
             GUI.gui.executeOnceDelayed(750, this::deleteMaintained);
         } else if(rep.equals("ENTER")) {
@@ -89,6 +91,7 @@ public class TextInput extends TextLabel {
     public void onCharKey(Keyboard keyboard, String rep) {
         label += rep;
         checkSizeOfText();
+        markDirty();
     }
 
     private void repeat() {
@@ -100,6 +103,7 @@ public class TextInput extends TextLabel {
         if(backspacePressed && !label.isEmpty()) {
             label = label.substring(0, label.length() - 1);
             checkSizeOfText();
+            markDirty();
             GUI.gui.executeOnceDelayed(75, this::deleteMaintained);
         }
     }
