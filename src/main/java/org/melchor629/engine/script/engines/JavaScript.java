@@ -4,6 +4,7 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.melchor629.engine.script.ScriptEngine;
 import org.melchor629.engine.script.ScriptError;
 import org.melchor629.engine.script.ScriptModule;
+import org.melchor629.engine.utils.IOUtils;
 
 import javax.script.ScriptContext;
 import java.util.Arrays;
@@ -27,19 +28,7 @@ public class JavaScript implements ScriptEngine {
 
         try {
             engine.getContext().setAttribute("__eng", this, ScriptContext.ENGINE_SCOPE);
-            engine.eval("function __exec_func_java_(name, args) {\n" +
-                    "if(__eng.functionMap.containsKey(name)) {\n" +
-                        "return __eng.wrapperFunctionCall(name, args);\n" +
-                    "}\n" +
-                "}\n" +
-                "\n" +
-                "function require(moduleName) {\n" +
-                    "if(__eng.moduleMap.containsKey(moduleName)) {\n" +
-                        "var m = __eng.moduleMap.get(moduleName);\n" +
-                        "m.moduleDidLoad();\n" +
-                        "return m;\n" +
-                    "} else throw new Error('Module not ' + moduleName + ' found');\n" +
-                "}\n");
+            engine.eval(IOUtils.readStream(IOUtils.getResourceAsStream("scripts/js/wrap.js")));
         } catch(Exception ignore) {}
     }
 
