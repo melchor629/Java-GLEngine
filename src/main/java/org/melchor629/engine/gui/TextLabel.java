@@ -70,24 +70,24 @@ public class TextLabel extends View {
         float fx = 0, fy = 0;
         if(textAlign == VerticalAlign.LEFT || width == null) {
             alignVert = NVG_ALIGN_LEFT;
-            fx = 0;
+            fx = 0 + paddingLeft;
         } else if(textAlign == VerticalAlign.CENTER) {
             alignVert = NVG_ALIGN_CENTER;
-            fx = width / 2;
+            fx = width / 2 + (paddingLeft - paddingRight) / 2;
         } else if(textAlign == VerticalAlign.RIGHT) {
             alignVert = NVG_ALIGN_RIGHT;
-            fx = width;
+            fx = width - paddingRight;
         }
 
         if(textAlign2 == HorizontalAlign.TOP || height == null) {
             alignHor = NVG_ALIGN_TOP;
-            fy = 0;
+            fy = 0 + paddingTop;
         } else if(textAlign2 == HorizontalAlign.CENTER) {
             alignHor = NVG_ALIGN_MIDDLE;
-            fy = height / 2;
+            fy = height / 2 + (paddingTop - paddingBottom) / 2;
         } else if(textAlign2 == HorizontalAlign.BOTTOM) {
             alignHor = NVG_ALIGN_BOTTOM;
-            fy = height;
+            fy = height - paddingBottom;
         }
 
         if(font != null) GUI.gui.setFont(font, fontSize);
@@ -103,9 +103,9 @@ public class TextLabel extends View {
             nvgTextAlign(ctx, NVG_ALIGN_TOP | NVG_ALIGN_LEFT);
             nvgFontSize(ctx, fontSize);
             nvgTextBounds(ctx, x, y, label, 0, bounds);
-            float width = this.width != null ? this.width : bounds[2] - bounds[0];
-            float height = this.height != null ? this.height : bounds[3] - bounds[1];
-            frame = new Frame(bounds[0] - paddingRight, bounds[1] - paddingBottom , width + paddingLeft + paddingRight, height + paddingTop + paddingBottom);
+            float width = this.width != null ? this.width : bounds[2] - bounds[0] + paddingLeft + paddingRight;
+            float height = this.height != null ? this.height : bounds[3] - bounds[1] + paddingTop + paddingBottom;
+            frame = new Frame(x, y, width, height);
             nvgRestore(ctx);
         }
         return frame;
