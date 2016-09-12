@@ -123,7 +123,7 @@ public class SkyBox {
         int func = gl.getInt(GLContext.GLGet.DEPTH_FUNC);
         int mode = gl.getInt(GLContext.GLGet.CULL_FACE_MODE);
         gl.depthFunc(GLContext.DepthFunction.LEQUAL);
-        gl.cullFace(GLContext.CullFaceMode.BACK);
+        gl.cullFace(GLContext.CullFaceMode.FRONT);
 
         Matrix4 view = (Matrix4) camera.getViewMatrix().clone();
         view.setColumn(4, new Vector4(0, 0, 0, 0));
