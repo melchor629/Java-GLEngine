@@ -44,6 +44,7 @@ class LWJGLGLContext implements GLContext {
         debugClosure = GLUtil.setupDebugMessageCallback();
         Configuration.DEBUG.set(true);
         erasableList = new ArrayList<>();
+        GLContext._ctxs.put(Thread.currentThread(), this);
     }
 
     @Override

@@ -39,6 +39,7 @@ public class LWJGLAudio implements AL {
             alCap = org.lwjgl.openal.AL.createCapabilities(alcCap);
             listener = new org.melchor629.engine.al.Listener(this);
             erasableList = new ArrayList<>();
+			AL._ctxs.put(Thread.currentThread(), this);
 		} catch(Exception e) {
 			ALError err = new ALError("Error creating context");
 			err.initCause(e);

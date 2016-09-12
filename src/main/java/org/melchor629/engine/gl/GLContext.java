@@ -14,16 +14,32 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-
-//import static org.lwjgl.opengl.GL14.*;
+import java.util.HashMap;
 
 /**
  * Enclosing interface for every renderer, and a bunch of variables in enums
- * for some functions that simplify coding. Is incomplete, but is actualy
+ * for some functions that simplify coding. Is incomplete, but is actually
  * functional.
  * @author melchor9000
+ * @see #_ctxs A note for implementors
  */
 public interface GLContext {
+    /**
+     * Implementors of {@link GLContext} must add the created context to
+     * this {@link HashMap} to let other parts of code to retrieve the OGL
+     * context for its Thread. Also let your implementation know if already
+     * there's a context for the current Thread in a easy way.
+     */
+    HashMap<Thread, GLContext> _ctxs = new HashMap<>();
+
+    /**
+     * Gets the current context for this {@link Thread}, or return {@code null}
+     * if there's no one.
+     * @return Context for this Thread or {@code null}
+     */
+    static GLContext contextForCurrentThread() {
+        return _ctxs.get(Thread.currentThread());
+    }
 
     /**
      * Enum for select some capability to enable/disable (maybe incomplete)

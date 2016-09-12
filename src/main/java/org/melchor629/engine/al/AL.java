@@ -6,6 +6,7 @@ import org.melchor629.engine.loaders.audio.AudioPCM;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
+import java.util.HashMap;
 
 //TODO Poner uso de Buffers (como ByteBuffer)
 /**
@@ -14,6 +15,23 @@ import java.nio.ShortBuffer;
  * @author melchor9000
  */
 public interface AL {
+    /**
+     * Implementors of {@link AL} must add the created context to
+     * this {@link HashMap} to let other parts of code to retrieve the OAL
+     * context for its Thread. Also let your implementation know if already
+     * there's a context for the current Thread in a easy way.
+     */
+    HashMap<Thread, AL> _ctxs = new HashMap<>();
+
+    /**
+     * Gets the current context for this {@link Thread}, or return {@code null}
+     * if there's no one.
+     * @return Context for this Thread or {@code null}
+     */
+    static AL contextForCurrentThread() {
+        return _ctxs.get(Thread.currentThread());
+    }
+
     enum Listener {
         GAIN (0x100A),
         POSITION (0x1004),
