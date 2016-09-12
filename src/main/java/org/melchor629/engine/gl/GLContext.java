@@ -471,7 +471,10 @@ public interface GLContext {
     }
 
     enum CullFaceMode {
-        BACK, FRONT, FRONT_AND_BACK
+        BACK (1028), FRONT (1029), FRONT_AND_BACK (1032);
+
+        final int e;
+        CullFaceMode(int t) { e = t; }
     }
 
     /**
@@ -1183,6 +1186,8 @@ public interface GLContext {
     void deleteRenderbuffer(int rb);
     void deleteRendebuffers(int[] rbs);
     void bindFramebuffer(int framebuffer);
+    void bindFramebufferRead(int framebuffer);
+    void bindFramebufferWrite(int framebuffer);
     void bindRenderbuffer(int rbo);
     FramebufferStatus checkFramebufferStatus();
 
@@ -1193,6 +1198,9 @@ public interface GLContext {
 
     void renderbufferStorage(TextureFormat fmt, int width, int height);
     void renderbufferStorageMultisample(TextureFormat fmt, int samples, int w, int h);
+
+    void blitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int bitmask, TextureFilter filter);
+    void drawBuffers(FramebufferAttachment... attachments);
 
     //Stencil utils
     void stencilFunc(StencilFunc func, int ref, int mask);

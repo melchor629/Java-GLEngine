@@ -195,6 +195,26 @@ public class FrameBuffer implements Erasable {
     }
 
     /**
+     * Binds this FrameBuffer as a read Buffer.
+     * @throws GLError If the FBO was deleted or incomplete
+     */
+    public void bindForRead() {
+        if(fb == -1) throw new GLError("glBindFramebuffer", "Cannot bind a deleted framebuffer");
+        lastFb = gl.getInt(GLContext.GLGet.READ_FRAMEBUFFER_BINDING);
+        gl.bindFramebufferRead(fb);
+    }
+
+    /**
+     * Binds this FrameBuffer as a draw/write Buffer.
+     * @throws GLError If the FBO was deleted or incomplete
+     */
+    public void bindForDraw() {
+        if(fb == -1) throw new GLError("glBindFramebuffer", "Cannot bind a deleted framebuffer");
+        lastFb = gl.getInt(GLContext.GLGet.DRAW_FRAMEBUFFER_BINDING);
+        gl.bindFramebufferWrite(fb);
+    }
+
+    /**
      * Unbinds this framebuffer
      */
     public void unbind() {

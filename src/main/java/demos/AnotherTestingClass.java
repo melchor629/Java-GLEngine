@@ -74,7 +74,7 @@ public class AnotherTestingClass extends Game {
         camera = new Camera(this);
         camera.setClipPanes(0.1, 100);
 
-        new Thread(() -> {
+        /*new Thread(() -> {
             try {
                 AudioFormat sound;
 
@@ -91,11 +91,10 @@ public class AnotherTestingClass extends Game {
                     });
                 }
             } catch(Exception ignore) {ignore.printStackTrace();}
-        }, "Canción de fondo").start();
+        }, "Canción de fondo").start();*/
 
         Collada c = null;
         try {
-            //c = new Collada(new File("mierda.dae"));
             c = new Collada(new File("src/main/resources/scenes/mierdolo.dae"));
             c.loadElements(this);
         } catch(Exception e) {
@@ -150,7 +149,7 @@ public class AnotherTestingClass extends Game {
 
         camera.updateIfNeeded();
         al.getListener().setPosition(camera.getPosition());
-        al.getListener().setOrientation(camera.getLookingAtDirection(), new Vector3(0, 0, 1));
+        al.getListener().setOrientation(camera.getLookingAtDirection(), new Vector3(0, 1, 0));
         al.getListener().setVelocity(camera.getSpeed());
     }
 

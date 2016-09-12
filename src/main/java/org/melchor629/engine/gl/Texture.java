@@ -56,7 +56,8 @@ public class Texture implements Erasable {
         gl.bindTexture(target, texture);
         gl.texParameteri(target, GLContext.TextureParameter.MIN_FILTER, GLContext.TextureFilter.LINEAR);
         gl.texParameteri(target, GLContext.TextureParameter.MAG_FILTER, GLContext.TextureFilter.LINEAR);
-        gl.texImage2D(target, 0, format, width, height, 0, eformat, GLContext.type.UNSIGNED_BYTE);
+        if(format == TextureFormat.RGB16F) gl.texImage2D(target, 0, format, width, height, 0, eformat, GLContext.type.FLOAT);
+        else gl.texImage2D(target, 0, format, width, height, 0, eformat, GLContext.type.UNSIGNED_BYTE);
 
         gl.addErasable(this);
     }

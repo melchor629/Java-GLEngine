@@ -229,6 +229,39 @@ class Cube {
         colorBuffer.unbind();
     }
 
+    void bindStuff(int vertex, int normal, int coord, int color) {
+        vao.bind();
+        indexBuffer.bind();
+
+        if (vertex >= 0) {
+            positionBuffer.bind();
+            gl.vertexAttribPointer(vertex, 3, GLContext.type.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(vertex);
+        }
+
+        if (normal >= 0) {
+            normalBuffer.bind();
+            gl.vertexAttribPointer(normal, 3, GLContext.type.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(normal);
+        }
+
+        if (coord >= 0) {
+            textureCoordBuffer.bind();
+            gl.vertexAttribPointer(coord, 2, GLContext.type.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(coord);
+        }
+
+        if (color >= 0) {
+            colorBuffer.bind();
+            gl.vertexAttribPointer(color, 3, GLContext.type.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(color);
+        }
+
+        vao.unbind();
+        indexBuffer.unbind();
+        colorBuffer.unbind();
+    }
+
     void draw() {
         vao.bind();
         gl.drawElements(GLContext.DrawMode.TRIANGLES, 36, GLContext.type.UNSIGNED_INT, 0);

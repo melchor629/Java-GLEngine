@@ -34,7 +34,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
  * Class for Render with LWJGL
  * @author melchor9000
  */
-public class LWJGLGLContext implements GLContext {
+class LWJGLGLContext implements GLContext {
     private org.lwjgl.opengl.GLCapabilities context;
     private Callback debugClosure;
     private List<Erasable> erasableList;
@@ -883,6 +883,16 @@ public class LWJGLGLContext implements GLContext {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     }
 
+    @Override
+    public void bindFramebufferRead(int framebuffer) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+    }
+
+    @Override
+    public void bindFramebufferWrite(int framebuffer) {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#bindRenderbuffer(int)
      */
@@ -962,6 +972,18 @@ public class LWJGLGLContext implements GLContext {
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, fmt.e, w, h);
     }
 
+    @Override
+    public void blitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int bitmask, TextureFilter filter) {
+        glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, bitmask, filter.e);
+    }
+
+    @Override
+    public void drawBuffers(FramebufferAttachment... attachments) {
+        int[] att = new int[attachments.length];
+        for(int i = 0; i < att.length; i++) att[i] = attachments[i].e;
+        glDrawBuffers(att);
+    }
+
     /* (non-Javadoc)
      * @see org.melchor629.engine.gl.GLContext#stencilFunc(org.melchor629.engine.gl.GLContext.StencilFunc, int, int)
      */
@@ -1036,14 +1058,7 @@ public class LWJGLGLContext implements GLContext {
      */
     @Override
     public void cullFace(CullFaceMode mode) {
-        int m;
-        switch(mode) {
-            case FRONT: m = GL_FRONT; break;
-            case BACK: m = GL_BACK; break;
-            case FRONT_AND_BACK: m = GL_FRONT_AND_BACK; break;
-            default: m = -1;
-        }
-        glCullFace(m);
+        glCullFace(mode.e);
     }
 
     @Override
