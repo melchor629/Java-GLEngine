@@ -29,8 +29,7 @@ public class Interfa extends Game {
                 .setOpenGLContextVersion(WindowBuilder.OpenGLContextVersion.GL_33)
                 .setDoubleBuffered(true)
                 .setVisible(false)
-                .create(1280, 720), null);
-        enableGui = true;
+                .create(1280, 720), true);
         startEngine();
     }
 

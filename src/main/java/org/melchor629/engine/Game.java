@@ -25,7 +25,6 @@ public abstract class Game {
     private static final Logger LOG = Logger.getLogger(Game.class);
 
     protected int width, height;
-    protected boolean enableGui = false;
     protected Timing t;
     protected Queue<Runnable> events;
     protected Window window;
@@ -38,13 +37,15 @@ public abstract class Game {
     private final Lock lock = new ReentrantLock(true);
     private final Condition waitClosing, waitFocus;
     private volatile boolean destroyed = false, focused = true;
+    private boolean enableGui = false;
     
     /**
-     * Default constructor for test games
+     * Full constructor for test games
      * @param window The Window created with your chosen implementation
      * @param audio The Audio context created with your chosen implementation
+     * @param enableGui Enables/Disables the GUI
      */
-    protected Game(Window window, AL audio) {
+    protected Game(Window window, AL audio, boolean enableGui) {
         events = new ConcurrentLinkedQueue<>();
         waitClosing = lock.newCondition();
         waitFocus = lock.newCondition();
@@ -52,6 +53,33 @@ public abstract class Game {
         this.al = audio;
         width = window.getWindowSize().width;
         height = window.getWindowSize().height;
+        this.enableGui = enableGui;
+    }
+
+    /**
+     * Constructor for test games without OpenAL
+     * @param window The Window created with your chosen implementation
+     * @param enableGui Enables/Disables the GUI
+     */
+    protected Game(Window window, boolean enableGui) {
+        this(window, null, enableGui);
+    }
+
+    /**
+     * Constructor for test games without GUI
+     * @param window The Window created with your chosen implementation
+     * @param audio The Audio context created with your chosen implementation
+     */
+    protected Game(Window window, AL audio) {
+        this(window, audio, false);
+    }
+
+    /**
+     * Constructor for test games without OpenAL and GUI
+     * @param window The Window created with your chosen implementation
+     */
+    protected Game(Window window) {
+        this(window, null, false);
     }
 
     private void makeGame() {
@@ -101,6 +129,7 @@ public abstract class Game {
                 this.window.setWindowShouldClose(true);
         });
 
+        window.showWindow();
         t = Timing.getGameTiming();
         while(!destroyed) {
             while(!events.isEmpty()) events.poll().run();

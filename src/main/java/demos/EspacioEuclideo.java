@@ -88,8 +88,7 @@ public class EspacioEuclideo extends Game {
                 .setVisible(false)
                 .setOpenGLContextVersion(WindowBuilder.OpenGLContextVersion.GL_33)
                 .setTitle("Espacio Euclídeo")
-                .create(1280, 720), null);
-        enableGui = true;
+                .create(1280, 720), true);
         startEngine();
     }
 
