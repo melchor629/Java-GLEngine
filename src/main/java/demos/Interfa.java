@@ -2,8 +2,8 @@ package demos;
 
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.LWJGLWindow;
-import org.melchor629.engine.gl.WindowBuilder;
+import org.melchor629.engine.window.LWJGLWindow;
+import org.melchor629.engine.window.WindowBuilder;
 import org.melchor629.engine.gui.*;
 import org.melchor629.engine.gui.easing.*;
 import org.melchor629.engine.utils.IOUtils;

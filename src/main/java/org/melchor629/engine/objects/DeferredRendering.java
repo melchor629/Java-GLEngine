@@ -4,6 +4,7 @@ import org.melchor629.engine.gl.*;
 import org.melchor629.engine.objects.lights.Light;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.math.ModelMatrix;
+import org.melchor629.engine.window.Window;
 
 import java.io.IOException;
 import java.util.List;

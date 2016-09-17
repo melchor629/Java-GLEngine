@@ -1,5 +1,6 @@
-package org.melchor629.engine.gl;
+package org.melchor629.engine.window;
 
+import org.melchor629.engine.gl.GLContext;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;
 

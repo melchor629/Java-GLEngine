@@ -1,6 +1,6 @@
 package org.melchor629.engine.gui;
 
-import org.melchor629.engine.gl.Window;
+import org.melchor629.engine.window.Window;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.utils.math.Vector2;
 

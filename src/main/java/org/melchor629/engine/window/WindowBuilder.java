@@ -1,4 +1,4 @@
-package org.melchor629.engine.gl;
+package org.melchor629.engine.window;
 
 /**
  * Helps you to create a {@code Window} by letting you change
@@ -120,6 +120,14 @@ public interface WindowBuilder<T extends Window> {
     WindowBuilder setTitle(String title);
 
     /**
+     * Changes the monitor where this window will be created. You can
+     * pass {@code null} to set to the default monitor.
+     * @param monitor the {@link Monitor} on which the window will be created
+     * @return this
+     */
+    WindowBuilder setMonitor(Monitor monitor);
+
+    /**
      * Creates a window in non-fullscreen mode with the size {@code width}
      * {@code height}.
      * @param width width of the window
@@ -129,10 +137,18 @@ public interface WindowBuilder<T extends Window> {
     T create(int width, int height);
 
     /**
-     * Creates a fullscreen window for the default monitor.
+     * Creates a fullscreen window for the monitor set before.
      * @return the created {@link Window}
      */
     T createFullscreen();
+
+    /**
+     * Creates a fullscreen window for the monitor set before and
+     * the screen resoultion desired.
+     * @param videoMode the {@link Monitor.VideoMode} for the window
+     * @return the created {@link Window}
+     */
+    T createFullscreen(Monitor.VideoMode videoMode);
 
     /**
      * Creates a windowed fullscreen window (if size is not supported by the

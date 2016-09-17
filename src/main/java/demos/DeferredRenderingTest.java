@@ -2,9 +2,9 @@ package demos;
 
 import org.melchor629.engine.Game;
 import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.LWJGLWindow;
+import org.melchor629.engine.window.LWJGLWindow;
 import org.melchor629.engine.gl.Texture;
-import org.melchor629.engine.gl.WindowBuilder;
+import org.melchor629.engine.window.WindowBuilder;
 import org.melchor629.engine.gui.Color;
 import org.melchor629.engine.objects.Camera;
 import org.melchor629.engine.objects.DeferredRendering;

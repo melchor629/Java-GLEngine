@@ -11,6 +11,8 @@ import org.melchor629.engine.utils.MemoryUtils;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.ImageIO;
 import org.melchor629.engine.utils.math.Vector3;
+import org.melchor629.engine.window.LWJGLWindow;
+import org.melchor629.engine.window.WindowBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;

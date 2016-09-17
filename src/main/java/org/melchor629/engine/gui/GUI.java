@@ -10,6 +10,7 @@ import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;
 import org.melchor629.engine.utils.IOUtils;
 import org.melchor629.engine.utils.logger.Logger;
+import org.melchor629.engine.window.Window;
 
 import java.io.File;
 import java.io.FileNotFoundException;

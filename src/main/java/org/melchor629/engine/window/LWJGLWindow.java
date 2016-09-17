@@ -1,4 +1,4 @@
-package org.melchor629.engine.gl;
+package org.melchor629.engine.window;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -6,6 +6,9 @@ import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
+import org.melchor629.engine.gl.GLContext;
+import org.melchor629.engine.gl.GLError;
+import org.melchor629.engine.gl.LWJGLGLContext;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.LWJGLKeyboard;
 import org.melchor629.engine.input.LWJGLMouse;
@@ -235,29 +238,10 @@ public class LWJGLWindow implements Window {
         });
     }
 
-    /**
-     * Retrieves the valid default monitor sizes
-     * @return valid monitor sizes
-     */
-    //TODO clase para manejar monitores varios
-    public static Size[] monitorSizes() {
-        if(!Builder.glfwInitialized) {
-            if(!glfwInit())
-                throw new RuntimeException("Could not initiate GLFW");
-            Builder.glfwInitialized = true;
-        }
-
-        GLFWVidMode.Buffer modes = glfwGetVideoModes(glfwGetPrimaryMonitor());
-        Size[] sizes = new Size[modes.capacity()];
-        for(int i = 0; i < modes.capacity(); i++) {
-            sizes[i] = new Size(modes.get(i).width(), modes.get(i).height());
-        }
-        return sizes;
-    }
-
     public static class Builder implements WindowBuilder<LWJGLWindow> {
         private String title;
         private boolean core;
+        private LWJGLMonitor monitor;
         private static boolean glfwInitialized;
 
         public Builder() {
@@ -333,6 +317,14 @@ public class LWJGLWindow implements Window {
         }
 
         @Override
+        public WindowBuilder setMonitor(Monitor monitor) {
+            if(monitor instanceof LWJGLWindow)
+                this.monitor = (LWJGLMonitor) monitor;
+            else throw new IllegalArgumentException("Only LWJGLMonitor objects can be used as monitors");
+            return this;
+        }
+
+        @Override
         public LWJGLWindow create(int width, int height) {
             long window = glfwCreateWindow(width, height, title, 0L, 0L);
             if(window == 0L) throw new GLError("Context cannot be created");
@@ -341,15 +333,25 @@ public class LWJGLWindow implements Window {
 
         @Override
         public LWJGLWindow createFullscreen() {
-            GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            long window = glfwCreateWindow(mode.width(), mode.height(), title, glfwGetPrimaryMonitor(), 0L);
+            long mon = monitor == null ? glfwGetPrimaryMonitor() : monitor.monitor;
+            GLFWVidMode mode = glfwGetVideoMode(mon);
+            long window = glfwCreateWindow(mode.width(), mode.height(), title, mon, 0L);
+            if(window == 0L) throw new GLError("Context cannot be created");
+            return new LWJGLWindow(window, core);
+        }
+
+        @Override
+        public LWJGLWindow createFullscreen(Monitor.VideoMode videoMode) {
+            long mon = monitor == null ? glfwGetPrimaryMonitor() : monitor.monitor;
+            long window = glfwCreateWindow(videoMode.width, videoMode.height, title, mon, 0L);
             if(window == 0L) throw new GLError("Context cannot be created");
             return new LWJGLWindow(window, core);
         }
 
         @Override
         public LWJGLWindow createFullscreen(int width, int height) {
-            long window = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), 0L);
+            long mon = monitor == null ? glfwGetPrimaryMonitor() : monitor.monitor;
+            long window = glfwCreateWindow(width, height, title, mon, 0L);
             if(window == 0L) throw new GLError("Context cannot be created");
             return new LWJGLWindow(window, core);
         }

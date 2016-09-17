@@ -2,7 +2,7 @@ package org.melchor629.engine;
 
 import org.melchor629.engine.al.AL;
 import org.melchor629.engine.gl.GLContext;
-import org.melchor629.engine.gl.Window;
+import org.melchor629.engine.window.Window;
 import org.melchor629.engine.gui.GUI;
 import org.melchor629.engine.input.Keyboard;
 import org.melchor629.engine.input.Mouse;

@@ -34,12 +34,12 @@ import static org.lwjgl.system.MemoryStack.stackPush;
  * Class for Render with LWJGL
  * @author melchor9000
  */
-class LWJGLGLContext implements GLContext {
+public class LWJGLGLContext implements GLContext {
     private org.lwjgl.opengl.GLCapabilities context;
     private Callback debugClosure;
     private List<Erasable> erasableList;
 
-    LWJGLGLContext(boolean core) {
+    public LWJGLGLContext(boolean core) {
         context = org.lwjgl.opengl.GL.createCapabilities(core && Platform.get() == Platform.MACOSX);
         debugClosure = GLUtil.setupDebugMessageCallback();
         Configuration.DEBUG.set(true);
