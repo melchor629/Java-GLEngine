@@ -35,6 +35,11 @@ public class ALError extends RuntimeException {
         this.alFunc = glFunc;
     }
 
+    public ALError(String msg, Throwable cause) {
+        super(msg, cause);
+        this.msg = msg;
+    }
+
     @Override
     public String getMessage() {
         if(alFunc == null)

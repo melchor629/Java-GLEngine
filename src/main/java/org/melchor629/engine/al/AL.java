@@ -5,13 +5,22 @@ import org.melchor629.engine.loaders.audio.AudioFormat;
 import org.melchor629.engine.loaders.audio.AudioPCM;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.HashMap;
+import java.util.List;
 
-//TODO Poner uso de Buffers (como ByteBuffer)
 /**
  * OpenAL interface for implement in bindings.
- * http://grva.lamce.coppe.ufrj.br/labcogsdk/download/extras/openal/OpenAL_Programmers_Guide.pdf
+ * <p>
+ *     Implementations must create two constructors:<br>
+ *         1. To create using the default devices<br>
+ *         2. To create using a device passed as argument
+ * </p>
+ * <p>
+ *     Implementations must have a static function to return
+ *     the available devices to use when creating the context
+ * </p>
  * @author melchor9000
  */
 public interface AL {
@@ -138,10 +147,29 @@ public interface AL {
     void createContext();
 
     /**
+     * Create a context with OpenAL 1.1 (if is not possible, then 1.0)
+     * @param freq Indicates the sample rate for the mixing in Hz, or null for default
+     * @param refresh Refresh intervals, in Hz, or null for default
+     * @param sync Flag indicating a synchronous context, or null for default
+     * @throws ALError if an error occurs while creating the context
+     */
+    void createContext(Integer freq, Integer refresh, Boolean sync);
+
+    /**
+     * Create a context with OpenAL 1.1 (if is not possible, then 1.0)
+     * @param freq Indicates the sample rate for the mixing in Hz, or null for default
+     * @param refresh Refresh intervals, in Hz, or null for default
+     * @param sync Flag indicating a synchronous context, or null for default
+     * @param monoSources a hint of how many mono sources will be, or null for default
+     * @param stereoSources a hint of how many stereo sources will be, or null for default
+     * @throws ALError if an error occurs while creating the context
+     */
+    void createContext(Integer freq, Integer refresh, Boolean sync, Integer monoSources, Integer stereoSources);
+
+    /**
      * Deletes the context for this thread
      */
     void destroyContext();
-    //TODO Dispositivos
 
     /**
      * Adds an erasable to be deleted when this AL Context is destroyed
@@ -266,6 +294,17 @@ public interface AL {
      * @param freq Frequency of the sound
      */
     void bufferData(int buffer, Format format, int[] data, int freq);
+
+    /**
+     * This function fills a buffer with audio data. All the pre-defined formats are
+     * PCM data, but this function may be used by extensions to load other data
+     * types as well.
+     * @param buffer Buffer to be filled
+     * @param format Format of the data
+     * @param data Array with the data
+     * @param freq Frequency of the sound
+     */
+    void bufferData(int buffer, Format format, IntBuffer data, int freq);
     
     /**
      * This function deletes one buffer, freeing the resources used

@@ -1,9 +1,6 @@
 package org.melchor629.engine.al;
 
-import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.ALC;
-import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
+import org.lwjgl.openal.*;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.melchor629.engine.Erasable;
@@ -14,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.ALC10.*;
+import static org.lwjgl.openal.ALC11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
@@ -26,30 +25,95 @@ public class LWJGLAudio implements AL {
 	private org.melchor629.engine.al.Listener listener;
 	private List<Erasable> erasableList;
 
+	public LWJGLAudio() {
+		device = alcOpenDevice((String) null);
+        alcCap = ALC.createCapabilities(device);
+	}
+
+    public LWJGLAudio(String name) {
+        device = alcOpenDevice(name);
+        if(device == 0L) throw new NullPointerException("Device does not exist");
+        alcCap = ALC.createCapabilities(device);
+    }
+
+    /**
+     * @return all available output devices
+     */
+    public static String[] getAvailableDevices() {
+        long device = alcOpenDevice((String) null);
+        if(!ALC.createCapabilities(device).OpenALC11) return new String[] { null };
+        List<String> list = ALUtil.getStringList(device, ALC_DEFAULT_DEVICE_SPECIFIER);
+        alcCloseDevice(device);
+
+        String[] strings = new String[list.size()];
+        for(int i = 0; i < list.size(); i++) strings[i] = list.get(i);
+        return strings;
+    }
+
 	/* (non-Javadoc)
 	 * @see org.melchor629.engine.al.AL#createContext()
 	 */
 	@Override
 	public void createContext() throws ALError {
-		try {
-			device = org.lwjgl.openal.ALC10.alcOpenDevice((String) null);
-            context = org.lwjgl.openal.ALC10.alcCreateContext(device, (IntBuffer) null);
-            org.lwjgl.openal.ALC10.alcMakeContextCurrent(context);
-            alcCap = ALC.createCapabilities(device);
+		createContext(null, null, null);
+	}
+
+    @Override
+    public void createContext(Integer freq, Integer refresh, Boolean sync) {
+        createContext(freq, refresh, sync, null, null);
+    }
+
+    @Override
+    public void createContext(Integer freq, Integer refresh, Boolean sync, Integer monoSources, Integer stereoSources) {
+        List<Integer> values = new ArrayList<>();
+        if(freq != null) {
+            values.add(ALC_FREQUENCY);
+            values.add(freq);
+        }
+        if(refresh != null) {
+            values.add(ALC_REFRESH);
+            values.add(refresh);
+        }
+        if(sync != null) {
+            values.add(ALC_SYNC);
+            values.add(sync ? 1 : 0);
+        }
+        if(monoSources != null) {
+            values.add(ALC_MONO_SOURCES);
+            values.add(monoSources);
+        }
+        if(stereoSources != null) {
+            values.add(ALC_STEREO_SOURCES);
+            values.add(stereoSources);
+        }
+
+        try {
+            int val[] = null;
+            if(values.size() != 0) {
+                val = new int[values.size()];
+                for (int i = 0; i < values.size(); i++) val[i] = values.get(i);
+            }
+            context = alcCreateContext(device, val);
+            alcMakeContextCurrent(context);
             alCap = org.lwjgl.openal.AL.createCapabilities(alcCap);
             listener = new org.melchor629.engine.al.Listener(this);
             erasableList = new ArrayList<>();
-			AL._ctxs.put(Thread.currentThread(), this);
-		} catch(Exception e) {
-			ALError err = new ALError("Error creating context");
-			err.initCause(e);
-			throw err;
-		}
-	}
+            AL._ctxs.put(Thread.currentThread(), this);
+        } catch(Exception e) {
+            throw new ALError("Error creating context", e);
+        }
 
-	/* (non-Javadoc)
-	 * @see org.melchor629.engine.al.AL#destroyContext()
-	 */
+        System.out.println("ALC_FREQUENCY: " + alcGetInteger(device, ALC_FREQUENCY));
+        System.out.println("ALC_REFRESH: " + alcGetInteger(device, ALC_REFRESH));
+        System.out.println("ALC_SYNC: " + alcGetInteger(device, ALC_SYNC));
+        System.out.println("ALC_MONO_SOURCES: " + alcGetInteger(device, ALC_MONO_SOURCES));
+        System.out.println("ALC_STEREO_SOURCES: " + alcGetInteger(device, ALC_STEREO_SOURCES));
+        System.out.println("ALC_DEVICE_SPECIFIER: " + alcGetString(device, ALC_DEVICE_SPECIFIER));
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.al.AL#destroyContext()
+     */
 	@Override
 	public void destroyContext() {
 		if(context != 0) {
@@ -149,10 +213,15 @@ public class LWJGLAudio implements AL {
         alBufferData(buffer, format.e, sbuff, freq);
         MemoryUtil.memFree(sbuff);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.melchor629.engine.al.AL#bufferData(int, org.melchor629.engine.al.AL.Format, ByteBuffer, int)
-	 */
+
+    @Override
+    public void bufferData(int buffer, Format format, IntBuffer data, int freq) {
+        alBufferData(buffer, format.e, data, freq);
+    }
+
+    /* (non-Javadoc)
+     * @see org.melchor629.engine.al.AL#bufferData(int, org.melchor629.engine.al.AL.Format, ByteBuffer, int)
+     */
 	@Override
 	public void bufferData(int buffer, Format format, ByteBuffer data, int freq) {
 		if(!isBuffer(buffer))
