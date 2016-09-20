@@ -254,6 +254,34 @@ public class Camera implements OnKeyboardEvent, OnMouseMoveEvent, OnMouseClickEv
     }
 
     /**
+     * Sets the camera rotation to look at the direction {@code dir}
+     * @param dir direction to look at
+     */
+    public final void setLookingAt(Vector3 dir) {
+        this.dir.x(dir.x()).y(dir.y()).z(dir.z());
+        this.dir.normalize();
+        pitch = ((float) Math.toDegrees(Math.asin(this.dir.y())));
+        yaw = ((float) Math.toDegrees(Math.acos(this.dir.x() / Math.cos(Math.toRadians(pitch)))));
+        roll = 0;
+        needsUpdateView = true;
+    }
+
+    /**
+     * Sets the camera rotation to look at the direction {@code dir}
+     * @param x x coordinate of the direction to look at
+     * @param y y coordinate of the direction to look at
+     * @param z z coordinate of the direction to look at
+     */
+    public final void setLookingAt(float x, float y, float z) {
+        this.dir.x(x).y(y).z(z);
+        this.dir.normalize();
+        pitch = ((float) Math.toDegrees(Math.asin(this.dir.y())));
+        yaw = ((float) Math.toDegrees(Math.acos(this.dir.x() / Math.cos(Math.toRadians(pitch)))));
+        roll = 0;
+        needsUpdateView = true;
+    }
+
+    /**
      * Gets the calculated speed from the camera movement. Speed is calculated
      * everyframe with the difference between the last frame with the current.
      * @return speed of the camera
