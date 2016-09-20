@@ -210,6 +210,27 @@ public class ModelMatrix {
         matrix.setIdentity();
         return this;
     }
+
+    /**
+     * @return the current location
+     */
+    public Vector3 getLocation() {
+        return loc;
+    }
+
+    /**
+     * @return the current rotation (in radians)
+     */
+    public Vector3 getRotation() {
+        return rot;
+    }
+
+    /**
+     * @return the current scale
+     */
+    public Vector3 getScale() {
+        return scale;
+    }
     
     /**
      * Obtains the model matrix from the Location,
