@@ -63,7 +63,7 @@ public class AudioPCM implements AutoCloseable {
      * @return Sound data as Byte array (char*)
      */
     public ByteBuffer getDataAsByte() {
-        return Native.getDirectByteBuffer(pcmAddress, pcmSize);
+        return Native.getDirectByteBuffer(pcmAddress, pcmSize).order(ByteOrder.nativeOrder());
     }
 
     /**
