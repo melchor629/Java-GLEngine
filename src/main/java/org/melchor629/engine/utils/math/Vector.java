@@ -28,6 +28,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @throws IndexOutOfBoundsException if the coordinate is invalid
      */
     public Vector<T> setCoord(int n, T value) {
+        mod = null;
         return (Vector<T>) super.setCoord(n, value);
     }
 
@@ -39,6 +40,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @throws IllegalArgumentException if collection has less values than needed
      */
     public Vector<T> fillWithValues(Collection<T> values) {
+        mod = null;
         return (Vector<T>) super.fillWithValues(values);
     }
 
@@ -50,6 +52,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @throws IllegalArgumentException if collection has less values than needed
      */
     public Vector<T> fillWithValues(T... values) {
+        mod = null;
         return (Vector<T>) super.fillWithValues(values);
     }
 
@@ -61,6 +64,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @throws ArithmeticException if the number of coordinates mismatch
      */
     public Vector<T> add(Point<T> v) {
+        mod = null;
         return (Vector<T>) super.add(v);
     }
 
@@ -72,6 +76,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @throws ArithmeticException if the number of coordinates mismatch
      */
     public Vector<T> substract(Point<T> v) {
+        mod = null;
         return (Vector<T>) super.substract(v);
     }
 
@@ -82,6 +87,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @return itself
      */
     public Vector<T> product(T scalar) {
+        mod = null;
         return (Vector<T>) super.product(scalar);
     }
 
@@ -99,6 +105,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
             dot = ops.add(dot, ops.mul(getCoord(coord), v.getCoord(coord)));
         }
 
+        mod = null;
         return dot;
     }
 
@@ -169,6 +176,7 @@ public class Vector<T extends Number> extends Point<T> implements Cloneable {
      * @return itself
      */
     public Vector<T> apply(Function<T, T> func) {
+        mod = null;
         return (Vector<T>) super.apply(func);
     }
 

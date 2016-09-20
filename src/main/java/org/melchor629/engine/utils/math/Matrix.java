@@ -47,6 +47,7 @@ public class Matrix<T extends Number> implements Cloneable {
 
     protected void setvalueAt(int col, int row, T value) {
         storage[index(col, row)] = value;
+        det = null;
     }
 
     /**
@@ -75,6 +76,7 @@ public class Matrix<T extends Number> implements Cloneable {
         if(col > cols && row > rows || col < 0 || row < 0)
             throw new IndexOutOfBoundsException("Invalid index (" + col + "," + row + ")");
         storage[index(col, row)] = value;
+        det = null;
     }
 
     /**
@@ -117,6 +119,7 @@ public class Matrix<T extends Number> implements Cloneable {
             }
         }
 
+        det = null;
         return this;
     }
 
@@ -147,6 +150,7 @@ public class Matrix<T extends Number> implements Cloneable {
             }
         }
 
+        det = null;
         return this;
     }
 
@@ -173,6 +177,7 @@ public class Matrix<T extends Number> implements Cloneable {
             }
         }
 
+        det = null;
         return this;
     }
 
@@ -194,6 +199,7 @@ public class Matrix<T extends Number> implements Cloneable {
             }
         }
 
+        det = null;
         return this;
     }
 
@@ -215,6 +221,7 @@ public class Matrix<T extends Number> implements Cloneable {
             }
         }
 
+        det = null;
         return this;
     }
 
@@ -246,6 +253,7 @@ public class Matrix<T extends Number> implements Cloneable {
 
         System.arraycopy(tmpStorage, 0, storage, 0, storage.length);
 
+        det = null;
         return this;
     }
 
@@ -262,6 +270,7 @@ public class Matrix<T extends Number> implements Cloneable {
             }
         }
 
+        det = null;
         return this;
     }
 
@@ -292,6 +301,7 @@ public class Matrix<T extends Number> implements Cloneable {
         inv.transpose().multiply(ops.div(ops.convert(1), determinant()));
         System.arraycopy(inv.storage, 0, storage, 0, storage.length);
 
+        det = null;
         return this;
     }
 
@@ -355,6 +365,7 @@ public class Matrix<T extends Number> implements Cloneable {
         int tmp = cols;
         cols = rows;
         rows = tmp;
+        det = null;
         return this;
     }
 
@@ -415,6 +426,7 @@ public class Matrix<T extends Number> implements Cloneable {
                 setvalueAt(col, row, function.apply(valueAt(col, row)));
             }
         }
+        det = null;
         return this;
     }
 
@@ -473,6 +485,7 @@ public class Matrix<T extends Number> implements Cloneable {
             setValueAt(row, col, vector.getCoord(row));
         }
 
+        det = null;
         return this;
     }
 
@@ -494,6 +507,7 @@ public class Matrix<T extends Number> implements Cloneable {
             setValueAt(row, col, vector.getCoord(col));
         }
 
+        det = null;
         return this;
     }
 
@@ -510,9 +524,7 @@ public class Matrix<T extends Number> implements Cloneable {
             newOne.det = null;
             return newOne;
         } catch(CloneNotSupportedException e) {
-            RuntimeException r = new RuntimeException();
-            r.initCause(e);
-            throw r;
+            throw new RuntimeException(e);
         }
     }
 
